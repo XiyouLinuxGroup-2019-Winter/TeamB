@@ -6,6 +6,8 @@
 |:------|:------|
 |周子毅|[csdn](https://me.csdn.net/weixin_43204126)|
 |杨懿凡|[csdn](https://blog.csdn.net/qq_44049351)|
+|吴新悦|[csdn](https://blog.csdn.net/qq_44235467)|
+|杨思语|[csdn](https://blog.csdn.net/yangyanxi1216)|
 |刘裕基|[csdn](https://blog.csdn.net/humblehunger)|
 |李毅恒|[csdn](https://blog.csdn.net/bjzxlyh)|
 |刘田|[csdn](https://blog.csdn.net/weixin_45672701)|
