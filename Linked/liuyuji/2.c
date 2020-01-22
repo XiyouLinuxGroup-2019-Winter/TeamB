@@ -43,14 +43,13 @@ int main()
     do{
         printf("%d",operate->n);
         operate=operate->after;
-    }while(operate->after!=head);
-    printf("%d\n",operate->n);
+    }while(operate!=head);
+    printf("\n");
     operate=head->before;
     do{
         printf("%d",operate->n);
         operate=operate->before;
-    }while(operate!=head);
-    printf("%d",operate->n);
+    }while(operate!=head->before);
     operate=head;
     while(operate->after!=head){
         record=operate->after;
