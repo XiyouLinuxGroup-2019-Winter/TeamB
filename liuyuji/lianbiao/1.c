@@ -4,7 +4,7 @@ typedef struct node{
         int b;
         struct node* next;
     }Node;
-void main()
+int main()
 {
     int a;
     Node* head=NULL;
@@ -39,4 +39,5 @@ void main()
         free(operate);
         operate=record->next;
     }
+    return 0;
 }
