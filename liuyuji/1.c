@@ -8,5 +8,5 @@
 #include<stdio.h>
 int main()
 {
-    printf("%s","HellofhiufhsiushiuwWorld");
+    printf("%s","Hello  World");
 }
