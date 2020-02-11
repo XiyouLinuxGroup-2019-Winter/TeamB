@@ -20,7 +20,7 @@ int main()
         int v[n+1];
         int w[n+1];
         int dp[c+1];
-        memset(dp,0x3f3f3f,sizeof(dp));
+        memset(dp,0x3f3f3f3f,sizeof(dp));
         for(int i=1;i<=n;i++){
             scanf("%d %d",&v[i],&w[i]);
         }
@@ -32,7 +32,7 @@ int main()
                 dp[j]=min(dp[j],dp[j-w[i]]+v[i]);
             }
         }
-        if(dp[c]!=0x3f3f3f)
+        if(dp[c]!=0x3f3f3f3f)
         {
             printf("The minimum amount of money in the piggy-bank is %d.\n",dp[c]);
         }
