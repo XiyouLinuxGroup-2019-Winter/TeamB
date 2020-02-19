@@ -76,8 +76,16 @@ void input()
 		head = operate;
 	}
 	else{
-		record->next=operate;
+        if(record==NULL){record=operate;}
+        if(record != NULL){
+	    if(record->next != NULL){
+		while(record->next != NULL){
+		record=record->next;
+		}
+	    }
+        record->next=operate;
 	}
+    }
 	printf("请输入学生学号");
 	scanf("%s",operate->num);
 	printf("请输入学生姓名");
@@ -96,9 +104,13 @@ void input()
 	record=operate;
 	printf("是否继续输入？\n1.继续2.放弃\n");
 	scanf("%d",&n);
-		FILE* fp1=fopen("2.0","a");
-fprintf(fp1,"%-12s  %-12s  %-12s  %-12s  %-12s  %-12s  %-12s\n",operate->num,operate->name,operate->age,operate->sex,operate->bir,operate->place,operate->pn);
-		fclose(fp1);
+    sort();
+	FILE* fp1=fopen("2.0","w");
+        operate=head;
+	while(operate != NULL){
+        fprintf(fp1,"%-12s  %-12s  %-12s  %-12s  %-12s  %-12s  %-12s\n",operate->num,operate->name,operate->age,operate->sex,operate->bir,operate->place,operate->pn);
+        operate=operate->next;}
+        fclose(fp1); 
 	}while(n==1);
 }
 void look()
@@ -186,6 +198,7 @@ void modify()
 	printf("1.继续  2.放弃\n");
 	scanf("%d",&n);
 	}while(n==1);
+    sort();
 	FILE* fp1=fopen("2.0","w");
 	operate=head;
 	while(operate != NULL){
@@ -225,4 +238,48 @@ void fr()
 		free(operate);
 		operate=record->next;
 	}
+}
+void sort()
+{
+    //按学号排序
+    operate=head;
+    record=operate->next;
+    int i=0;
+    while(operate!=NULL){
+        i++;
+        operate=operate->next;
+    }
+    if(i!=1){
+    operate=head;
+    for(int j=1;j<=i;j++){
+        for(;record;){
+            if(atoi(operate->num) > atoi(record->num)){
+                char* a;
+                a=operate->num;
+                strcpy(operate->num,record->num);
+                strcpy(record->num,a);
+                a=operate->name;
+                strcpy(operate->name,record->name);
+                strcpy(record->name,a);
+                a=operate->age;
+                strcpy(operate->age,record->age);
+                strcpy(record->age,a);
+                a=operate->sex;
+                strcpy(operate->sex,record->sex);
+                strcpy(record->sex,a);
+                a=operate->bir;
+                strcpy(operate->bir,record->bir);
+                strcpy(record->bir,a);
+                a=operate->place;
+                strcpy(operate->place,record->place);
+                strcpy(record->place,a);
+                a=operate->pn;
+                strcpy(operate->pn,record->pn);
+                strcpy(record->pn,a);
+            }
+            operate=record;
+            record=operate->next;
+        }
+    }
+    }
 }
