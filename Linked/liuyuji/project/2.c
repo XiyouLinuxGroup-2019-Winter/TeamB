@@ -14,7 +14,7 @@ int main()
         inode.size=0;
         Head* p=&inode;
     while(1){
-        printf("请选择您的操作\n1.增加节点\n2.查看信息\n3.删除节点\n4.搜索节点\n5.修改节点\n6.退出\n");
+        printf("请选择您的操作\n1.增加节点\n2.查看信息\n3.删除节点\n4.搜索节点\n5.修改节点\n6.反转链表\n7.退出\n");
         int a;
         scanf("%d",&a);
         switch(a){
@@ -23,7 +23,8 @@ int main()
             case 3:del(p);break;
             case 4:find(p);break;
             case 5:change(p);break;
-            case 6:fr(p);break;
+            case 6:fanzhuan(p);break;
+            case 7:fr(p);break;
         }
     }
 }
@@ -139,4 +140,18 @@ void change(Head* p)
     scanf("%d",&temp);
     operate->data=temp;
     sort(p);
+}
+void fanzhuan(Head* p)
+{
+    Node *operate,*record;
+    operate=p->head;
+    for(int i=0;i<p->size;i++){
+        record=operate->next;
+        operate->next=operate->prev;
+        operate->prev=record;
+        operate=record;
+    }
+    record=p->head;
+    p->head=p->last;
+    p->last=record;
 }
