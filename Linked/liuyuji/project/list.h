@@ -27,5 +27,6 @@ void del(Head* p);
 Node* find(Head* p);
 void fr(Head* p);
 void change(Head* p);
+void fanzhuan(Head* p);
 
 #endif
