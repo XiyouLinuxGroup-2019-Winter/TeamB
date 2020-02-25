@@ -8,19 +8,19 @@
 #ifndef _MY_LS_H
 #define _MY_LS_H
 
-#include<stdlib.h>
-#include<string.h>
-#include<time.h>
-#include<sys/stat.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<Linux/limits.h>
-#include<dirent.h>
-#include<grp.h>
-#include<pwd.h>
-#include<errno.h>
-void print_finfo(struct stat buf,char *name);
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <linux/limits.h>
+#include <dirent.h>
+#include <grp.h>
+#include <pwd.h>
+#include <errno.h>
+void print_finfo(char *name);
 void print_fname(char *name);
-void my_err(const char *err_string,int line);
+void my_err();
 
 #endif
