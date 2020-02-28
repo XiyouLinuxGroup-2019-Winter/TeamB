@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include<stdio.h>//未完成！！！
-#include"my_ls.h"
+#include"my_ls.h"//这是一个已经放弃的代码
 int main(int argc,char *argv[])
 {
     if(argc==1){
