@@ -6,26 +6,7 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <linux/limits.h>
-#include <dirent.h>
-#include <grp.h>
-#include <pwd.h>
-#include <errno.h>
-//采用二进制思想解析参数
-#define PARAM_NONE 0
-#define PARAM_A 1
-#define PARAM_L 2
-#define PARAM_R 4
-#define MAXROWLEN 80
-int g_leave_len =MAXROWLEN;
-int g_maxlen;
+#include "my_ls.h"
 int main(int argc,char **argv)
 {
     int k=0;
@@ -33,7 +14,7 @@ int main(int argc,char **argv)
     char param[32];
     int flag_p=PARAM_NONE;
     //记录参数
-    for(int i=1,i<argc,i++){
+    for(int i=1;i<argc;i++){
         if(argv[i][0]=='-'){
             for(int j=0;j<strlen(argv[i]);j++){
                 param[k]=argv[i][j];
@@ -45,15 +26,15 @@ int main(int argc,char **argv)
     //将参数转化为数字标记
     for(int i=0;i<k;i++){
         if(param[i]=='a'){
-            flag_p[i]|=PARAM_A;
+            flag_p|=PARAM_A;
             continue;
         }
         else if(param[i]=='l'){
-            flag_p[i]|=PARAM_L;
+            flag_p|=PARAM_L;
             continue;
         }
         else if(param[i]=='R'){
-            flag_p[i]|=PARAM_R;
+            flag_p|=PARAM_R;
             continue;
         }
     }
@@ -66,13 +47,17 @@ int main(int argc,char **argv)
         display_dir(flag_p,path);
         return 0;
     }
+    //若参数中含有目录项
+    else{
+        
+    }
 }
 void display_dir(int flag_p,char *path)
 {
     //打开目录
     DIR *dir;
     if((dir=opendir(path))==NULL){
-        my_err("opendir",_LINE_);
+        my_err("opendir",__LINE__);
     }
     //获取该目录下文件总数和最长文件名的长度
     struct dirent *ptr;
@@ -88,7 +73,7 @@ void display_dir(int flag_p,char *path)
     char f_names[256][PATH_MAX+1];
     int path_len=strlen(path);
     if((dir=opendir(path))==NULL){
-        my_err("opendir",_LINE_);
+        my_err("opendir",__LINE__);
     } 
     for(int i=0;i<count;i++){
         ptr=readdir(dir);
@@ -99,10 +84,10 @@ void display_dir(int flag_p,char *path)
     }
     closedir(dir);
     //使用冒泡法对文件名排序
+    char temp[PATH_MAX+1];
     for(int i=0;i<count-1;i++){
-        for(int j=0;j<conut-1;j++){
+        for(int j=0;j<count-1-i;j++){
             if(strcmp(f_names[j],f_names[j+1])>0){
-                char temp[PATH_MAX+1];
                 strcpy(temp,f_names[j]);
                 temp[strlen(f_names[j])]=0;
                 strcpy(f_names[j],f_names[j+1]);
@@ -115,6 +100,9 @@ void display_dir(int flag_p,char *path)
     //遍历所有文件名并调用函数
     for(int i=0;i<count;i++){
         display(flag_p,f_names[i]);
+    }
+    if((flag_p & PARAM_L)==0){
+        printf("\n");
     }
 }
 void display(int flag,char *pathname)
@@ -133,38 +121,38 @@ void display(int flag,char *pathname)
     //获取文件信息并储存
     struct stat buf;
     if(lstat(name,&buf)==-1){
-        my_err("stat",_LINE_);
+        my_err("stat",__LINE__);
     }
     //根据命令参数调用不同函数打印文件信息
     switch(flag){
         case PARAM_NONE :
-            if(name(0)!='.'){
+            if(name[0]!='.'){
                 print_fname(name);
             }
             break;
         case PARAM_A :
             print_fname(name);
             break;
-        csae PARAM_L :
+        case PARAM_L :
             if(name[0]!='.'){
                 print_finfo(buf,name);
                 printf("  %-s\n",name);
             }
             break;
-        case PARAM_R :
+        case PARAM_R :break;
             
         case PARAM_A+PARAM_L :
             print_finfo(buf,name);
             printf("  %-s\n",name);
             break;
-        case PARAM_A+PARAM_R :
-        case PARAM_L+PARAM_R :
-        case PARAM_A+PARAM_L+PARAM_R :
+        case PARAM_A+PARAM_R :break;
+        case PARAM_L+PARAM_R :break;
+        case PARAM_A+PARAM_L+PARAM_R :break;
     }
 }
 void print_fname(char *name)
 {
-    //判断如果本行是否有空间打印
+    //判断如果本行是否有充足空间打印
     if(g_leave_len<g_maxlen){
         printf("\n");
         g_leave_len=MAXROWLEN;
@@ -181,5 +169,86 @@ void print_fname(char *name)
 }
 void print_finfo(struct stat buf,char *name)
 {
-    
+    //打印文件类型和文件访问权限
+    if(S_ISLNK(buf.st_mode)){
+        printf("l");
+    }else if(S_ISREG(buf.st_mode)){
+        printf("-");
+    }else if(S_ISDIR(buf.st_mode)){
+        printf("d");
+    }else if(S_ISCHR(buf.st_mode)){
+        printf("c");
+    }else if(S_ISBLK(buf.st_mode)){
+        printf("b");
+    }else if(S_ISFIFO(buf.st_mode)){
+        printf("f");
+    }else if(S_ISSOCK(buf.st_mode)){
+        printf("s");
+    }
+    if(buf.st_mode&S_IRUSR){
+        printf("r");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IWUSR){
+        printf("w");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IXUSR){
+        printf("x");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IRGRP){
+        printf("r");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IWGRP){
+        printf("w");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IXGRP){
+        printf("x");
+    }else{
+        printf("-");
+    }
+        if(buf.st_mode&S_IROTH){
+        printf("r");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IWOTH){
+        printf("w");
+    }else{
+        printf("-");
+    }
+    if(buf.st_mode&S_IXOTH){
+        printf("x");
+    }else{
+        printf("-");
+    }
+    printf("  ");
+    //打印硬链接数
+    printf("%4ld ",buf.st_nlink);
+    //打印文件所有者以及所在组
+    struct passwd *psd=psd=getpwuid(buf.st_uid);//id转为名字
+    struct group *grp=getgrgid(buf.st_gid);
+    printf("%-8s",psd->pw_name);
+    printf("%-8s",grp->gr_name);
+    //打印文件大小
+    printf("%6ld",buf.st_size);
+    //打印文件创建时间
+    char buf_time[32];
+    strcpy(buf_time,ctime(&buf.st_mtime));
+    buf_time[strlen(buf_time)-1]=0;
+    printf("   %s",buf_time);
+}
+void my_err(const char *str,int line)
+{
+    fprintf(stderr,"line:%d",line);
+    perror(str);
+    exit(1);
 }
