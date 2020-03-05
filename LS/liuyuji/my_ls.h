@@ -33,5 +33,6 @@ void display(int flag,char *pathname);
 void print_fname(char *name);
 void print_finfo(struct stat buf,char *name);
 void my_err(const char *str,int line);
+void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1]);
 
 #endif

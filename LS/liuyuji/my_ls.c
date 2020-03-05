@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include "my_ls.h"
-int main(int argc,char **argv)
+int main(int argc,char *argv[])
 {
     int k=0;
     int num=0;
@@ -16,7 +16,7 @@ int main(int argc,char **argv)
     //记录参数
     for(int i=1;i<argc;i++){
         if(argv[i][0]=='-'){
-            for(int j=0;j<strlen(argv[i]);j++){
+            for(int j=1;j<strlen(argv[i]);j++){
                 param[k]=argv[i][j];
                 k++;
             }
@@ -28,14 +28,14 @@ int main(int argc,char **argv)
         if(param[i]=='a'){
             flag_p|=PARAM_A;
             continue;
-        }
-        else if(param[i]=='l'){
+        }else if(param[i]=='l'){
             flag_p|=PARAM_L;
             continue;
-        }
-        else if(param[i]=='R'){
+        }else if(param[i]=='R'){
             flag_p|=PARAM_R;
             continue;
+        }else{
+            printf("参数错误");
         }
     }
     param[k]=0;
@@ -97,9 +97,37 @@ void display_dir(int flag_p,char *path)
             }
         }
     }
-    //遍历所有文件名并调用函数
+    if((dir=opendir(path))==NULL){
+        my_err("opendir",__LINE__);
+    }
+    //遍历记录此目录中包含的目录文件并调用函数打印文件
+    char dirs[256][PATH_MAX+1];
+    int j=0;
     for(int i=0;i<count;i++){
+        ptr=readdir(dir);
+        struct stat buf;
+        memset(&buf,0,sizeof(buf));
+        if(lstat(ptr->d_name,&buf)==-1){
+            my_err("lstat",__LINE__);
+        }
+        if(S_ISDIR(buf.st_mode)){
+            if(ptr->d_name[0]!='.'){
+                strcpy(dirs[j],f_names[i]);
+                if(dirs[j][strlen(dirs[j])-1]!='/'){
+                    dirs[j][strlen(dirs[j])]='/';
+                    dirs[j][strlen(dirs[j])+1]=0;
+                }
+                j++;
+            }
+        }
         display(flag_p,f_names[i]);
+    }
+    closedir(dir);
+    //若参数中有-R选项
+    if((flag_p & PARAM_R)!=0){
+        for(int i=0;i<j;i++){
+            display_Subdir(flag_p,j,dirs);
+        }
     }
     if((flag_p & PARAM_L)==0){
         printf("\n");
@@ -139,15 +167,29 @@ void display(int flag,char *pathname)
                 printf("  %-s\n",name);
             }
             break;
-        case PARAM_R :break;
+        case PARAM_R :
+            if(name[0]!='.'){
+                print_fname(name);
+            }
+            break;
             
         case PARAM_A+PARAM_L :
             print_finfo(buf,name);
             printf("  %-s\n",name);
             break;
-        case PARAM_A+PARAM_R :break;
-        case PARAM_L+PARAM_R :break;
-        case PARAM_A+PARAM_L+PARAM_R :break;
+        case PARAM_A+PARAM_R :
+            print_fname(name);
+            break;
+        case PARAM_L+PARAM_R :
+            if(name[0]!='.'){
+                print_finfo(buf,name);
+                printf("  %-s\n",name);
+            }
+            break;
+        case PARAM_A+PARAM_L+PARAM_R :
+            print_finfo(buf,name);
+            printf("  %-s\n",name);
+            break;
     }
 }
 void print_fname(char *name)
@@ -245,6 +287,13 @@ void print_finfo(struct stat buf,char *name)
     strcpy(buf_time,ctime(&buf.st_mtime));
     buf_time[strlen(buf_time)-1]=0;
     printf("   %s",buf_time);
+}
+void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1])
+{
+    for(int i=0;i<j;i++){
+        printf("%s:\n",dirs[i]);
+        display_dir(flag_p,dirs[i]);
+    }
 }
 void my_err(const char *str,int line)
 {
