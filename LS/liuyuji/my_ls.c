@@ -131,7 +131,7 @@ void display_dir(int flag_p,char *path)
     struct stat buf;
     int j=0;
     //若有-R选项先打印路径名
-    if((flag_p & PARAM_R)!=0 && p==0){
+    if((flag_p & PARAM_R)!=0){
         printf("%s:\n",path);
     }
     g_leave_len=MAXROWLEN;
