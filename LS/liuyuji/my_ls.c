@@ -45,6 +45,9 @@ int main(int argc,char *argv[])
         strcpy(path,"./");
         path[2]=0;
         display_dir(flag_p,path);
+        if((flag_p & PARAM_R)!=0){
+            printf("\n");
+        }
         return 0;
     }
     //若参数中含有目录项
@@ -73,6 +76,9 @@ int main(int argc,char *argv[])
             i++;
         }
     }while(i<argc);
+    if((flag_p & PARAM_R)!=0){
+        printf("\n");
+    }
     return 0;
 }
 void display_dir(int flag_p,char *path)
@@ -124,7 +130,7 @@ void display_dir(int flag_p,char *path)
     char dirs[256][PATH_MAX+1];
     struct stat buf;
     int j=0;
-    //若有-R选项先打印一次路径名
+    //若有-R选项先打印路径名
     if((flag_p & PARAM_R)!=0 && p==0){
         printf("%s:\n",path);
     }
@@ -168,7 +174,7 @@ void display_dir(int flag_p,char *path)
             display_Subdir(flag_p,j,dirs);
         }
     }
-    if((flag_p & PARAM_L)==0){
+    if((flag_p & PARAM_L)==0 && (flag_p & PARAM_R)==0){
         printf("\n");
     }
 }
