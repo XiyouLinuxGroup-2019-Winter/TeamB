@@ -120,23 +120,37 @@ void display_dir(int flag_p,char *path)
             }
         }
     }
-    if((dir=opendir(path))==NULL){
-        my_err("opendir",__LINE__);
-    }
-    //遍历记录此目录中包含的目录文件并调用函数打印文件
+    //遍历并调用函数打印文件
     char dirs[256][PATH_MAX+1];
-    ptr=NULL;
     struct stat buf;
     int j=0;
+    //若有-R选项先打印一次路径名
+    if((flag_p & PARAM_R)!=0 && p==0){
+        printf("%s:\n",path);
+    }
+    g_leave_len=MAXROWLEN;
     for(int i=0;i<count;i++){
+        //如果参数含有-R选项
         if((flag_p & PARAM_R)!=0){
-            ptr=readdir(dir);
+            //获取文件名
+            int k=0;
+            char name[NAME_MAX+1];
+            for(int a=0;a<strlen(f_names[i]);a++){
+                if(f_names[i][a]=='/'){
+                    k=0;
+                    continue;
+                }
+                name[k]=f_names[i][a];
+                k++;
+            }
+            name[k]=0;
+            //记录目录文件
             memset(&buf,0,sizeof(buf));
-            if(lstat(ptr->d_name,&buf)==-1){
+            if(lstat(f_names[i],&buf)==-1){
                 my_err("lstat",__LINE__);
             }
             if(S_ISDIR(buf.st_mode)){
-                if(ptr->d_name[0]!='.'){
+                if(name[0]!='.'){
                     strcpy(dirs[j],f_names[i]);
                     if(dirs[j][strlen(dirs[j])-1]!='/'){
                         dirs[j][strlen(dirs[j])]='/';
@@ -148,7 +162,6 @@ void display_dir(int flag_p,char *path)
         }
         display(flag_p,f_names[i]);
     }
-    closedir(dir);
     //若参数中有-R选项
     if((flag_p & PARAM_R)!=0){
         for(int i=0;i<j;i++){
@@ -198,7 +211,6 @@ void display(int flag,char *pathname)
                 print_fname(name);
             }
             break;
-            
         case PARAM_A+PARAM_L :
             print_finfo(buf,name);
             printf("  %-s\n",name);
@@ -317,7 +329,9 @@ void print_finfo(struct stat buf,char *name)
 void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1])
 {
     for(int i=0;i<j;i++){
-        printf("%s:\n",dirs[i]);
+        if((flag_p & PARAM_L)==0){
+            printf("\n");
+        }
         display_dir(flag_p,dirs[i]);
     }
 }
