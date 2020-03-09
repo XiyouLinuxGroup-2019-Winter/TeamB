@@ -48,32 +48,32 @@ int main(int argc,char *argv[])
         return 0;
     }
     //若参数中含有目录项
+    struct stat buf;
     int i=1;
-    struct stat buf;    
-    do{
-        if(argv[i][0]=='-'){
-            i++;
-            continue;
-        }else{
-            strcpy(path,argv[i]);
-        }
-        if(stat(path,&buf)==-1)
-            my_err("stat",__LINE__);
-        if(S_ISDIR(buf.st_mode)){
-            if(path[strlen(argv[i])-1]!='/'){
-                path[strlen(argv[i])]='/';
-                path[strlen(argv[i])+1]='\0';
-            }else
-                path[strlen(argv[i])]='\0';
-            display_dir(flag_p,path);
-            i++;
-         }
-        else{
-            display(flag_p,path);
-            i++;
-        }
-    }while(i<argc);
-    return 0;
+        do{
+            if(argv[i][0]=='-'){
+                i++;
+                continue;
+            }else{
+                strcpy(path,argv[i]);
+            }
+            if(stat(path,&buf)==-1)
+                my_err("stat",__LINE__);
+            if(S_ISDIR(buf.st_mode)){
+                if(path[strlen(argv[i])-1]!='/'){
+                    path[strlen(argv[i])]='/';
+                    path[strlen(argv[i])+1]='\0';
+                }else
+                    path[strlen(argv[i])]='\0';
+                display_dir(flag_p,path);
+                i++;
+            }
+            else{
+                display(flag_p,path);
+                i++;
+            }
+        }while(i<argc);
+        return 0;
 }
 void display_dir(int flag_p,char *path)
 {
@@ -129,21 +129,19 @@ void display_dir(int flag_p,char *path)
     struct stat buf;
     int j=0;
     for(int i=0;i<count;i++){
-        if((flag_p & PARAM_R)!=0){
-            ptr=readdir(dir);
-            memset(&buf,0,sizeof(buf));
-            if(lstat(ptr->d_name,&buf)==-1){
-                my_err("lstat",__LINE__);
-            }
-            if(S_ISDIR(buf.st_mode)){
-                if(ptr->d_name[0]!='.'){
-                    strcpy(dirs[j],f_names[i]);
-                    if(dirs[j][strlen(dirs[j])-1]!='/'){
-                        dirs[j][strlen(dirs[j])]='/';
-                        dirs[j][strlen(dirs[j])+1]=0;
-                    }
-                    j++;
+        ptr=readdir(dir);
+        memset(&buf,0,sizeof(buf));
+        if(lstat(ptr->d_name,&buf)==-1){
+            my_err("lstat",__LINE__);
+        }
+        if(S_ISDIR(buf.st_mode)){
+            if(ptr->d_name[0]!='.'){
+                strcpy(dirs[j],f_names[i]);
+                if(dirs[j][strlen(dirs[j])-1]!='/'){
+                    dirs[j][strlen(dirs[j])]='/';
+                    dirs[j][strlen(dirs[j])+1]=0;
                 }
+                j++;
             }
         }
         display(flag_p,f_names[i]);
@@ -174,8 +172,8 @@ void display(int flag,char *pathname)
     name[j]=0;
     //获取文件信息并储存
     struct stat buf;
-    if(lstat(pathname,&buf)==-1){
-        my_err("lstat",__LINE__);
+    if(lstat(name,&buf)==-1){
+        my_err("stat",__LINE__);
     }
     //根据命令参数调用不同函数打印文件信息
     switch(flag){
@@ -317,7 +315,7 @@ void print_finfo(struct stat buf,char *name)
 void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1])
 {
     for(int i=0;i<j;i++){
-        printf("%s:\n",dirs[i]);
+        printf("\n%s:\n",dirs[i]);
         display_dir(flag_p,dirs[i]);
     }
 }
