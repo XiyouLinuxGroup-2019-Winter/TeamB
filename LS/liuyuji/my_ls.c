@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
         strcpy(path,"./");
         path[2]=0;
         display_dir(flag_p,path);
-        if((flag_p & PARAM_R)!=0){
+        if((flag_p & PARAM_R)!=0 && (flag_p & PARAM_L)==0){
             printf("\n");
         }
         return 0;
@@ -76,7 +76,7 @@ int main(int argc,char *argv[])
             i++;
         }
     }while(i<argc);
-    if((flag_p & PARAM_R)!=0){
+    if((flag_p & PARAM_R)!=0 && (flag_p & PARAM_L)==0){
         printf("\n");
     }
     return 0;

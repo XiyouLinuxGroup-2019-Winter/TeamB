@@ -25,7 +25,7 @@
 #define PARAM_A 1
 #define PARAM_L 2
 #define PARAM_R 4
-#define MAXROWLEN 80
+#define MAXROWLEN 200
 int g_leave_len =MAXROWLEN;
 int g_maxlen;
 void display_dir(int flag_p,char *path);
