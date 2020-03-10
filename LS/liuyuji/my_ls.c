@@ -170,9 +170,7 @@ void display_dir(int flag_p,char *path)
     }
     //若参数中有-R选项
     if((flag_p & PARAM_R)!=0){
-        for(int i=0;i<j;i++){
             display_Subdir(flag_p,j,dirs);
-        }
     }
     if((flag_p & PARAM_L)==0 && (flag_p & PARAM_R)==0){
         printf("\n");
