@@ -72,7 +72,7 @@ int main(int argc,char *argv[])
             i++;
          }
         else{
-            display(flag_p,path);
+            display(flag_p,path,0);
             i++;
         }
     }while(i<argc);
@@ -134,6 +134,7 @@ void display_dir(int flag_p,char *path)
     if((flag_p & PARAM_R)!=0){
         printf("%s:\n",path);
     }
+    //将行剩余空间设置为最大值
     g_leave_len=MAXROWLEN;
     for(int i=0;i<count;i++){
         //如果参数含有-R选项
@@ -166,7 +167,12 @@ void display_dir(int flag_p,char *path)
                 }
             }
         }
-        display(flag_p,f_names[i]);
+        memset(&buf,0,sizeof(buf));
+        if(lstat(f_names[i],&buf)==-1){
+            my_err("lstat",__LINE__);
+        }
+        int color=display_color(buf);
+        display(flag_p,f_names[i],color);
     }
     //若参数中有-R选项
     if((flag_p & PARAM_R)!=0){
@@ -176,7 +182,7 @@ void display_dir(int flag_p,char *path)
         printf("\n");
     }
 }
-void display(int flag,char *pathname)
+void display(int flag,char *pathname,int color)
 {
     //从路径名中解析出文件名
     int j=0;
@@ -198,52 +204,60 @@ void display(int flag,char *pathname)
     switch(flag){
         case PARAM_NONE :
             if(name[0]!='.'){
-                print_fname(name);
+                print_fname(name,color);
             }
             break;
         case PARAM_A :
-            print_fname(name);
+            print_fname(name,color);
             break;
         case PARAM_L :
             if(name[0]!='.'){
                 print_finfo(buf,name);
-                printf("  %-s\n",name);
+                printf("  ");
+                print_color(name,color);
+                printf("\n");
             }
             break;
         case PARAM_R :
             if(name[0]!='.'){
-                print_fname(name);
+                print_fname(name,color);
             }
             break;
         case PARAM_A+PARAM_L :
             print_finfo(buf,name);
-            printf("  %-s\n",name);
+            printf("  ");
+            print_color(name,color);
+            printf("\n");
             break;
         case PARAM_A+PARAM_R :
-            print_fname(name);
+            print_fname(name,color);
             break;
         case PARAM_L+PARAM_R :
             if(name[0]!='.'){
                 print_finfo(buf,name);
-                printf("  %-s\n",name);
+                printf("  ");
+                print_color(name,color);
+                printf("\n");
             }
             break;
         case PARAM_A+PARAM_L+PARAM_R :
             print_finfo(buf,name);
-            printf("  %-s\n",name);
+            printf("  ");
+            print_color(name,color);
+            printf("\n");
             break;
     }
 }
-void print_fname(char *name)
+void print_fname(char *name,int color)
 {
-    //判断如果本行是否有充足空间打印
+    //判断本行是否有充足空间打印
     if(g_leave_len<g_maxlen){
         printf("\n");
         g_leave_len=MAXROWLEN;
     }
-    //对齐得输出
+    //对齐输出
     int len=g_maxlen-strlen(name);
-    printf("%s",name);
+    print_color(name,color);
     for(int i=0;i<len;i++){
         printf(" ");
     }
@@ -337,6 +351,27 @@ void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1])
             printf("\n");
         }
         display_dir(flag_p,dirs[i]);
+    }
+}
+int display_color(struct stat buf)
+{
+    int color=0;
+    if(S_ISDIR(buf.st_mode)) {
+        color = BLUE;
+    }
+    if((buf.st_mode & S_IXUSR) && color != BLUE) {
+        color = GREEN;
+    }
+    return color;
+}
+void print_color(char *name,int color)
+{
+    if(color == GREEN) {
+        printf("\033[1m\033[32m%-s\033[0m",name);
+    } else if(color == BLUE){
+        printf("\033[1m\033[34m%-s\033[0m",name);
+    } else if(color == NORMAL){
+        printf("%-s",name);
     }
 }
 void my_err(const char *str,int line)
