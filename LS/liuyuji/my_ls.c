@@ -4,7 +4,6 @@
 	> Mail: 
 	> Created Time: 2020年02月29日 星期六 19时49分53秒
  ************************************************************************/
-
 #include <stdio.h>
 #include "my_ls.h"
 int main(int argc,char *argv[])
@@ -33,6 +32,9 @@ int main(int argc,char *argv[])
             continue;
         }else if(param[i]=='R'){
             flag_p|=PARAM_R;
+            continue;
+        }else if(param[i]=='r'){
+            flag_p|=PARAM_r;
             continue;
         }else{
             printf("参数错误");
@@ -136,43 +138,85 @@ void display_dir(int flag_p,char *path)
     }
     //将行剩余空间设置为最大值
     g_leave_len=MAXROWLEN;
-    for(int i=0;i<count;i++){
-        //如果参数含有-R选项
-        if((flag_p & PARAM_R)!=0){
-            //获取文件名
-            int k=0;
-            char name[NAME_MAX+1];
-            for(int a=0;a<strlen(f_names[i]);a++){
-                if(f_names[i][a]=='/'){
-                    k=0;
-                    continue;
+    if((flag_p & PARAM_r)==0){
+        for(int i=0;i<count;i++){
+            //如果参数含有-R选项
+            if((flag_p & PARAM_R)!=0){
+                //获取文件名
+                int k=0;
+                char name[NAME_MAX+1];
+                for(int a=0;a<strlen(f_names[i]);a++){
+                    if(f_names[i][a]=='/'){
+                        k=0;
+                        continue;
+                    }
+                    name[k]=f_names[i][a];
+                    k++;
                 }
-                name[k]=f_names[i][a];
-                k++;
+                name[k]=0;
+                //记录目录文件
+                memset(&buf,0,sizeof(buf));
+                if(lstat(f_names[i],&buf)==-1){
+                    my_err("lstat",__LINE__);
+                }
+                if(S_ISDIR(buf.st_mode)){
+                    if(name[0]!='.'){
+                        strcpy(dirs[j],f_names[i]);
+                        if(dirs[j][strlen(dirs[j])-1]!='/'){
+                            dirs[j][strlen(dirs[j])]='/';
+                            dirs[j][strlen(dirs[j])+1]=0;
+                        }
+                        j++;
+                    }
+                }
             }
-            name[k]=0;
-            //记录目录文件
             memset(&buf,0,sizeof(buf));
             if(lstat(f_names[i],&buf)==-1){
                 my_err("lstat",__LINE__);
             }
-            if(S_ISDIR(buf.st_mode)){
-                if(name[0]!='.'){
-                    strcpy(dirs[j],f_names[i]);
-                    if(dirs[j][strlen(dirs[j])-1]!='/'){
-                        dirs[j][strlen(dirs[j])]='/';
-                        dirs[j][strlen(dirs[j])+1]=0;
+            int color=display_color(buf);
+            display(flag_p,f_names[i],color);
+        }
+    }
+    if((flag_p & PARAM_r)!=0){
+        for(int i=count-1;i>=0;i--){
+            //如果参数含有-R选项
+            if((flag_p & PARAM_R)!=0){
+                //获取文件名
+                int k=0;
+                char name[NAME_MAX+1];
+                for(int a=0;a<strlen(f_names[i]);a++){
+                    if(f_names[i][a]=='/'){
+                        k=0;
+                        continue;
                     }
-                    j++;
+                    name[k]=f_names[i][a];
+                    k++;
+                }
+                name[k]=0;
+                //记录目录文件
+                memset(&buf,0,sizeof(buf));
+                if(lstat(f_names[i],&buf)==-1){
+                    my_err("lstat",__LINE__);
+                }
+                if(S_ISDIR(buf.st_mode)){
+                    if(name[0]!='.'){
+                        strcpy(dirs[j],f_names[i]);
+                        if(dirs[j][strlen(dirs[j])-1]!='/'){
+                            dirs[j][strlen(dirs[j])]='/';
+                            dirs[j][strlen(dirs[j])+1]=0;
+                        }
+                        j++;
+                    }
                 }
             }
+            memset(&buf,0,sizeof(buf));
+            if(lstat(f_names[i],&buf)==-1){
+                my_err("lstat",__LINE__);
+            }
+            int color=display_color(buf);
+            display(flag_p,f_names[i],color);
         }
-        memset(&buf,0,sizeof(buf));
-        if(lstat(f_names[i],&buf)==-1){
-            my_err("lstat",__LINE__);
-        }
-        int color=display_color(buf);
-        display(flag_p,f_names[i],color);
     }
     //若参数中有-R选项
     if((flag_p & PARAM_R)!=0){
@@ -201,6 +245,7 @@ void display(int flag,char *pathname,int color)
         my_err("lstat",__LINE__);
     }
     //根据命令参数调用不同函数打印文件信息
+    flag=flag & (~PARAM_r);
     switch(flag){
         case PARAM_NONE :
             if(name[0]!='.'){

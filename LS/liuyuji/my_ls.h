@@ -25,6 +25,7 @@
 #define PARAM_A 1
 #define PARAM_L 2
 #define PARAM_R 4
+#define PARAM_r 8
 #define MAXROWLEN 200
 #define NORMAL 0
 #define GREEN  1 
