@@ -99,9 +99,16 @@ void display_dir(int flag_p,char *path)
         }
         count++;
     }
+    if(count>20000){
+        my_err("too many files under this directory",__LINE__);
+    }
     closedir(dir);
     //获取该目录下所有文件名并与其路径名储存
-    char f_names[256][PATH_MAX+1];
+    char **f_names;
+    f_names=(char **)malloc(sizeof(char *)*20000);
+    for(int i=0;i<20000;i++){
+        f_names[i]=(char *)malloc(PATH_MAX+1);
+    }
     int path_len=strlen(path);
     if((dir=opendir(path))==NULL){
         my_err("opendir",__LINE__);
@@ -129,7 +136,11 @@ void display_dir(int flag_p,char *path)
         }
     }
     //遍历并调用函数打印文件
-    char dirs[256][PATH_MAX+1];
+    char **dirs;
+    dirs=(char **)malloc(sizeof(char *)*20000);
+    for(int i=0;i<20000;i++){
+        dirs[i]=(char *)malloc(PATH_MAX+1);
+    }
     struct stat buf;
     int j=0;
     //若有-R选项先打印路径名
@@ -225,6 +236,8 @@ void display_dir(int flag_p,char *path)
     if((flag_p & PARAM_L)==0 && (flag_p & PARAM_R)==0){
         printf("\n");
     }
+    free(f_names);
+    free(dirs);
 }
 void display(int flag,char *pathname,int color)
 {
@@ -389,7 +402,7 @@ void print_finfo(struct stat buf,char *name)
     buf_time[strlen(buf_time)-1]=0;
     printf("   %s",buf_time);
 }
-void display_Subdir(int flag_p,int j,char (*dirs)[PATH_MAX+1])
+void display_Subdir(int flag_p,int j,char **dirs)
 {
     for(int i=0;i<j;i++){
         if((flag_p & PARAM_L)==0){
