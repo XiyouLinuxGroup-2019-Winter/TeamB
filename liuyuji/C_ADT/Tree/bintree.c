@@ -46,6 +46,9 @@ int main()
                 printf("不存在");
             }
         }else if(chose==4){
+            if(tree.root==NULL){
+                printf("当前树为空树");
+            }
             Display_tree(tree.root);
         }else if(chose==5){
             Del_tree(&tree);
@@ -139,10 +142,12 @@ int Del_node(int date,Tree *ptree)
     Treenode *operate,*record,*parent,*temp;
     parent=ptree->root;
     operate=ptree->root;
+    record=NULL;
     //调用Find_node函数寻找节点，并记录下节点与其父节点地址
     Find_node(date,operate,&record,&parent);
     if(record==NULL){
         printf("找不到此数据\n");
+        return 0;
     }
     else{
         if(record==ptree->root){//节点为树根
