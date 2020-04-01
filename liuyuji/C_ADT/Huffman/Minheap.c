@@ -1,14 +1,15 @@
 /*************************************************************************
-	> File Name: Maxheap.c
+	> File Name: Minheap.c
 	> Author: 
 	> Mail: 
-	> Created Time: 2020年03月28日 星期六 21时49分10秒
+	> Created Time: 2020年04月01日 星期三 20时16分40秒
  ************************************************************************/
-//最大堆
+
+#include<stdio.h>
 #include<stdio.h>
 #include<stdlib.h>
 typedef struct heaphead{
-    int *Date;
+    Treenode **Date;
     int Num;
     int max;
 }Heap;
@@ -33,29 +34,29 @@ int full(Heap *heap)
 Heap *creatheap(int max)
 {
     Heap *heap=(Heap *)malloc(sizeof(Heap));
-    heap->Date=(int *)malloc(sizeof(int)*(max+1));
+    heap->Date=(Treenode *)malloc(sizeof(Treenode)*(max+1));
     if(heap==NULL){
         printf("malloc %d",__LINE__);
         exit(1);
     }
     heap->Num=0;
-    heap->Date[0]=0x3f3f3f3f;
+    heap->Date[0]=NULL;
     heap->max=max;
     return heap;
 }
-int insert(Heap *heap,int date)
+int insert(Heap *heap,Treenode *node)
 {
     if(full(heap)==1){
         printf("输入失败堆已满\n");
         return 0;
     }
     int num=heap->Num++;
-    heap->Date[++num]=date;
+    heap->Date[++num]=node;
     if(num==1){
         return 0;
     }
-    while(heap->Date[num]>heap->Date[num/2]){
-        int temp;
+    while(heap->Date[num]->weight<heap->Date[num/2]->weight){
+        Treenode *temp;
         temp=heap->Date[num/2];
         heap->Date[num/2]=heap->Date[num];
         heap->Date[num]=temp;
@@ -65,21 +66,21 @@ int insert(Heap *heap,int date)
         }
     }
 }
-int del(Heap *heap)
+Treenode *del(Heap *heap)
 {
     if(empty(heap)==1){
         printf("堆为空\n");
         return 0;
     }
-    int Maxdate=heap->Date[1];
-    int temp=heap->Date[heap->Num--];
+    Treenode *Mindate=heap->Date[1];
+    Treenode *temp=heap->Date[heap->Num--];
     int parent,child;
     for( parent=1; parent*2<=heap->Num; parent=child){
         child=parent*2;
-        if((child!=heap->Num) && (heap->Date[child]<heap->Date[child+1])){
+        if((child!=heap->Num) && (heap->Date[child]->weight>heap->Date[child+1]->weight)){
             child++;
         }
-        if(temp>=heap->Date[child]){
+        if(temp->weight<=heap->Date[child]->weight){
             break;
         }
         else{
@@ -87,6 +88,5 @@ int del(Heap *heap)
         }
     }
     heap->Date[parent]=temp;
-    return Maxdate;
+    return Mindate;
 }
-
