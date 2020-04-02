@@ -58,20 +58,14 @@ int insert(Heap *heap,Treenode *node)
         printf("输入失败堆已满\n");
         return 0;
     }
-    int num=heap->Num++;
-    heap->Date[++num]=node;
-    if(num==1){
-        return 0;
-    }
-    while(heap->Date[num]->weight<heap->Date[num/2]->weight){
+    int num=++heap->Num;
+    heap->Date[num]=node;
+    while(num!=1 && heap->Date[num]->weight<heap->Date[num/2]->weight){
         Treenode *temp;
         temp=heap->Date[num/2];
         heap->Date[num/2]=heap->Date[num];
         heap->Date[num]=temp;
-        num/=2;
-        if(num==1){
-            break;
-        }
+        num=num/2;
     }
 }
 Treenode *del(Heap *heap)
@@ -108,11 +102,11 @@ Huffman *creat_huffman(int num)
 Treenode *Build_huffman(Heap *heap)//有bug
 {
     Treenode *node;
-    for(int i=0;i<heap->Num;i++){
+    for(int i=0;i<heap->max;i++){
         node=(Treenode *)malloc(sizeof(Treenode));
         node->left=del(heap);
         node->right=del(heap);
-        node->weight=node->left->weight+node->left->weight;
+        node->weight=node->left->weight+node->right->weight;
         insert(heap,node);
     }
     node=del(heap);
@@ -129,7 +123,7 @@ void Display_huffman(Treenode *node)
 }
 void free_heap(Heap *heap)
 {
-    for(int i=0;i<heap->Num;i++){
+    for(int i=0;i<heap->max;i++){
         free(heap->Date[i]);
     }
     free(heap->Date);

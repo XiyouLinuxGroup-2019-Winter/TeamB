@@ -89,4 +89,32 @@ int del(Heap *heap)
     heap->Date[parent]=temp;
     return Maxdate;
 }
-
+int main(char argc,char **argv)
+{
+    int max,date;
+    printf("输入堆的大小\n");
+    scanf("%d",&max);
+    Heap *heap=creatheap(max);
+    while(1){
+        printf("1.入堆\n2.出堆\n3.退出\n");
+        int chose;
+        scanf("%d",&chose);
+        switch(chose){
+            case 1:
+                printf("输入数据\n");
+                scanf("%d",&date);
+                insert(heap,date);
+                break;
+            case 2:
+                date=del(heap);
+            if(date!=0){
+                printf("%d\n",date);
+            }
+                break;
+            case 3:
+                free(heap->Date);
+                free(heap);
+                exit(0);
+        }
+    }
+}
