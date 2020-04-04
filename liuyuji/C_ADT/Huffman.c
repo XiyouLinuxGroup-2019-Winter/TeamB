@@ -102,11 +102,13 @@ Huffman *creat_huffman(int num)
 Treenode *Build_huffman(Heap *heap)//有bug
 {
     Treenode *node;
-    for(int i=0;i<heap->max;i++){
+    for(int i=1;i<heap->max;i++){
         node=(Treenode *)malloc(sizeof(Treenode));
         node->left=del(heap);
         node->right=del(heap);
+        printf("第%d次合并%d,%d",i,node->left->weight,node->right->weight);
         node->weight=node->left->weight+node->right->weight;
+        printf("成为%d\n",node->weight);
         insert(heap,node);
     }
     node=del(heap);
@@ -155,6 +157,7 @@ int main()
         insert(heap,node);
     }
     H->root=Build_huffman(heap);
+    printf("中序遍历哈夫曼树\n");
     Display_huffman(H->root);
     free_heap(heap);
     free_huffman(H->root);
