@@ -20,7 +20,7 @@
 int g_leave_len = MAXROWLEN;           
 int g_maxlen;                          
 
-
+unsigned long long sum; 
 
 /*错误处理函数*/
 void my_err(const char *err_string,int line)
@@ -155,10 +155,10 @@ void display_attribute(struct stat buf,char *name)
 	printf("%-8s",psd->pw_name);    //打印用户名字
 	printf("%-8s",grp->gr_name);    //打印用户组名字
 
-	printf("%6ld",buf.st_size);     //打印文件大小
+	printf("%6ld  ",buf.st_size);     //打印文件大小
+	sum = sum + buf.st_size;
 	strcpy(buf_time,ctime(&buf.st_mtime));
 	buf_time[strlen(buf_time)-1]='\0';//去掉换行符
-	printf("  %s",buf_time);//打印文件时间
 }
 
 
@@ -174,15 +174,14 @@ void display_single(char *name)
 		g_leave_len=MAXROWLEN;
 	}
 
-	len=strlen(name);
-	len=g_maxlen-len;
-	printf("%-s",name);
+	len=g_maxlen-strlen(name);
+	printf(" %-s",name);
 
 	for(i=0;i<len;i++)
 	{
-		printf("  ");
+		printf(" ");
 	}
-	printf("  ");
+	printf(" ");
 	//下面两指示空两格
 	g_leave_len -=(g_maxlen+2);
 }
@@ -248,7 +247,7 @@ void display(int flag,char *pathname)
                         break;
 
 		case PARAM_A+PARAM_R:                                // -a与-R
-                        display_attribute(buf,name);
+                        display_single(name);
                         printf("%-s\n",name);
                         break;
 
@@ -293,10 +292,9 @@ void display_dir(int flag_param,char *path)
 		count++;
 	}
 	closedir(dir);
-
 	if(count>256)
 	{
-		printf("%d:too many files under this dir",__LINE__);
+		my_err("too many files under this dir",__LINE__);
 	}
 
 	int i,j,len=strlen(path);
@@ -315,7 +313,7 @@ void display_dir(int flag_param,char *path)
 		filenames[i][len+strlen(ptr->d_name)]='\0';
 
 	}
-	closedir(dir);
+	
 
 	//冒泡排序
 	//按文件名
@@ -334,10 +332,12 @@ void display_dir(int flag_param,char *path)
 			}
 		}
 	}
+	sum = 0;
 	for(i=0;i<count;i++)
 	{
 		display(flag_param,filenames[i]);
 	}
+
 	closedir(dir);
 	//命令行无-l，打印一个换行符
 	if((flag_param&PARAM_L)==0)
@@ -360,7 +360,7 @@ int main(int argc,char **argv)
 	//命令行参数解析
 	j=0;
 	num=0;
-	for(i=1;i<argc;i++)
+	for(i=0;i<argc;i++)
 	{
 		if(argv[i][0]=='-')
 		{
@@ -402,13 +402,13 @@ int main(int argc,char **argv)
 	if((num+1)==argc)
 	{
 		strcpy(path,"./");
-		path[2]='\0';
+		path[2] = '\0';
 		display_dir(flag_param,path);
 		return 0;
 	}
 
-	i=1;
-	do
+	i=0;
+	while(i<argc)
 	{
 		//不是目标文件，解析下一个命令行参数
 		if(argv[i][0]=='-')
@@ -444,6 +444,6 @@ int main(int argc,char **argv)
 				i++;
 			}
 		}
-	}while(i<argc);
+	}
 	return 0;
 }
