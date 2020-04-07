@@ -89,6 +89,7 @@ void display_dir(int flag_p,char *path)
     DIR *dir;
     if((dir=opendir(path))==NULL){
         my_err("opendir",__LINE__);
+        return;
     }
     //获取该目录下文件总数和最长文件名的长度
     struct dirent *ptr;
@@ -99,14 +100,14 @@ void display_dir(int flag_p,char *path)
         }
         count++;
     }
-    if(count>20000){
+    if(count>15000){
         my_err("too many files under this directory",__LINE__);
     }
     closedir(dir);
     //获取该目录下所有文件名并与其路径名储存
     char **f_names;
-    f_names=(char **)malloc(sizeof(char *)*20000);
-    for(int i=0;i<20000;i++){
+    f_names=(char **)malloc(sizeof(char *)*15000);
+    for(int i=0;i<15000;i++){
         f_names[i]=(char *)malloc(PATH_MAX+1);
     }
     int path_len=strlen(path);
@@ -137,8 +138,8 @@ void display_dir(int flag_p,char *path)
     }
     //遍历并调用函数打印文件
     char **dirs;
-    dirs=(char **)malloc(sizeof(char *)*20000);
-    for(int i=0;i<20000;i++){
+    dirs=(char **)malloc(sizeof(char *)*15000);
+    for(int i=0;i<15000;i++){
         dirs[i]=(char *)malloc(PATH_MAX+1);
     }
     struct stat buf;
@@ -436,5 +437,4 @@ void my_err(const char *str,int line)
 {
     fprintf(stderr,"line:%d",line);
     perror(str);
-    exit(1);
 }
