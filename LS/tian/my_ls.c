@@ -17,10 +17,10 @@
 #define PARAM_R      8                 //-R  
 #define MAXROWLEN    80                //一行显示的最多字符数
 
-int g_leave_len = MAXROWLEN;           
-int g_maxlen;                          
+int g_leave_len = MAXROWLEN;      //一行剩余长度，输出对齐    
+int g_maxlen;                   //存放某目录最长文件名长度
 
-unsigned long long sum; 
+unsigned long long sum;         
 
 /*错误处理函数*/
 void my_err(const char *err_string,int line)
@@ -38,7 +38,7 @@ void display_attribute(struct stat buf,char *name)
 	struct passwd *psd;
 	struct group *grp;
 
-/*文件类型*/
+        /*获取打印文件类型*/
 	if(S_ISLNK(buf.st_mode))
 	{
 		printf("l");
@@ -68,7 +68,7 @@ void display_attribute(struct stat buf,char *name)
                 printf("s");
         }
 
-/**/
+        /*获取打印文件所有者的权限*/
 	if(buf.st_mode&S_IRUSR)
 	{
 		printf("r");
@@ -94,7 +94,7 @@ void display_attribute(struct stat buf,char *name)
                 printf("-");
         }
 
-/**/
+        /*获取打印与文件所有者同组用户的操作权限*/
 	if(buf.st_mode&S_IRGRP)
 	{
 		printf("r");
@@ -120,7 +120,7 @@ void display_attribute(struct stat buf,char *name)
                 printf("-");
         }
 
-/**/
+        /*获取打印其他用户对该文件的操作权限*/
 	if(buf.st_mode&S_IROTH)
 	{
 		printf("r");
@@ -159,6 +159,7 @@ void display_attribute(struct stat buf,char *name)
 	sum = sum + buf.st_size;
 	strcpy(buf_time,ctime(&buf.st_mtime));
 	buf_time[strlen(buf_time)-1]='\0';//去掉换行符
+	printf("  %s  ",buf_time);        //打印文件时间信息
 }
 
 
@@ -188,7 +189,7 @@ void display_single(char *name)
 
 
 
-//根据命令行输出文件信息
+//根据命令行参数与路径名显示文件信息
 void display(int flag,char *pathname)
 {
 	int i,j;
@@ -248,7 +249,6 @@ void display(int flag,char *pathname)
 
 		case PARAM_A+PARAM_R:                                // -a与-R
                         display_single(name);
-                        printf("%-s\n",name);
                         break;
 
 		case PARAM_R+PARAM_L:                                //-R与-l
@@ -269,20 +269,22 @@ void display(int flag,char *pathname)
 	}
 }
 
-//显示目录信息
+//为显示某个目录下的文件做准备
 void display_dir(int flag_param,char *path)
 {
 	DIR  *dir;
 	struct dirent  *ptr;
 	int count=0;
-	char filenames[256][PATH_MAX+1],temp[PATH_MAX+10];
+	char temp[PATH_MAX+10];
 
 	//获取该目录下文件总数与最长的文件名
 	dir=opendir(path);
+
 	if(dir==NULL)
 	{
 		my_err("opendir",__LINE__);
 	}
+
 	while((ptr=readdir(dir))!=NULL)
 	{
 		if(g_maxlen<strlen(ptr->d_name))
@@ -291,6 +293,15 @@ void display_dir(int flag_param,char *path)
 		}
 		count++;
 	}
+
+
+	//开辟空间
+	char **filenames = (char **)malloc(sizeof(char*)*(count+1));
+        for(int i = 0;i < count+1;i++)
+	{
+		filenames[i] = (char *)malloc(sizeof(int)*10000);
+        }
+
 	closedir(dir);
 	if(count>256)
 	{
@@ -298,7 +309,7 @@ void display_dir(int flag_param,char *path)
 	}
 
 	int i,j,len=strlen(path);
-	//获取所有文件名
+	//获取该目录下所有的文件名
 	dir=opendir(path);
 	for(i=0;i<count;i++)
 	{
@@ -315,8 +326,7 @@ void display_dir(int flag_param,char *path)
 	}
 	
 
-	//冒泡排序
-	//按文件名
+	//冒泡排序对文件名，将名字存储在filenames里
 	for(i=0;i<count-1;i++)
 	{
 		for(j=0;j<count-1-i;j++)
@@ -332,13 +342,69 @@ void display_dir(int flag_param,char *path)
 			}
 		}
 	}
-	sum = 0;
 	for(i=0;i<count;i++)
 	{
 		display(flag_param,filenames[i]);
 	}
 
-	closedir(dir);
+	//递归读取某文件夹及其子文件夹下所有文件名
+	if(flag_param & PARAM_R)
+	{
+		rewinddir(dir);//倒带目录：返回最开始的位置
+		
+		//对文件名进行排序，存储到filenames里
+		for(i = 0;i < count-1;i++)
+		{
+			for(j = 0;j < count-1-i;j++)
+			{
+				if(strcmp(filenames[j],filenames[j+1]) > 0)
+				{
+					strcpy(temp,filenames[j+1]);
+                                        temp[strlen(filenames[j+1])] = '\0';
+                                        strcpy(filenames[j+1],filenames[j]);
+                                        filenames[j+1][strlen(filenames[j])] = '\0';
+                                        strcpy(filenames[j],temp);
+                                        filenames[j][strlen(temp)] = '\0';
+                                 }
+                        }
+                }
+
+		//读取dir目录信息，判断是否为空
+		while((ptr=readdir(dir))!=NULL)
+		{
+			char path2[_PC_PATH_MAX+1];
+                        strcpy(path2,path);//拷贝字符串
+
+                        path2[strlen(path2)+1]='\0';
+                        strcat(path2,ptr->d_name);//把字符串连接到数组末尾
+
+            
+                        path2[strlen(path2)]='\0';
+                        struct stat buf2;
+                        lstat(path2,&buf2);//解析链接文件
+			
+			if(strcmp(ptr->d_name,"..")!=0 && strcmp(ptr->d_name,".")!=0 && S_ISDIR(buf2.st_mode)) //判断是否是一个目录和是否是开始目录
+			{
+				putchar('\n');
+                                char path2[_PC_PATH_MAX+1];
+                                strcpy(path2,path);
+
+                                path2[strlen(path2)+1]='\0';
+                                strcat(path2,ptr->d_name);//把字符串连接到数组末尾
+                                //int x = strlen(path2);
+
+				strcat(path2,"/");
+				strcat(path2,"\0");
+                                //path2[x]='/';
+                                //path2[x+1]='\0';
+                
+                                printf("%s\n",path2);
+                                display_dir(flag_param,path2);//递归使用
+                       }
+                 }
+	}
+	
+	closedir(dir);//关闭dir所指向的目录
 	//命令行无-l，打印一个换行符
 	if((flag_param&PARAM_L)==0)
 	{
