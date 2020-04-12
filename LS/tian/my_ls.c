@@ -303,10 +303,6 @@ void display_dir(int flag_param,char *path)
         }
 
 	closedir(dir);
-	if(count>256)
-	{
-		my_err("too many files under this dir",__LINE__);
-	}
 
 	int i,j,len=strlen(path);
 	//获取该目录下所有的文件名
@@ -391,12 +387,9 @@ void display_dir(int flag_param,char *path)
 
                                 path2[strlen(path2)+1]='\0';
                                 strcat(path2,ptr->d_name);//把字符串连接到数组末尾
-                                //int x = strlen(path2);
 
 				strcat(path2,"/");
 				strcat(path2,"\0");
-                                //path2[x]='/';
-                                //path2[x+1]='\0';
                 
                                 printf("%s\n",path2);
                                 display_dir(flag_param,path2);//递归使用
@@ -473,42 +466,44 @@ int main(int argc,char **argv)
 		return 0;
 	}
 
-	i=0;
+	i=1;
+	/*访问proc时出现了No such file or directory的问题*/
 	while(i<argc)
 	{
-		//不是目标文件，解析下一个命令行参数
+		//如果不是目标文件名或目录，解析下一个命令行参数
 		if(argv[i][0]=='-')
 		{
 			i++;
-			continue;
-		}
+                        continue;
+                }
 		else
 		{
+			int ii = i;
 			strcpy(path,argv[i]);
-			//文件不存在，报错退出程序
+			//目标文件不存在报错退出
 			if(stat(path,&buf)==-1)
-			{
+                        {
 				my_err("stat",__LINE__);
-			}
-			if(S_ISDIR(buf.st_mode))
-			{
-				if(path[strlen(argv[i])-1]!='/')
-				{
-					path[strlen(argv[i])]!='/';
-					path[strlen(argv[i])+1]!='\0';
+                        }
+                        if(S_ISDIR(buf.st_mode))
+                        {
+				char a = path[strlen(argv[ii])-1];
+				if(path[strlen(argv[ii])-1]!='/')
+                                {
+					path[strlen(argv[ii])]='/';
+                                        path[strlen(argv[ii])+1]='\0';
 				}
-				else
+                                else
 				{
-					path[strlen(argv[i])]!='\0';
-				}
+					path[strlen(argv[ii])]='\0';
+                                }
 				display_dir(flag_param,path);
-				i++;
 			}
 			else
 			{
-				display(flag_param,path);
-				i++;
-			}
+				display(flag_param,path);//参数为一个文件
+                        }
+			i++;
 		}
 	}
 	return 0;
