@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include<stdio.h>
+#include"my_shell.h"
 int main(char argc,char **argv)
 {
 
