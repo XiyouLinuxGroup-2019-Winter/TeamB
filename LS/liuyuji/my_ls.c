@@ -107,7 +107,7 @@ void display_dir(int flag_p,char *path)
     //获取该目录下所有文件名并与其路径名储存
     char **f_names;
     f_names=(char **)malloc(sizeof(char *)*20000);
-    for(int i=0;i<count;i++){
+    for(int i=0;i<20000;i++){
         f_names[i]=(char *)malloc(PATH_MAX+1);
     }
     int path_len=strlen(path);
@@ -140,7 +140,7 @@ void display_dir(int flag_p,char *path)
     char **dirs;
     if((flag_p & PARAM_R)!=0){
         dirs=(char **)malloc(sizeof(char *)*20000);
-        for(int i=0;i<count;i++){
+        for(int i=0;i<20000;i++){
             dirs[i]=(char *)malloc(PATH_MAX+1);
         }
     }
