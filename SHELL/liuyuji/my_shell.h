@@ -17,4 +17,15 @@
 #include<sys/stat.h>
 #include<dirent.h>
 
+#define normal 0
+#define out_re 1
+#define in_re 2
+#define have_pipe 3
+
+void print_shell();
+void git_input(char *);
+void explain_input(char *,int *,char a[][]);
+void do_cmd(int,char a[][]);
+int find_cmd(char *);
+
 #endif
