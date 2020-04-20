@@ -23,9 +23,9 @@
 #define have_pipe 3
 
 void print_shell();
-void git_input(char *);
-void explain_input(char *,int *,char a[][]);
-void do_cmd(int,char a[][]);
+void get_input(char *);
+void explain_input(char *,int *,char arglist[100][256]);
+void do_cmd(int,char arglist[100][256]);
 int find_cmd(char *);
 
 #endif
