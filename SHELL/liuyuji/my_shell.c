@@ -75,5 +75,10 @@ void explain_input(char *buf,int *argcount,char arglist[100][256])
 }
 void do_cmd(int argcount,char arglist[100][256])
 {
+    char **arg;
+    for(int i=0;i<argcount;i++){
+        arg[i]=(char *)arglist[i];
+    }
+    arg[argcount]=NULL;
     
 }
