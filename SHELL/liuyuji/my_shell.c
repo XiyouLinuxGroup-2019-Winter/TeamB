@@ -80,5 +80,6 @@ void do_cmd(int argcount,char arglist[100][256])
         arg[i]=(char *)arglist[i];
     }
     arg[argcount]=NULL;
-    
+    int a;
+
 }
