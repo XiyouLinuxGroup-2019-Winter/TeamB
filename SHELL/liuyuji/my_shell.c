@@ -75,11 +75,159 @@ void explain_input(char *buf,int *argcount,char arglist[100][256])
 }
 void do_cmd(int argcount,char arglist[100][256])
 {
-    char **arg;
+    char *arg[argcount+1];
     for(int i=0;i<argcount;i++){
         arg[i]=(char *)arglist[i];
     }
     arg[argcount]=NULL;
-    int a;
-
+    int background=0;
+    for(int i=0;i<argcount;i++){
+        if(strncmp(arg[i],"&",1)==0){
+            if(i==argcount-1){
+                background=1;
+                arg[argcount-1]=NULL;
+                break;
+            }
+            else{
+                printf("worry command\n");
+            }
+        }
+    }
+    int flag=0;
+    int how=0;
+    for(int i=0;arg[i]!=NULL;i++){
+        if(strcmp(arg[i],">")==0){
+            flag++;
+            how=out_re;
+            if(arg[i+1]==NULL || i==0){
+                flag++;
+            }
+        }
+        if(strcmp(arg[i],"<")==0){
+            flag++;
+            how=in_re;
+            if(arg[i+1]==NULL || i==0){
+                flag++;
+            }
+        }
+        if(strcmp(arg[i],"|")==0){
+            flag++;
+            how=have_pipe;
+            if(arg[i+1]==NULL || i==0){
+                flag++;
+            }
+        }
+    }
+    if(flag>1){
+        printf("worry command\n");
+        return;
+    }
+    char *file;
+    if(how==out_re){
+        for(int i=0;;i++){
+            if(strcmp(arg[i],">")){
+                file=arg[i+1];
+                arg[i]=NULL;
+                break;
+            }
+        }
+    }
+    if(how==in_re){
+        for(int i=0;;i++){
+            if(strcmp(arg[i],"<")){
+                file=arg[i+1];
+                arg[i]=NULL;
+                break;
+            }
+        }
+    }
+    char *argnext[argcount+1];
+    if(how==have_pipe){
+        for(int i=0;;i++){
+            if(strcmp(arg[i],"|")){
+                arg[i]=NULL;
+                for(int j=0;arg[i+1]!=NULL;j++,i++){
+                    argnext[j]=arg[i+1];
+                }
+                break;
+            }
+        }
+    }
+    if( (pid=fork()) <= 0){
+        printf("fork worry\n");
+        return;
+    }
+    switch(how){
+        case 0:
+        if(pid==0){
+            if(!(find_command(arg[0]))){
+                printf("%s : command not found\n",arg[0]);
+                exit(0);
+            }
+            execvp(arg[0],arg);
+            exit(0);
+        }
+        break;
+        case 1:
+        if(pid==0){
+            if(!(find_command(arg[0]))){
+                printf("%s : command not found\n",arg[0]);
+                exit(0);
+            }
+            fd=open(file,file,O_RDWR|O_CREAT|O_TRUNC,0644);
+            dup2(fd,1);
+            execvp(arg[0],arg);
+            exit(0);
+        }
+        break;
+        case 2:
+        if(pid==0){
+            if(!(find_command(arg[0]))){
+                printf("%s : command not found\n",arg[0]);
+                exit(0);
+            }
+            fd=open(file,file,O_RDONLY);
+            dup2(fd,0);
+            execvp(arg[0],arg);
+            exit(0);
+        }
+        break;
+        case 3:
+        if(pid==0){
+            int pid2;
+            int status2;
+            int fd2;
+            if((pid2=fork())<0){
+                printf("fork2 error\n");
+                return;
+            }
+            else if(pid2==0){
+                if(!(find_command(arg[0]))){
+                    printf("%s :command not found\n",arg[0]);
+                    exit(0);
+                }
+            }
+            fd2=open("/tmp/youdonotkonwfile",O_WRONLY|O_TRUNC,0644);
+            dup2(fd2,1);
+            execvp(arg[0],arg);
+            exit(0);
+            if(waitpid(pid2,&status2,0)==-1){
+                printf("wait for child process error\n");
+            }
+            if(!find_command(argnext[0])){
+                printf("%s : command not found\n",argnext[0]);
+                exit(0);
+            }
+            fd2=open("/tmp/youdonotknowfile",O_RDONLY);
+            dup2(fd2,0);
+            execvp(argnext[0],argnext);
+            if(remove("/tmp/youdonotknowfile")){
+                printf("remove error\n");
+            }
+            exit(0);
+        }
+        break;
+        default:
+        break;
+    }
 }
