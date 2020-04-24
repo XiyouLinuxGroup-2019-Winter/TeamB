@@ -16,6 +16,7 @@
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<dirent.h>
+#include<pwd.h>
 
 #define normal 0
 #define out_re 1

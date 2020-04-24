@@ -9,6 +9,10 @@
 #include"my_shell.h"
 int main(char argc,char **argv)
 {
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask,SIGINT);
+    sigprocmask(SIG_BLOCK,&mask,NULL);
     char *buf=NULL;
     buf=(char *)malloc(256);
     if(buf==NULL){
@@ -35,7 +39,16 @@ int main(char argc,char **argv)
 }
 void print_shell()
 {
-    printf("my_shell $$: ");
+    printf("\e[1m\e[32mliuyuji@my_shell:\e[0m");
+    char *buf=NULL;
+    printf("\e[1m\e[34m%s\e[0m",getcwd(buf,0));
+    free(buf);
+    struct passwd *usrname;
+	usrname = getpwuid(getuid());
+    if(strcmp(usrname->pw_name,"root")==0)
+        printf("# ");
+	else
+        printf("$ ");
 }
 void get_input(char *buf)
 {
