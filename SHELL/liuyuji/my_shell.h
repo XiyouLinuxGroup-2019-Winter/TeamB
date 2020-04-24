@@ -26,6 +26,6 @@ void print_shell();
 void get_input(char *);
 void explain_input(char *,int *,char arglist[100][256]);
 void do_cmd(int,char arglist[100][256]);
-int find_cmd(char *);
+int find_command(char *);
 
 #endif

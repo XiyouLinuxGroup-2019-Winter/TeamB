@@ -68,7 +68,7 @@ void explain_input(char *buf,int *argcount,char arglist[100][256])
             k++;
         }
         j++;
-        argcount++;
+        *argcount=*argcount+1;
         k=0;
         //printf("%s\n",arglist[j-1]);
     }
@@ -153,10 +153,12 @@ void do_cmd(int argcount,char arglist[100][256])
             }
         }
     }
-    if( (pid=fork()) <= 0){
+    int pid;
+    if( (pid=fork()) < 0){
         printf("fork worry\n");
         return;
     }
+    int fd,fd2;
     switch(how){
         case 0:
         if(pid==0){
@@ -174,7 +176,7 @@ void do_cmd(int argcount,char arglist[100][256])
                 printf("%s : command not found\n",arg[0]);
                 exit(0);
             }
-            fd=open(file,file,O_RDWR|O_CREAT|O_TRUNC,0644);
+            fd=open(file,O_RDWR|O_CREAT|O_TRUNC,0644);
             dup2(fd,1);
             execvp(arg[0],arg);
             exit(0);
@@ -186,7 +188,7 @@ void do_cmd(int argcount,char arglist[100][256])
                 printf("%s : command not found\n",arg[0]);
                 exit(0);
             }
-            fd=open(file,file,O_RDONLY);
+            fd=open(file,O_RDONLY);
             dup2(fd,0);
             execvp(arg[0],arg);
             exit(0);
@@ -234,8 +236,38 @@ void do_cmd(int argcount,char arglist[100][256])
         printf("[process id %d]\n",pid);
         return;
     }
+    int status;
     if(waitpid(pid,&status,0)==-1){
         printf("wait for child process error\n");
     }
 }
+int find_command(char *command)
+{
+	DIR* dp;
+	struct dirent* dirp;
+	char* path[]={"./","/bin","/usr/bin",NULL};
+	if(strncmp(command,"./",2)==0)
+	{
+		command=command+2;
+	}
 
+	int i=0;
+	while(path[i]!=NULL)
+	{
+		if( (dp=opendir(path[i]))==NULL)
+		{
+			printf("can not open /bin \n");
+		}
+		while((dirp=readdir(dp))!=NULL)
+		{
+			if(strcmp(dirp->d_name,command)==0)
+			{
+				closedir(dp);
+				return 1;
+			}
+		}
+		closedir(dp);
+		i++;
+	}
+	return 0;
+}
