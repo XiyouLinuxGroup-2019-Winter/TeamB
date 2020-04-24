@@ -207,7 +207,7 @@ void do_cmd(int argcount,char arglist[100][256])
                     exit(0);
                 }
             }
-            fd2=open("/tmp/youdonotkonwfile",O_WRONLY|O_TRUNC,0644);
+            fd2=open("/tmp/file",O_WRONLY|O_TRUNC,0644);
             dup2(fd2,1);
             execvp(arg[0],arg);
             exit(0);
@@ -218,10 +218,10 @@ void do_cmd(int argcount,char arglist[100][256])
                 printf("%s : command not found\n",argnext[0]);
                 exit(0);
             }
-            fd2=open("/tmp/youdonotknowfile",O_RDONLY);
+            fd2=open("/tmp/file",O_RDONLY);
             dup2(fd2,0);
             execvp(argnext[0],argnext);
-            if(remove("/tmp/youdonotknowfile")){
+            if(remove("/tmp/file")){
                 printf("remove error\n");
             }
             exit(0);
@@ -230,4 +230,12 @@ void do_cmd(int argcount,char arglist[100][256])
         default:
         break;
     }
+    if(background==1){
+        printf("[process id %d]\n",pid);
+        return;
+    }
+    if(waitpid(pid,&status,0)==-1){
+        printf("wait for child process error\n");
+    }
 }
+
