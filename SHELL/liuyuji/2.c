@@ -155,7 +155,7 @@ void do_cmd(int argcount,char arglist[100][256])
     char *file;
     if(how==out_re){
         for(int i=0;;i++){
-            if(strcmp(arg[i],">")==0){
+            if(strcmp(arg[i],">")){
                 file=arg[i+1];
                 arg[i]=NULL;
                 break;
@@ -164,7 +164,7 @@ void do_cmd(int argcount,char arglist[100][256])
     }
     if(how==in_re){
         for(int i=0;;i++){
-            if(strcmp(arg[i],"<")==0){
+            if(strcmp(arg[i],"<")){
                 file=arg[i+1];
                 arg[i]=NULL;
                 break;
