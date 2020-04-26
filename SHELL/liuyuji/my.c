@@ -9,7 +9,8 @@
 #include"my_shell.h"
 int main(char argc,char **argv)
 {
-    create(&q);
+    Queue q;
+    creat(&q);
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask,SIGINT);
@@ -66,7 +67,7 @@ void get_input(char *buf)
     }
     buf[len++]='\n';
     buf[len]=0;
-    insert(&q,buf);
+    insert(q,buf);
 }
 void explain_input(char *buf,int *argcount,char arglist[100][256])
 {
@@ -105,7 +106,6 @@ void do_cmd(int argcount,char arglist[100][256])
     }
     if(strcmp(arglist[0],"history")==0){
         history(&q);
-        return;
     }
     char *arg[argcount+1];
     for(int i=0;i<argcount;i++){
@@ -365,9 +365,8 @@ int find_command(char *command)
 }
 void history(Queue *p)
 {
-    for(Node *operate=p->head;operate->next!=NULL;operate=operate->next){
-        printf("%s",operate->date);
-    }
+    Node *operate=p->head;
+    printf("%s\n",operate->date);
 }
 int full(Queue *p)
 {
@@ -388,7 +387,7 @@ void create(Queue *p)
     Node *operate,*record;
     p->num=100;
     operate=record=NULL;
-    for(int i=0;i<100;i++){
+    for(int i=0;i<n;i++){
         operate=(Node *)malloc(sizeof(Node));
         if(i==0){
             p->head=operate;
@@ -416,7 +415,7 @@ int insert(Queue *p,char *buf)
         record=p->tail;
         operate=record->next;
     }
-    operate->date=buf;
+    operate->date=arg;
     p->tail=operate;
 }
 void rm(Queue *p)
