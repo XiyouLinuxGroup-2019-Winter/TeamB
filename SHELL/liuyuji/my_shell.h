@@ -28,6 +28,7 @@ typedef struct queue{
     Node *head;
     Node *tail;
     int num;
+    int len;
 }Queue;
 Node *mark=NULL;
 Queue q;

@@ -15,15 +15,15 @@ int main(char argc,char **argv)
     sigaddset(&mask,SIGINT);
     sigprocmask(SIG_BLOCK,&mask,NULL);
     char *buf=NULL;
-    buf=(char *)malloc(256);
-    if(buf==NULL){
-        printf("malloc failed");
-        exit(-1);
-    }
     int argcount=0;
     char arglist[100][256];
     while(1){
         print_shell();
+        buf=(char *)malloc(256);
+        if(buf==NULL){
+            printf("malloc failed");
+            exit(-1);
+        }
         memset(buf,0,256);
         get_input(buf);
         //printf("%s\n",buf);//调试
@@ -38,6 +38,7 @@ int main(char argc,char **argv)
         explain_input(buf,&argcount,arglist);
         do_cmd(argcount,arglist);
     }
+    del(&q);
 }
 void print_shell()
 {
@@ -365,8 +366,10 @@ int find_command(char *command)
 }
 void history(Queue *p)
 {
-    for(Node *operate=p->head;operate->next!=NULL;operate=operate->next){
-        printf("%s",operate->date);
+    Node *operate=p->head;
+    for(int i=1;i<=p->len;i++){
+        printf("%d.%s",i,operate->date);
+        operate=operate->next;
     }
 }
 int full(Queue *p)
@@ -402,6 +405,7 @@ void create(Queue *p)
         record=operate;
     }
     p->tail=NULL;
+    p->len=0;
 }
 int insert(Queue *p,char *buf)
 {
@@ -418,6 +422,8 @@ int insert(Queue *p,char *buf)
     }
     operate->date=buf;
     p->tail=operate;
+    p->len++;
+
 }
 void rm(Queue *p)
 {
@@ -425,6 +431,7 @@ void rm(Queue *p)
     Node *record=operate->next;
     free(operate);
     p->head=record;
+    p->len--;
 }
 void del(Queue *p)
 {
@@ -432,6 +439,9 @@ void del(Queue *p)
     operate=mark;
     for(int i=0;i<p->num;i++){
         record=operate->next;
+        if(operate->date!=NULL){
+            free(operate->date);
+        }
         free(operate);
         operate=record;
     }
