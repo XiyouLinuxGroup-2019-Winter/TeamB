@@ -65,6 +65,9 @@ int main(int argc,char **argv)
 void print_prompt()
 {
 	printf("myshell$$ ");
+	char *buf=NULL;
+	printf("%s ",getcwd(buf,0));
+	free(buf);
 }
 
 void get_input(char *buf)
@@ -245,18 +248,34 @@ void do_cmd(int argcount,char arglist[100][256])
 
 	if(strcmp(arg[0],"cd")==0)
 	{
-		sprintf(home,"/home/%s/",named);
-		if(argcount==1||argcount==2&&strcmp(arg[1],"~")==0)
+		
+		if(argcount==2)
 		{
-			chdir(home);
-			return 0;
+			if(chdir(arg[1])<0)
+			{
+				printf("cd error\n");
+			}
+			return;
 		}
-		if(chdir(arg[1])==-1)
+		else
 		{
-			perror("chdir");
+			printf("worry command\n");
+			return;
 		}
-		return 0;
 	}
+
+/*
+	if(strcmp(arg[0],"history")==0)
+	{
+		for()
+		{
+			dd;
+		}
+		return;
+	}
+
+	*/
+
 
 	if((pid=fork())<0)
 	{
