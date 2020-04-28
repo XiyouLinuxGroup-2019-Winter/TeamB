@@ -30,7 +30,6 @@ typedef struct queue{
     int num;
     int len;
 }Queue;
-Node *mark=NULL;
 Queue q;
 
 #define normal 0

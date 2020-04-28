@@ -108,7 +108,7 @@ void do_cmd(int argcount,char arglist[100][256])
         history(&q);
         return;
     }
-    char *arg[argcount+1];
+    char * arg[argcount+1];
     for(int i=0;i<argcount;i++){
         arg[i]=(char *)arglist[i];
     }
@@ -210,14 +210,17 @@ void do_cmd(int argcount,char arglist[100][256])
             }
         }
     }
-    char *argnext[argcount+1];
+    char * argnext[argcount+1];
     if(how==have_pipe){
         for(int i=0;;i++){
             if(strcmp(arg[i],"|")){
                 arg[i]=NULL;
-                for(int j=0;arg[i+1]!=NULL;j++,i++){
-                    argnext[j]=arg[i+1];
+                int j;
+                for(j=i+1;arg[j]!=NULL;j++){
+                    argnext[j-i-1]=arg[j];
+                    i++;
                 }
+                argnext[j-i-1]=arg[j];
                 break;
             }
         }
@@ -272,16 +275,16 @@ void do_cmd(int argcount,char arglist[100][256])
                 printf("fork2 error\n");
                 return;
             }
-            else if(pid2==0){
+            if(pid2==0){
                 if(!(find_command(arg[0]))){
                     printf("%s :command not found\n",arg[0]);
                     exit(0);
                 }
+                fd2=open("/tmp/donotknowfile",O_CREAT|O_WRONLY|O_TRUNC,0644);
+                dup2(fd2,1);
+                execvp(arg[0],arg);
+                exit(0);
             }
-            fd2=open("/tmp/file",O_WRONLY|O_TRUNC,0644);
-            dup2(fd2,1);
-            execvp(arg[0],arg);
-            exit(0);
             if(waitpid(pid2,&status2,0)==-1){
                 printf("wait for child process error\n");
             }
@@ -289,10 +292,10 @@ void do_cmd(int argcount,char arglist[100][256])
                 printf("%s : command not found\n",argnext[0]);
                 exit(0);
             }
-            fd2=open("/tmp/file",O_RDONLY);
+            fd2=open("/tmp/donotknofile",O_RDONLY);
             dup2(fd2,0);
             execvp(argnext[0],argnext);
-            if(remove("/tmp/file")){
+            if(remove("/tmp/donotknofile")){
                 printf("remove error\n");
             }
             exit(0);
@@ -374,12 +377,7 @@ void history(Queue *p)
 }
 int full(Queue *p)
 {
-    Node *operate;
-    operate=p->tail;
-    if(operate==NULL){
-        return 0;
-    }
-    if(operate->next==NULL){
+    if(p->len==p->num){
         return 1;
     }
     else{
@@ -388,22 +386,8 @@ int full(Queue *p)
 }
 void create(Queue *p)
 {
-    Node *operate,*record;
     p->num=100;
-    operate=record=NULL;
-    for(int i=0;i<100;i++){
-        operate=(Node *)malloc(sizeof(Node));
-        if(i==0){
-            p->head=operate;
-            mark=operate;
-        }
-        else{
-            record->next=operate;
-        }
-        operate->date=NULL;
-        operate->next=NULL;
-        record=operate;
-    }
+    p->head=NULL;
     p->tail=NULL;
     p->len=0;
 }
@@ -413,12 +397,13 @@ int insert(Queue *p,char *buf)
         rm(p);
     }
     Node *operate,*record;
-    if(p->tail==NULL){
-        operate=p->head;
+    operate=(Node *)malloc(sizeof(Node));
+    if(p->head==NULL){
+        p->head=operate;
     }
     else{
         record=p->tail;
-        operate=record->next;
+        record->next=operate;
     }
     operate->date=buf;
     p->tail=operate;
@@ -436,12 +421,10 @@ void rm(Queue *p)
 void del(Queue *p)
 {
     Node *operate,*record;
-    operate=mark;
-    for(int i=0;i<p->num;i++){
+    operate=p->head;
+    for(int i=0;i<p->len;i++){
         record=operate->next;
-        if(operate->date!=NULL){
-            free(operate->date);
-        }
+        free(operate->date);
         free(operate);
         operate=record;
     }
