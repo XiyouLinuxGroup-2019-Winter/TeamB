@@ -12,6 +12,8 @@
 #define out_redirect  1
 #define in_redirect   2
 #define have_pipe     3
+#define out_redirects 4
+#define in_redirects  5
 
 void print_prompt();
 void get_input(char *);
@@ -22,6 +24,7 @@ int find_command(char *);
 
 int main(int argc,char **argv)
 {
+        signal(SIGINT, SIG_IGN);
 	int i;
 	int argcount=0;
 	char arglist[100][256];
@@ -140,6 +143,11 @@ void do_cmd(int argcount,char arglist[100][256])
 	char* file;
 	pid_t pid;
 
+	if(argcount==0)
+	{
+		return;
+	}
+
 	for(i=0;i<argcount;i++)
 	{
 		arg[i]=(char *)arglist[i];
@@ -184,6 +192,24 @@ void do_cmd(int argcount,char arglist[100][256])
 				flag++;
 			}
 		}
+		if(strcmp(arg[i],">>")==0)
+		{
+			flag++;
+			how=out_redirects;
+			if(arg[i+1]==NULL||i==0)
+			{
+				flag++;
+			}
+		}
+		if(strcmp(arg[i],"<<")==0)
+		{
+			flag++;
+                        how=in_redirects;
+                        if(arg[i+1]==NULL||i==0)
+			{
+				flag++;
+                        }
+        }
 		if(strcmp(arg[i],"|")==0)
 		{
 			flag++;
@@ -198,10 +224,9 @@ void do_cmd(int argcount,char arglist[100][256])
 			}
 		}
 	}
-
 	if(flag>1)
 	{
-		printf("wrong command\n");
+		printf("worry command\n");
 		return;
 	}
 
@@ -228,6 +253,30 @@ void do_cmd(int argcount,char arglist[100][256])
 			}
 		}
 	}
+	if(how==out_redirects)
+        {
+                for(i=0;arg[i]!=NULL;i++)
+                {
+                        if(strcmp(arg[i],">>")==0)
+                        {
+                                file=arg[i+1];
+                                arg[i]=NULL;
+                        }
+                }
+        }
+
+        if(how==in_redirects)
+        {
+                for(i=0;arg[i]!=NULL;i++)
+                {
+                        if(strcmp(arg[i],"<<")==0)
+                        {
+                                file=arg[i+1];
+                                arg[i]=NULL;
+                        }
+                }
+        }
+
 	if(how==have_pipe)
 	{
 		for(i=0;arg[i]!=NULL;i++)
@@ -369,6 +418,35 @@ void do_cmd(int argcount,char arglist[100][256])
 				exit(0);
 			}
 			break;
+		case 4:
+                        if(pid==0)
+                        {
+                                if(!(find_command(arg[0])))
+                                {
+                                         printf("%s : command not found\n",arg[0]);
+                                         exit(0);
+                                }
+                                fd=open(file,O_RDWR|O_CREAT|O_TRUNC,0644);
+                                dup2(fd,1);
+                                execvp(arg[0],arg);
+                                exit(0);
+                        }
+                        break;
+                case 5:
+                        if(pid==0)
+                        {
+                                if(!(find_command(arg[0])))
+                                {
+                                         printf("%s : command not found\n",arg[0]);
+                                         exit(0);
+                                }
+                                fd=open(file,O_RDONLY);
+                                dup2(fd,0);
+                                execvp(arg[0],arg);
+                                exit(0);
+                        }
+                        break;
+
 		default:
 			break;
 	}
