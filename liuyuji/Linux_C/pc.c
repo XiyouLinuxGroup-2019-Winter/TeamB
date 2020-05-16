@@ -116,7 +116,7 @@ void *consumer(void *a)
         if(empty(&pc)==0){
             printf("\t\t\t消费者消费%d\n",pc.head->date);
             rm(&pc);
-            if(pc.len==9){
+            if(pc.len==2){
                 pthread_cond_signal(&cond1);
             }
             pthread_mutex_unlock(&mutex);
@@ -164,7 +164,7 @@ int main()
     ret=pthread_create(&th6,NULL,consumer,NULL);
     if(ret!=0)
         printf("pthread_create consumer error ");
-    pthread_cond_signal(&cond);
+    pthread_cond_broadcast(&cond);
     pthread_join(th1,NULL);
     pthread_join(th2,NULL);
     pthread_join(th3,NULL);
