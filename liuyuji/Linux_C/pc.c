@@ -20,7 +20,7 @@ typedef struct queue{
     int len;
 }Queue;
 Queue pc;
-pthread_mutex_t mutex,mutex1,mutex2;
+pthread_mutex_t mutex,mutex1,mutex2,mutex3;
 pthread_cond_t cond,cond1,cond2;
 int full(Queue *p)
 {
@@ -65,14 +65,17 @@ int insert(Queue *p)
 }
 void rm(Queue *p)
 {
+    pthread_mutex_lock(&mutex3);
     Node *operate=p->head;
     Node *record=operate->next;
     free(operate);
     p->head=record;
     p->len--;
+    pthread_mutex_unlock(&mutex3);
 }
 void del(Queue *p)
 {
+    pthread_mutex_lock(&mutex3);
     Node *operate,*record;
     operate=p->head;
     for(int i=0;i<p->len;i++){
@@ -80,6 +83,7 @@ void del(Queue *p)
         free(operate);
         operate=record;
     }
+    pthread_mutex_unlock(&mutex3);
 }
 void *producer(void *a)
 {
@@ -144,6 +148,7 @@ int main()
     pthread_mutex_init(&mutex2,NULL);
     pthread_mutex_init(&mutex,NULL);
     pthread_cond_init(&cond2,NULL);
+    pthread_mutex_init(&mutex3,NULL);
     create(&pc);
     int ret;
     ret=pthread_create(&th1,NULL,producer,NULL);
@@ -165,12 +170,7 @@ int main()
     if(ret!=0)
         printf("pthread_create consumer error ");
     pthread_cond_broadcast(&cond);
-    pthread_join(th1,NULL);
-    pthread_join(th2,NULL);
-    pthread_join(th3,NULL);
-    pthread_join(th4,NULL);
-    pthread_join(th5,NULL);
-    pthread_join(th6,NULL);
+    sleep(10);
     del(&pc);
     printf("all over\n");
     exit(0);
