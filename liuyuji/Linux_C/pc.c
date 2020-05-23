@@ -89,7 +89,9 @@ void *producer(void *a)
 {
     while(1){
         pthread_mutex_lock(&mutex);
-        pthread_cond_wait(&cond,&mutex);
+        while(full(&pc)==1){
+            pthread_cond_wait(&cond,&mutex);
+        }
         if(full(&pc)==0){
             insert(&pc);
             printf("生产者生产%d\n",pc.tail->date);
@@ -116,7 +118,9 @@ void *consumer(void *a)
 {
     while(1){
         pthread_mutex_lock(&mutex);
-        pthread_cond_wait(&cond,&mutex);
+        while(empty(&pc)==1){
+            pthread_cond_wait(&cond,&mutex);
+        }
         if(empty(&pc)==0){
             printf("\t\t\t消费者消费%d\n",pc.head->date);
             rm(&pc);
