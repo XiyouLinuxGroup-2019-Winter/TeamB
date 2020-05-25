@@ -53,9 +53,10 @@ int add_work(void *(*fun)(void *arg),void *arg)
     }
     Work *operate,*record;
     operate=(Work *)malloc(sizeof(Work));
-    operate->fun=fun;
+    operate->fun=func;
     operate->arg=arg;
     operate->next=NULL;
+    
     pthread_mutex_lock(&mutex);
     pool->work_num++;
     if(pool->queue_head==NULL){
@@ -108,16 +109,21 @@ void pool_init(int max_thread_num)
 {
     pthread_cond_init(&cond,NULL);
     pthread_mutex_init(&mutex,NULL);
+
     pool=(Thread_pool *)malloc(sizeof(Thread_pool));
+
     pool->queue_head=NULL;
     pool->queue_tail=NULL;
+    pool->work_num=0;
+    pool->max_work_num=20;
+
     pool->thid=(pthread_t *)malloc(10 * sizeof(pthread_t));
     memset(pool->thid,0,10 * sizeof(pthread_t));
     pool->thread_num=max_thread_num;
     pool->max_thread_num=10;
-    pool->work_num=0;
-    pool->max_work_num=20;
+
     pool->shutdown=0;
+    
     for(int i=0;i<max_thread_num;i++){
         pthread_create(&pool->thid[i],NULL,thread,NULL);
     }
