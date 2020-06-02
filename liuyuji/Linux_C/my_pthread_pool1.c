@@ -5,7 +5,31 @@
 	> Created Time: 2020年05月23日 星期六 21时58分12秒
  ************************************************************************/
 
-#include "threadpool_QuickSort.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+#include<string.h>
+typedef struct work{
+    void *(*fun)(void *arg);
+    void *arg;
+    struct work* next;
+}Work;
+typedef struct
+{
+    Work *queue_head;
+    Work *queue_tail;
+    int work_num;
+    int max_work_num;
+    
+    pthread_t *thid;
+    int thread_num;
+    int max_thread_num;
+    
+    int shutdown;
+}Thread_pool;
+Thread_pool *pool;
+pthread_mutex_t mutex;
+pthread_cond_t cond;
 /*void *func(void *a)
 {
     printf("thread %ld is working for task %d\n",pthread_self(),*(int *)a);

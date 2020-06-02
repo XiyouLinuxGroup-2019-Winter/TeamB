@@ -6,12 +6,6 @@
  ************************************************************************/
 
 #include "threadpool_QuickSort.h"
-/*void *func(void *a)
-{
-    printf("thread %ld is working for task %d\n",pthread_self(),*(int *)a);
-    sleep(1);
-    return NULL;
-}*/
 int full()
 {
     if(pool->work_num==pool->max_work_num){
@@ -21,7 +15,7 @@ int full()
         return 0;
     }
 }
-int add_work(void *(*fun)(void *arg),void *arg)
+int add_work(void *(*fun)(int *arg),int *arg)
 {
     if(full()==1){
         printf("work queue is full\n");
@@ -29,7 +23,7 @@ int add_work(void *(*fun)(void *arg),void *arg)
     }
     Work *operate,*record;
     operate=(Work *)malloc(sizeof(Work));
-    operate->fun=func;
+    operate->fun=fun;
     operate->arg=arg;
     operate->next=NULL;
     
@@ -76,10 +70,6 @@ void *thread(void *a)
         del_work();
         pthread_mutex_unlock(&mutex);
         (*(operate->fun))(operate->arg);
-        /*        if(pool->shutdown==1){
-            pthread_exit(NULL);
-        }
-*/
     }
 }
 void pool_init(int max_thread_num)
@@ -117,6 +107,7 @@ void destroy_queue()
 }
 void pool_destroy()
 {
+    int i=0;
     pool->shutdown=1;
     pthread_cond_broadcast(&cond);
     for(int i=0;i<pool->thread_num;i++){
@@ -128,18 +119,3 @@ void pool_destroy()
     pthread_mutex_destroy(&mutex);
     pthread_cond_destroy(&cond);
 }
-//测试代码
-/*int main()
-{
-    pool_init(3);
-    int *arg=(int *)malloc(10*sizeof(int));
-    for(int i=0;i<10;i++)
-    {
-        arg[i]=i+1;
-        add_work(func,&arg[i]);
-    }
-    sleep (5);
-    pool_destroy();
-    free(arg);
-    return 0;
-}*/
