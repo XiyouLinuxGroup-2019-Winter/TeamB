@@ -13,8 +13,8 @@
 #include<pthread.h>
 #include<string.h>
 typedef struct work{
-    void *(*fun)(int *arg);
-    void *arg;
+    void *(*fun)(int *a,int *arg);
+    int *arg;
     struct work* next;
 }Work;
 typedef struct
@@ -35,7 +35,7 @@ Thread_pool *pool;
 pthread_mutex_t mutex;
 pthread_cond_t cond;
 int full();
-int add_work(void *(*fun)(int *arg),int *arg);
+int add_work(void *(*fun)(int *a,int *arg),int *arg);
 int del_work();
 void *thread(void *a);
 void pool_init(int max_thread_num);

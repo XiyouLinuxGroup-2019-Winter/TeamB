@@ -129,19 +129,13 @@ int Mid(int *a,int left,int right)
     int size;
     size=(left+right)/2;
     if(a[left]>a[size]){
-        int temp=a[left];
-        a[left]=a[size];
-        a[size]=temp;
+        swap(&a[left],&a[size]);
     }
     if(a[left]>a[right]){
-        int temp=a[left];
-        a[left]=a[right];
-        a[right]=temp;
+        swap(&a[left],&a[right]);
     }
     if(a[size]>a[right]){
-        int temp=a[size];
-        a[size]=a[right];
-        a[right]=temp;
+        swap(&a[right],&a[size]);
     }
     swap(&a[size],&a[right-1]);
     return a[right-1];
@@ -151,9 +145,9 @@ void *Quicksort(int *a,int *arg)
     int left,right;
     left=arg[0];
     right=arg[1];
-    if(right-left+1<2){
-        return NULL;
-    }
+//    if(right-left+1<2){
+//        return NULL;
+//    }
 //    if(MIDNUM<right-left+1){
         int mid=Mid(a,left,right);
         int i=left,j=right-1;
@@ -174,8 +168,8 @@ void *Quicksort(int *a,int *arg)
         left_sub[1]=i-1;
         right_sub[0]=i+1;
         right_sub[1]=right;
-        add_work(Quicksort,left_sub);
-        add_work(Quicksort,right_sub);
+        if(i-left>1)add_work(Quicksort,left_sub);
+        if(right-i>1)add_work(Quicksort,right_sub);
 //    else{
 //
 //    }
@@ -197,7 +191,7 @@ int main()
         scanf("%d",&a[i]);
     }
     Quick_Sort(a,size);
-    sleep(5);
+    sleep(10);
     for(int i=0;i<size;i++){
         printf("%d ",a[i]);
     }
