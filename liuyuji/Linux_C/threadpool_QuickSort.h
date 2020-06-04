@@ -30,7 +30,7 @@ typedef struct
 
     int shutdown;
 }Thread_pool;
-int *a;
+//int *a;
 Thread_pool *pool;
 pthread_mutex_t mutex;
 pthread_cond_t cond;
