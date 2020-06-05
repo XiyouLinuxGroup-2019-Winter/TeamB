@@ -12,6 +12,7 @@
 #include<stdlib.h>
 #include<pthread.h>
 #include<string.h>
+#define MIDNUM 10
 typedef struct work{
     void *(*fun)(int *a,int *arg);
     int *arg;

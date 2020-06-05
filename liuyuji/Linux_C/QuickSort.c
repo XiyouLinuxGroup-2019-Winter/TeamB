@@ -18,6 +18,16 @@ int a[1000]={
 ,1,3,20,43,2,7,4,87,34,65,12,77,11,34,6,7,8,53,2,23,199,55,43,4,34,76,433,6,4,3,2,55,6,3,66,32,5,67,32,2,6,66,7,8,7,9,0,8,7,62,3,4,5,6,7,9,3,4,5,6,2,45,6,7,98,5,34,2,4,6,78,9,67,59,64,22,4,5,60,70,89,61,4,322,23,226,744,8,6,65,533,422,344,264,233,367,434,444,55,534
 ,1,3,20,43,2,7,4,87,34,65,12,77,11,34,6,7,8,53,2,23,199,55,43,4,34,76,433,6,4,3,2,55,6,3,66,32,5,67,32,2,6,66,7,8,7,9,0,8,7,62,3,4,5,6,7,9,3,4,5,6,2,45,6,7,98,5,34,2,4,6,78,9,67,59,64,22,4,5,60,70,89,61,4,322,23,226,744,8,6,65,533,422,344,264,233,367,434,444,55,20
 };
+void mpsort(int *a,int n)
+{
+    for(int i=0;i<n-1;i++){
+        for(int j=0;j<n;j++){
+            if(a[j]>a[j+1]){
+                swap(&a[j],&a[j+1]);
+            }
+        }
+    }
+}
 int full()
 {
     if(pool->work_num==pool->max_work_num){
@@ -69,14 +79,14 @@ void *thread(void *arg)
         pthread_mutex_lock(&mutex);
         while (pool->work_num == 0 && !pool->shutdown)
         {
-            printf ("thread %ld is waiting\n", pthread_self ());
+            //printf ("thread %ld is waiting\n", pthread_self ());
             pthread_cond_wait(&cond,&mutex);
         }
         if(pool->shutdown==1){
             pthread_mutex_unlock(&mutex);
             pthread_exit(NULL);
         }
-        printf("thread %ld is working\n",pthread_self());
+        //printf("thread %ld is working\n",pthread_self());
         Work *operate=pool->queue_head;
         del_work();
         pthread_mutex_unlock(&mutex);
@@ -93,7 +103,7 @@ void pool_init(int max_thread_num)
     pool->queue_head=NULL;
     pool->queue_tail=NULL;
     pool->work_num=0;
-    pool->max_work_num=20;
+    pool->max_work_num=0x3f3f3f;
 
     pool->thid=(pthread_t *)malloc(10 * sizeof(pthread_t));
     memset(pool->thid,0,10 * sizeof(pthread_t));
@@ -163,10 +173,7 @@ void *Quicksort(int *a,int *arg)
     int left,right;
     left=arg[0];
     right=arg[1];
-    if(right-left+1<2){
-        return NULL;
-    }
-//    if(MIDNUM<right-left+1){
+    if(MIDNUM<right-left+1){
         int mid=Mid(a,left,right);
         int i=left,j=right-1;
         while(1){
@@ -188,9 +195,10 @@ void *Quicksort(int *a,int *arg)
         right_sub[1]=right;
         add_work(Quicksort,left_sub);
         add_work(Quicksort,right_sub);
-//    else{
-//
-//    }
+    }
+    else{
+        mpsort(a+left,right-left+1);
+    }
 }
 void Quick_Sort(int *a,int n)
 {
@@ -202,17 +210,19 @@ void Quick_Sort(int *a,int n)
 int main()
 {
     pool_init(6);
-    int size;
-    scanf("%d",&size);
 /*    a=(int *)malloc(size*sizeof(int));
     for(int i=0;i<size;i++){
         scanf("%d",&a[i]);
     }*/
-    Quick_Sort(a,size);
-    sleep(5);
-    for(int i=0;i<size;i++){
-        printf("%d ",a[i]);
+    Quick_Sort(a,1000);
+    sleep(1);
+    for(int i=0;i<1000;i++){
+        if(a[i-1]==a[i+1] && i<=998){
+            printf("%d ",a[i-1]);
+        }
+        else printf("%d ",a[i]);
     }
+    printf("\n");
     pool_destroy();
     //free(a);
     return 0;
