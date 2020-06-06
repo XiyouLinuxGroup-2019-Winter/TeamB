@@ -20,8 +20,8 @@ typedef struct queue{
     int len;
 }Queue;
 Queue pc;
-pthread_mutex_t mutex,mutex1,mutex2,mutex3;
-pthread_cond_t cond,cond1,cond2;
+pthread_mutex_t mutex;
+pthread_cond_t cond,cond1;
 int full(Queue *p)
 {
     if(p->len==p->num){
@@ -42,7 +42,7 @@ int empty(Queue *p)
 }
 void create(Queue *p)
 {
-    p->num=3;
+    p->num=5;
     p->head=NULL;
     p->tail=NULL;
     p->len=0;
@@ -65,17 +65,14 @@ int insert(Queue *p)
 }
 void rm(Queue *p)
 {
-    pthread_mutex_lock(&mutex3);
     Node *operate=p->head;
     Node *record=operate->next;
     free(operate);
     p->head=record;
     p->len--;
-    pthread_mutex_unlock(&mutex3);
 }
 void del(Queue *p)
 {
-    pthread_mutex_lock(&mutex3);
     Node *operate,*record;
     operate=p->head;
     for(int i=0;i<p->len;i++){
@@ -83,35 +80,22 @@ void del(Queue *p)
         free(operate);
         operate=record;
     }
-    pthread_mutex_unlock(&mutex3);
 }
 void *producer(void *a)
 {
     while(1){
         pthread_mutex_lock(&mutex);
         while(full(&pc)==1){
+            printf("生产者%ld等待中\n",pthread_self());
             pthread_cond_wait(&cond,&mutex);
         }
-        if(full(&pc)==0){
-            insert(&pc);
-            printf("生产者生产%d\n",pc.tail->date);
-            if(pc.len==1){
-                pthread_cond_signal(&cond2);
-            }
-            pthread_mutex_unlock(&mutex);
-            sleep(1);
-            pthread_cond_broadcast(&cond);
+        insert(&pc);
+        printf("生产者%ld生产%d\n",pthread_self(),pc.tail->date);
+        if(pc.len==1){
+            pthread_cond_signal(&cond);
         }
-        else{
-            pthread_mutex_lock(&mutex1);
-            printf("生产者挂起\n");
-            pthread_mutex_unlock(&mutex);
-            sleep(1);
-            pthread_cond_broadcast(&cond);
-            pthread_cond_wait(&cond1,&mutex1);
-            printf("生产者运行\n");
-            pthread_mutex_unlock(&mutex1);
-        }
+        pthread_mutex_unlock(&mutex);
+        sleep(1);
     }
 }
 void *consumer(void *a)
@@ -119,40 +103,24 @@ void *consumer(void *a)
     while(1){
         pthread_mutex_lock(&mutex);
         while(empty(&pc)==1){
+            printf("\t\t\t消费者%ld等待中\n",pthread_self());
             pthread_cond_wait(&cond,&mutex);
         }
-        if(empty(&pc)==0){
-            printf("\t\t\t消费者消费%d\n",pc.head->date);
-            rm(&pc);
-            if(pc.len==2){
-                pthread_cond_signal(&cond1);
-            }
-            pthread_mutex_unlock(&mutex);
-            sleep(1);
-            pthread_cond_broadcast(&cond);
+        printf("\t\t\t消费者%ld消费%d\n",pthread_self(),pc.head->date);
+        rm(&pc);
+        if(pc.len==5){
+            pthread_cond_signal(&cond1);
         }
-        else{
-            pthread_mutex_lock(&mutex2);
-            printf("\t\t\t消费者挂起\n");
-            pthread_mutex_unlock(&mutex);
-            sleep(1);
-            pthread_cond_broadcast(&cond);
-            pthread_cond_wait(&cond2,&mutex2);
-            printf("\t\t\t消费者运行\n");
-            pthread_mutex_unlock(&mutex2);
-        }
+        pthread_mutex_unlock(&mutex);
+        sleep(1);
     }
 }
 int main()
 {
     pthread_t th1,th2,th3,th4,th5,th6;
-    pthread_mutex_init(&mutex1,NULL);
     pthread_cond_init(&cond,NULL);
     pthread_cond_init(&cond1,NULL);
-    pthread_mutex_init(&mutex2,NULL);
     pthread_mutex_init(&mutex,NULL);
-    pthread_cond_init(&cond2,NULL);
-    pthread_mutex_init(&mutex3,NULL);
     create(&pc);
     int ret;
     ret=pthread_create(&th1,NULL,producer,NULL);
