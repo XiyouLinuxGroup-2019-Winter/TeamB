@@ -13,6 +13,7 @@
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #include<errno.h>
+#include<stdlib.h>
 
 #define SERV_PORT 4507//服务器端口号
 #define LISTENQ 12//链接队列最大长度
@@ -24,8 +25,8 @@
 struct userinfo{
     char username[32];
     char password[32];
-}
-struct userinfo users[]={
+};
+struct userinfo user[]={
     {"Linux","unix"},
     {"4507","4508"},
     {"cli","cli"},
@@ -46,7 +47,7 @@ int find_name(const char *name)
         printf("in find_name,NULL pointer\n");
         return -2;
     }
-    for(i=0;users[i].username[0]!=' ';i++){
+    for(i=0;user[i].username[0]!=' ';i++){
         if(strcmp(user[i].username,name)==0){
             return i;
         }
@@ -84,7 +85,7 @@ int main()
     memset(&serv_addr,0,sizeof(struct sockaddr_in));
     serv_addr.sin_family=AF_INET;
     serv_addr.sin_port=htons(SERV_PORT);
-    serv_addr.in_addr.s_addr=htonl(INADDR_ANY);
+    serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);
     //套接字绑定到固定端口
     if(bind(sock_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
         my_err("bind",__LINE__);
@@ -94,8 +95,9 @@ int main()
         my_err("listen",__LINE__);
     }
     cli_len=sizeof(struct sockaddr_in);
+    printf("server is running\n");
     while(1){
-        conn_fd=accept(sock_fd,(struct sockaddr*)&cli_addr,cli_len);
+        conn_fd=accept(sock_fd,(struct sockaddr*)&cli_addr,&cli_len);
         if(conn_fd<0){
             my_err("accept",__LINE__);
         }
@@ -104,7 +106,7 @@ int main()
         if((pid=fork())==0){
             while(1){
                 if(ret=recv(conn_fd,recv_buf,sizeof(recv_buf),0)<0){
-                    perror("recv",__LINE__);
+                    my_err("recv",__LINE__);
                     exit(1);
                 }
                 recv_buf[ret-1]=0;
