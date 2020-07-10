@@ -21,8 +21,55 @@
 #define USERNAME 0//用户名
 #define PASSWORD 1//密码
 
+struct userinfo{
+    char username[32];
+    char password[32];
+}
+struct userinfo users[]={
+    {"Linux","unix"},
+    {"4507","4508"},
+    {"cli","cli"},
+    {"liuyuji""lyj"},
+    {" "," "}
+};
+
+void my_err(const char *str,int line)
+{
+    fprintf(stderr,"line:%d ",line);
+    perror(str);
+    exit(1);
+}
+int find_name(const char *name)
+{
+    int i;
+    if(name==NULL){
+        printf("in find_name,NULL pointer\n");
+        return -2;
+    }
+    for(i=0;users[i].username[0]!=' ';i++){
+        if(strcmp(user[i].username,name)==0){
+            return i;
+        }
+    }
+    return -1;
+}
+void send_data(int conn_fd,const char*string)
+{
+    if(send(conn_fd,(void *)string,strlen(string),0)<0){
+        my_err("send",__LINE__);
+    }
+}
 int main()
 {
+    int sock_fd,conn_fd;
+    int optval;
+    int flag_recv=USERNAME;
+    int ret;
+    int name_num;
+    pid_t pid;
+    socklen_t cli_len;
+    struct sockaddr_in serv_addr,cli_addr;
+    char recv_buf[128];
     //创建TCP套接字
     sock_fd=socket(AF_INET,SOCK_STREAM,0);
     if(sock_fd<0){
@@ -60,12 +107,42 @@ int main()
                     perror("recv",__LINE__);
                     exit(1);
                 }
-                recv_buf[ret]=0;
+                recv_buf[ret-1]=0;
                 if(flag_recv==USERNAME){
-                    
+                    name_num=find_name(recv_buf);
+                    switch(name_num){
+                        case -1:
+                        send_data(conn_fd,"n\n");
+                        break;
+                        case -2:
+                        exit(1);
+                        break;
+                        default:
+                        send_data(conn_fd,"y\n");
+                        flag_recv=PASSWORD;
+                        break;
+                    }
+                }
+                else if(flag_recv==PASSWORD){
+                    if(strcmp(user[name_num].password,recv_buf)==0){
+                        send_data(conn_fd,"y\n");
+                        send_data(conn_fd,"Welcome login my serve\n");
+                        printf("%s login\n",user[name_num].username);
+                        break;
+                    }
+                    else{
+                        send_data(conn_fd,"n\n");
+                    }
                 }
             }
+            close(sock_fd);
+            close(conn_fd);
+            exit(0);//退出子进程
+        }
+        else{
+            close(conn_fd);
         }
     }
+    return 0;
 }
 
