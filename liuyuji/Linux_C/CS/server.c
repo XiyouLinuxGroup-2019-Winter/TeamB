@@ -1,5 +1,5 @@
 /*************************************************************************
-	> File Name: my_server.c
+	> File Name: server.c
 	> Author: 
 	> Mail: 
 	> Created Time: 2020年07月10日 星期五 14时54分28秒
@@ -30,7 +30,7 @@ struct userinfo user[]={
     {"Linux","unix"},
     {"4507","4508"},
     {"cli","cli"},
-    {"liuyuji""lyj"},
+    {"liuyuji","lyj"},
     {" "," "}
 };
 
@@ -48,6 +48,7 @@ int find_name(const char *name)
         return -2;
     }
     for(i=0;user[i].username[0]!=' ';i++){
+        //printf("%s\n",user[i].username);
         if(strcmp(user[i].username,name)==0){
             return i;
         }
@@ -105,13 +106,18 @@ int main()
         //创建子进程处理
         if((pid=fork())==0){
             while(1){
-                if(ret=recv(conn_fd,recv_buf,sizeof(recv_buf),0)<0){
+                memset(recv_buf,0,sizeof(recv_buf));
+                if((ret=recv(conn_fd,recv_buf,sizeof(recv_buf),0))<0){
                     my_err("recv",__LINE__);
                     exit(1);
                 }
+                //printf("ret=%d",ret);//
+                //printf("%d\n",strlen(recv_buf));//
                 recv_buf[ret-1]=0;
+                //printf("%s",recv_buf);//
                 if(flag_recv==USERNAME){
                     name_num=find_name(recv_buf);
+                    //printf("%d\n",name_num);//
                     switch(name_num){
                         case -1:
                         send_data(conn_fd,"n\n");
@@ -128,7 +134,8 @@ int main()
                 else if(flag_recv==PASSWORD){
                     if(strcmp(user[name_num].password,recv_buf)==0){
                         send_data(conn_fd,"y\n");
-                        send_data(conn_fd,"Welcome login my serve\n");
+                        send_data(conn_fd,"Welcome login my server\n");
+                        sleep(1);
                         printf("%s login\n",user[name_num].username);
                         break;
                     }

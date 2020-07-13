@@ -29,15 +29,13 @@ int get_userinfo(char *buf,int len)
     if(buf==NULL){
         return -1;
     }
-    int i=0;
-    while(1){
-        buf[i]=getchar();
-        if(buf[i++]=='\n' || i>len-1){
-            break;
-        }
+    int i=0,ch;
+    while(((ch=getchar())!='\n') && (ch!=EOF) && (i<len-2)){
+        buf[i++]=ch;
     }
-    buf[i-1]='\n';
-    buf[i]=0;
+    buf[i++]='\n';
+    buf[i++]=0;
+    //printf("%s",buf);//zzz
     return 0;
 }
 void send_userinfo(int conn_fd,const char* str)
@@ -50,24 +48,25 @@ void send_userinfo(int conn_fd,const char* str)
             printf("error return\n");
             exit(1);
         }
+        //printf("%d\n",strlen(send_buf));//zzz
         if(send(conn_fd,(void *)send_buf,strlen(send_buf),0)<0){
             my_err("send",__LINE__);
         }
         if(ret=recv(conn_fd,(void *)recv_buf,32,0)<0){
             my_err("recv",__LINE__);
         }
-        if(recv_buf[0]=='y'){
+        if(recv_buf[0]==VALID_USERINFO){
             break;
         }
         else{
-            printf("%c\n",recv_buf[0]);
+            printf("%s error\n",str);
         }
     }while(1);
 }
 int main(int argc,char **argv)
 {
     struct sockaddr_in serv_addr;
-    int conn_fd;
+    int conn_fd,ret;
     int serv_port;
     char recv_buf[32];
     //检查参数个数
@@ -118,8 +117,17 @@ int main(int argc,char **argv)
     send_userinfo(conn_fd,"username");
     send_userinfo(conn_fd,"password");
     //接收服务器消息
-    if(recv(conn_fd,(void *)recv_buf,32,0)<0){
+    memset(recv_buf,0,sizeof(recv_buf));
+    
+    if((ret=recv(conn_fd,(void *)recv_buf,sizeof(recv_buf),0))<0){
         my_err("recv",__LINE__);
+    }
+    printf("ret=%d\n",ret);//
+    printf("%d\n",strlen(recv_buf));
+    for(int i=0;i<ret;i++){
+        printf("666\n");//
+        printf("%c",recv_buf[i]);
+        printf("666\n");//
     }
     printf("%s",recv_buf);
     close(conn_fd);
