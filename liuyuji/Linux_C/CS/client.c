@@ -14,16 +14,10 @@
 #include<stdlib.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
-
+#include"my_recv.h"
 #define INVALID_USERINFO 'n'
 #define VALID_USERINFO 'y'
 
-void my_err(const char *str,int line)
-{
-    fprintf(stderr,"line:%d ",line);
-    perror(str);
-    exit(1);
-}
 int get_userinfo(char *buf,int len)
 {
     if(buf==NULL){
@@ -52,8 +46,8 @@ void send_userinfo(int conn_fd,const char* str)
         if(send(conn_fd,(void *)send_buf,strlen(send_buf),0)<0){
             my_err("send",__LINE__);
         }
-        if(ret=recv(conn_fd,(void *)recv_buf,32,0)<0){
-            my_err("recv",__LINE__);
+        if(ret=recv(conn_fd,recv_buf,sizeof(recv_buf),0)<0){
+            printf("%d:date is too long\n",__LINE__);
         }
         if(recv_buf[0]==VALID_USERINFO){
             break;
@@ -68,7 +62,8 @@ int main(int argc,char **argv)
     struct sockaddr_in serv_addr;
     int conn_fd,ret;
     int serv_port;
-    char recv_buf[32];
+    char recv_buf[1024];
+    memset(recv_buf,0,sizeof(recv_buf));
     //检查参数个数
     if(argc!=5){
         printf("Usage: [-p] [serv_port] [-a] [serv_addr]\n");
@@ -117,19 +112,17 @@ int main(int argc,char **argv)
     send_userinfo(conn_fd,"username");
     send_userinfo(conn_fd,"password");
     //接收服务器消息
-    memset(recv_buf,0,sizeof(recv_buf));
-    
-    if((ret=recv(conn_fd,(void *)recv_buf,sizeof(recv_buf),0))<0){
+    if((ret=my_recv(conn_fd,recv_buf,sizeof(recv_buf)))<0){
         my_err("recv",__LINE__);
     }
     printf("ret=%d\n",ret);//
-    printf("%d\n",strlen(recv_buf));
+    //printf("%d\n",strlen(recv_buf));
     for(int i=0;i<ret;i++){
-        printf("666\n");//
+        //printf("666\n");//
         printf("%c",recv_buf[i]);
-        printf("666\n");//
+        //printf("666\n");//
     }
-    printf("%s",recv_buf);
+    printf("\n");
     close(conn_fd);
     return 0;
 }

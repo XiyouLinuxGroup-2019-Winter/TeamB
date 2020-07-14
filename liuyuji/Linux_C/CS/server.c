@@ -14,7 +14,7 @@
 #include<arpa/inet.h>
 #include<errno.h>
 #include<stdlib.h>
-
+#include"my_recv.h"
 #define SERV_PORT 4507//服务器端口号
 #define LISTENQ 12//链接队列最大长度
 #define INVALID_USERINFO 'n'//用户信息无效
@@ -34,12 +34,6 @@ struct userinfo user[]={
     {" "," "}
 };
 
-void my_err(const char *str,int line)
-{
-    fprintf(stderr,"line:%d ",line);
-    perror(str);
-    exit(1);
-}
 int find_name(const char *name)
 {
     int i;
@@ -135,7 +129,6 @@ int main()
                     if(strcmp(user[name_num].password,recv_buf)==0){
                         send_data(conn_fd,"y\n");
                         send_data(conn_fd,"Welcome login my server\n");
-                        sleep(1);
                         printf("%s login\n",user[name_num].username);
                         break;
                     }
