@@ -46,9 +46,10 @@ void send_userinfo(int conn_fd,const char* str)
         if(send(conn_fd,(void *)send_buf,strlen(send_buf),0)<0){
             my_err("send",__LINE__);
         }
-        if(ret=recv(conn_fd,recv_buf,sizeof(recv_buf),0)<0){
+        if(ret=my_recv(conn_fd,recv_buf,sizeof(recv_buf))<0){
             printf("%d:date is too long\n",__LINE__);
         }
+        //printf("%s\n",recv_buf);//
         if(recv_buf[0]==VALID_USERINFO){
             break;
         }
@@ -115,7 +116,7 @@ int main(int argc,char **argv)
     if((ret=my_recv(conn_fd,recv_buf,sizeof(recv_buf)))<0){
         my_err("recv",__LINE__);
     }
-    printf("ret=%d\n",ret);//
+    //printf("ret=%d\n",ret);//
     //printf("%d\n",strlen(recv_buf));
     for(int i=0;i<ret;i++){
         //printf("666\n");//
