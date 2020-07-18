@@ -1,4 +1,11 @@
 /*************************************************************************
+	> File Name: new_pthread_pool.c
+	> Author: 
+	> Mail: 
+	> Created Time: 2020年07月18日 星期六 11时32分06秒
+ ************************************************************************/
+
+/*************************************************************************
 	> File Name: my_pthread_pool.c
 	> Author: 
 	> Mail: 
@@ -78,7 +85,6 @@ int del_work()
     if(pool->queue_head==NULL){
         pool->queue_tail=NULL;
     }
-    free(operate->arg);
     free(operate);
     pool->work_num--;
 }
@@ -99,7 +105,7 @@ void *thread(void *a)
         Work operate=*(pool->queue_head);
         del_work();
         pthread_mutex_unlock(&mutex);
-        (operate.fun)(operate.arg);
+        (*(operate.fun))(operate.arg);
         /*        if(pool->shutdown==1){
             pthread_exit(NULL);
         }

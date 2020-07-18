@@ -72,7 +72,8 @@ int main()
     char recv_buf[1024];
     int client_addr_len=sizeof(struct sockaddr);
     while(1){
-        event_num=epoll_wait(epfd,ep_events,10,500);
+        event_num=epoll_wait(epfd,ep_events,10,-1);
+        printf("epoll return\n");
         for(int i=0;i<event_num;i++){
             if(ep_events[i].data.fd==listenfd){
                 connfd=accept(listenfd,(struct sockaddr*)&client_addr,&client_addr_len);
@@ -86,12 +87,15 @@ int main()
             }
             else if(ep_events[i].events & EPOLLIN){
                 int ret=0;
-                if((ret=recv(ep_events[i].data.fd,(void *)recv_buf,sizeof(recv_buf),0))<0){
+                if((ret=my_recv(ep_events[i].data.fd,(void *)recv_buf,sizeof(recv_buf)))<0){
                     printf("my_recv,%d",__LINE__);
                 }
                 recv_buf[ret]=0;
                 for(int j=0;j<ret;j++){
                     printf("%c",recv_buf[j]);
+                    if(j==ret-1){
+                        printf("\n");
+                    }
                 }
             }
         }

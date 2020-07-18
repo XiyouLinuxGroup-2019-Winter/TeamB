@@ -6,12 +6,12 @@
  ************************************************************************/
 
 #include "threadpool_QuickSort.h"
-/*void *func(void *a)
+void *func(void *a)
 {
     printf("thread %ld is working for task %d\n",pthread_self(),*(int *)a);
     sleep(1);
     return NULL;
-}*/
+}
 int full()
 {
     if(pool->work_num==pool->max_work_num){
@@ -72,10 +72,10 @@ void *thread(void *a)
             pthread_exit(NULL);
         }
         printf("thread %ld is working\n",pthread_self());
-        Work *operate=pool->queue_head;
+        Work operate=*(pool->queue_head);
         del_work();
         pthread_mutex_unlock(&mutex);
-        (*(operate->fun))(operate->arg);
+        (operate.fun)(operate.arg);
         /*        if(pool->shutdown==1){
             pthread_exit(NULL);
         }
@@ -129,17 +129,17 @@ void pool_destroy()
     pthread_cond_destroy(&cond);
 }
 //测试代码
-/*int main()
+int main()
 {
     pool_init(3);
     int *arg=(int *)malloc(10*sizeof(int));
     for(int i=0;i<10;i++)
     {
         arg[i]=i+1;
-        add_work(func,&arg[i]);
+        add_work(&func,&arg[i]);
     }
     sleep (5);
     pool_destroy();
     free(arg);
     return 0;
-}*/
+}

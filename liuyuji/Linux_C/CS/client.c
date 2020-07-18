@@ -53,8 +53,11 @@ void send_userinfo(int conn_fd,const char* str)
         if(recv_buf[0]==VALID_USERINFO){
             break;
         }
-        else{
+        else if(recv_buf[0]==INVALID_USERINFO){
             printf("%s error\n",str);
+        }
+        else if(ret==0){
+            printf("socket be closed\n");
         }
     }while(1);
 }
