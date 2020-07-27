@@ -1,11 +1,12 @@
 /*************************************************************************
-	> File Name: server.c
+	> File Name: client.c
 	> Author: 
 	> Mail: 
-	> Created Time: 2020年07月22日 星期三 14时12分23秒
+	> Created Time: 2020年07月27日 星期一 19时34分13秒
  ************************************************************************/
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<pthread.h>
-#include<>
+#include"chat.h"
+int main()
+{
+    
+}
