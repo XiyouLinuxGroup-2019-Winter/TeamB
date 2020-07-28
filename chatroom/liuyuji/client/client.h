@@ -1,13 +1,12 @@
 /*************************************************************************
-	> File Name: chat.h
+	> File Name: client.h
 	> Author: 
 	> Mail: 
-	> Created Time: 2020年07月27日 星期一 17时33分31秒
+	> Created Time: 2020年07月28日 星期二 16时49分42秒
  ************************************************************************/
 
-#ifndef _CHAT_H
-#define _CHAT_H
-
+#ifndef _CLIENT_H
+#define _CLIENT_H
 #include <stdio.h>
 #include <mysql/mysql.h>
 #include <stdio.h>
@@ -19,8 +18,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
-#define SERV_PORT 8848//服务器端口号
+#include<pthread.h>
+#include<errno.h>
 
 enum{
     LOGIN=1,
@@ -41,43 +40,20 @@ enum{
     GCHATMSG,
     SETSTATE,
     DELMEMBER,
-}
+};
 
-pthread_key_t key;
-MYSQL mysql;
+typedef struct {
+    char type[2];
+    char len[2];
+    char data[1024];
+}Pack;
 
-
-void setnoblock(int sock);
-void *unpack(void *arg);
-int my_read(int conn_fd,void *buf,int len);
-int get_arg(char *arg_buf,int len);
+int print_main();
+int uregister(int connfd);
 int send_pack(int connfd,int type,int len,char *value);
 int my_write(int connfd,char *send_buf,int len);
+int my_read(int conn_fd,void *buf,int len);
+int unpack(int connfd,char *recv_buf,int lenth);
 void my_err(const char *str,int line);
-
-void *login(void *arg);
-void *uregister(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
 
 #endif

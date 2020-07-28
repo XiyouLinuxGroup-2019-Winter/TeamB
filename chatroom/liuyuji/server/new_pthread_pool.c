@@ -5,6 +5,8 @@
 	> Created Time: 2020年07月18日 星期六 11时32分06秒
  ************************************************************************/
 
+#include "thread_pool.h"
+#include"chat.h"
 int full()
 {
     if(pool->work_num==pool->max_work_num){
@@ -22,7 +24,7 @@ int add_work(void *(*fun)(void *arg),void *arg)
     }
     Work *operate,*record;
     operate=(Work *)malloc(sizeof(Work));
-    operate->fun=func;
+    operate->fun=fun;
     operate->arg=arg;
     operate->next=NULL;
     
@@ -37,6 +39,7 @@ int add_work(void *(*fun)(void *arg),void *arg)
         record->next=operate;
         pool->queue_tail=operate;
     }
+    //printf("add_work Namei\n");
     pthread_mutex_unlock(&mutex);
     pthread_cond_signal(&cond);
 }
@@ -63,10 +66,15 @@ void *thread(void *a)
             pthread_mutex_unlock(&mutex);
             pthread_exit(NULL);
         }
+        //重新设置本线程TSD为0
+        int tsd;
+        tsd=0;
+        pthread_setspecific(key,(void *)tsd);
         printf("thread %ld is working\n",pthread_self());
         Work operate=*(pool->queue_head);
         del_work();
         pthread_mutex_unlock(&mutex);
+        //printf("start\n");//
         (*(operate.fun))(operate.arg);
         /*        if(pool->shutdown==1){
             pthread_exit(NULL);
@@ -74,7 +82,7 @@ void *thread(void *a)
 */
     }
 }
-void pool_init(int max_thread_num)
+void pool_init(int thread_num)
 {
     pthread_cond_init(&cond,NULL);
     pthread_mutex_init(&mutex,NULL);
@@ -88,12 +96,12 @@ void pool_init(int max_thread_num)
 
     pool->thid=(pthread_t *)malloc(10 * sizeof(pthread_t));
     memset(pool->thid,0,10 * sizeof(pthread_t));
-    pool->thread_num=max_thread_num;
+    pool->thread_num=thread_num;
     pool->max_thread_num=10;
 
     pool->shutdown=0;
     
-    for(int i=0;i<max_thread_num;i++){
+    for(int i=0;i<thread_num;i++){
         pthread_create(&pool->thid[i],NULL,thread,NULL);
     }
 }
