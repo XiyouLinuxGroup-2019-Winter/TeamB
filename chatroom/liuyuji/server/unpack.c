@@ -34,14 +34,16 @@ void *unpack(void *arg)
     int conn_fd=*(int *)arg;
     
     //接收数据类型
-    char ty[2];
+    char ty[3];
+    memset(ty,0,sizeof(3));
     if(my_read(conn_fd,&ty,2)<0){
         my_err("read",__LINE__);
     }
     fprintf(stderr,"数据type为%s\n",ty);
     
     //接收数据长度
-    char len[2];
+    char len[3];
+    memset(len,0,sizeof(len));
     if(my_read(conn_fd,&len,2)<0){
         my_err("read",__LINE__);
     }
@@ -56,27 +58,28 @@ void *unpack(void *arg)
     fprintf(stderr,"数据为%s\n",recv_buf);
     
     //准备参数
-    char *argv=(char *)malloc(atoi(len)+2);
+    char *argv=(char *)malloc(atoi(len)+4);
+    memset(argv,0,sizeof(argv));
     sprintf(argv,"%s%d\n",recv_buf,conn_fd);
-    argv[atoi(len)+1]=0;
     fprintf(stderr,"参数为%s",argv);
 
     //判断type，将对应处理函数放进线程池
     int type=atoi(ty);
+    pthread_t tid;
     switch(type){
-        /*case LOGIN:
-        add_work(login,(void *)arg);
-        break;*/
+        case LOGIN:
+        add_work(login,(void *)argv);
+        break;
         case UREGISTER:
         add_work(uregister,(void *)argv);
         break;
         /*case FHCAT:
-        add_work(fchat,(void *)arg);
-        break;
+        add_work(fchat,(void *)argv);
+        break;*/
         case ADDFRIEND:
-        add_work(addfriend,(void *)arg);
+        add_work(addfriend,(void *)argv);
         break;
-        case DELFRIEND:
+        /*case DELFRIEND:
         add_work(delfriend,(void *)arg);
         break;
         case FINDFRIEN:

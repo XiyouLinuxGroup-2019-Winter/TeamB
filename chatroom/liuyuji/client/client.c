@@ -54,36 +54,41 @@ int main(int argc,char **argv)
         printf("Usage: [-p] [serv_port] [-a] [serv_addr]\n");
         exit(1);
     }
-    int chose=print_main();
-    switch(chose){
-        case 1:
-        //创建TCP套接字
-        conn_fd=socket(AF_INET,SOCK_STREAM,0);
-        if(conn_fd<0){
-            my_err("socket",__LINE__);
+    int chose=0;
+    while(chose!=3){
+        chose=print_login();
+        switch(chose){
+            case 1:
+            //创建TCP套接字
+            conn_fd=socket(AF_INET,SOCK_STREAM,0);
+            if(conn_fd<0){
+                my_err("socket",__LINE__);
+            }
+            //链接服务器
+            if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
+                my_err("connect",__LINE__);
+            }
+            login(conn_fd);
+            break;
+            case 2:
+            //创建TCP套接字
+            conn_fd=socket(AF_INET,SOCK_STREAM,0);
+            if(conn_fd<0){
+                my_err("socket",__LINE__);
+            }
+            //链接服务器
+            if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
+                my_err("connect",__LINE__);
+            }
+            uregister(conn_fd);
+            break;
+            case 3:
+            printf("再见\n");
+            break;
         }
-        //链接服务器
-        if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
-            my_err("connect",__LINE__);
-        }
-
-        break;
-        case 2:
-        //创建TCP套接字
-        conn_fd=socket(AF_INET,SOCK_STREAM,0);
-        if(conn_fd<0){
-            my_err("socket",__LINE__);
-        }
-        //链接服务器
-        if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
-            my_err("connect",__LINE__);
-        }
-        uregister(conn_fd);
-        break;
-        case 3:
-        break;
     }
-    //创建TCP套接字
+    close(conn_fd);
+    /*//创建TCP套接字
     conn_fd=socket(AF_INET,SOCK_STREAM,0);
     if(conn_fd<0){
         my_err("socket",__LINE__);
@@ -91,6 +96,6 @@ int main(int argc,char **argv)
     //链接服务器
     if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
         my_err("connect",__LINE__);
-    }
+    }*/
 
 }

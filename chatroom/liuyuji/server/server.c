@@ -129,8 +129,11 @@ int main()
             //若有客户请求
             else if(ep_events[i].events & EPOLLIN){
                 //将解包函数放入线程池
-                //printf("add_work\n");
                 add_work(unpack,&ep_events[i].data.fd);
+                //printf("add_work\n");
+                //pthread_t tid;//
+                //pthread_create(&tid,NULL,unpack,&ep_events[i].data.fd);
+                //unpack(&ep_events[i].data.fd);
             }
             //若客户挂断
             else if(ep_events[i].events & EPOLLHUP){

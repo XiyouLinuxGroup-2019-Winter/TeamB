@@ -18,10 +18,6 @@ int full()
 }
 int add_work(void *(*fun)(void *arg),void *arg)
 {
-    if(full()==1){
-        printf("work queue is full\n");
-        return 0;
-    }
     Work *operate,*record;
     operate=(Work *)malloc(sizeof(Work));
     operate->fun=fun;
@@ -29,6 +25,9 @@ int add_work(void *(*fun)(void *arg),void *arg)
     operate->next=NULL;
     
     pthread_mutex_lock(&mutex);
+    while(full()==1){
+        pthread_cond_wait(&work_not_full,&mutex);
+    }
     pool->work_num++;
     if(pool->queue_head==NULL){
         pool->queue_head=operate;
@@ -50,7 +49,6 @@ int del_work()
     if(pool->queue_head==NULL){
         pool->queue_tail=NULL;
     }
-    free(operate);
     pool->work_num--;
 }
 void *thread(void *a)
@@ -71,11 +69,14 @@ void *thread(void *a)
         tsd=0;
         pthread_setspecific(key,(void *)tsd);
         printf("thread %ld is working\n",pthread_self());
-        Work operate=*(pool->queue_head);
+        Work *operate=pool->queue_head;
         del_work();
         pthread_mutex_unlock(&mutex);
         //printf("start\n");//
-        (*(operate.fun))(operate.arg);
+        (*(operate->fun))(operate->arg);
+        free(operate);
+        pthread_cond_signal(&work_not_full);
+        operate=NULL;
         /*        if(pool->shutdown==1){
             pthread_exit(NULL);
         }

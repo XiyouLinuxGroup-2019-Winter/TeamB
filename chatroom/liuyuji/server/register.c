@@ -49,30 +49,35 @@ void *uregister(void *arg)
     //调用mysql增加用户信息
     char cmd[1024];
     memset(cmd,0,sizeof(cmd));
+    printf("sprinf cmd\n");
     sprintf(cmd,"insert into user_data(name,password,socket,question,answer) values('%s','%s','%s','%s','%s')",name,psw,fd,question,answer);
     printf("cmd is %s\n",cmd);//
+
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
     memset(cmd,0,sizeof(cmd));
     //查询用户id并返回
-    sprintf(cmd,"select id from user_data where socket = '%s'",fd);
+    sprintf(cmd,"select id from user_data where socket = '%s' && name = '%s' && password = '%s'",fd,name,psw);
+    printf("cmd is %s",cmd);//
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
     MYSQL_RES *result=NULL;
 	MYSQL_ROW row;
-	MYSQL_FIELD *field;
+	//MYSQL_FIELD *field;
+    printf("result\n");//
     result=mysql_store_result(&mysql);
-    if((result=mysql_store_result(&mysql))==NULL){
+    /*if((result=mysql_store_result(&mysql))==NULL){
         my_err("mysql_store_result",__LINE__);
-    }
+    }*/
     if((row=mysql_fetch_row(result))==NULL){
         my_err("mysql_fetch_row",__LINE__);
     }
     char data[20];
     memset(data,0,sizeof(data));
     sprintf(data,"%s\n",row[0]);
+    printf("%s",data);//
     if(send_pack(atoi(fd),UREGISTER,strlen(data),data)<0){
         my_err("write",__LINE__);
     }

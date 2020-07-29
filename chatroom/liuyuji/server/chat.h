@@ -64,6 +64,7 @@ void my_err(const char *str,int line);
 
 void *login(void *arg);
 void *uregister(void *arg);
+void *addfriend(void *arg);
 /*void *(void *arg);
 void *(void *arg);
 void *(void *arg);

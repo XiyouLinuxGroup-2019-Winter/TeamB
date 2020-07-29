@@ -47,13 +47,16 @@ typedef struct {
     char len[2];
     char data[1024];
 }Pack;
+char user_id[10];
 
 int print_main();
+int print_login();
 int uregister(int connfd);
 int send_pack(int connfd,int type,int len,char *value);
 int my_write(int connfd,char *send_buf,int len);
 int my_read(int conn_fd,void *buf,int len);
 int unpack(int connfd,char *recv_buf,int lenth);
 void my_err(const char *str,int line);
+int login(int connfd);
 
 #endif

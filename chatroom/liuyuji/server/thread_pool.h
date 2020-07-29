@@ -32,7 +32,7 @@ typedef struct
 }Thread_pool;
 Thread_pool *pool;
 pthread_mutex_t mutex;
-pthread_cond_t cond;
+pthread_cond_t cond,work_not_full;
 int full();
 int add_work(void *(*fun)(void *arg),void *arg);
 int del_work();
