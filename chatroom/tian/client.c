@@ -14,7 +14,7 @@
 #include<sys/epoll.h>
 #include"chat.h"
 
-#define SERV_PORT 8848  //服务器端口号
+#define SERV_PORT 8848  
 
 #define EXIT -1
 #define REGISTE 1
@@ -131,8 +131,10 @@ void registe()
 
     if(recv_registe_flag == 1)
         printf("\t\t注册成功!\n");
-    else if(recv_registe_flag == 0)
-        printf("\t\t该用户名已存在，请重新选择!\n");
+    else
+    {
+        printf("\t\t该用户名已存在，请重新输入\n");
+    } 
 }
 
 int login()
@@ -162,9 +164,9 @@ int login()
         strncpy(user, login_name, strlen(login_name));
         return 1;
     }
-    else if(recv_login_flag == 0)
-        printf("\t\t登陆失败!\n");
-    else if(recv_login_flag == 2)
-        printf("\t\t该用户已在线!\n");
-    return 0;
+    else 
+    {
+	    printf("\t\t登陆失败!\n");
+    } 
+	return 0;
 }

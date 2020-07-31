@@ -19,7 +19,7 @@
 #define LISTENQ 10     
 #define MAX_EVENTS 1000
 		
-void *Menu(void *recv_pack_t);
+void *deal(void *recv_pack_t);
 void Exit(PACK *recv_pack);   
 void registe(PACK *recv_pack);
 void login(PACK *recv_pack);
@@ -29,7 +29,9 @@ void login(PACK *recv_pack);
 MYSQL mysql;
 pthread_mutex_t mutex;
 pthread_cond_t cond;
-
+User *pHead = NULL;
+Relation *pStart = NULL;
+Recordinfo *pRec = NULL;
 
 int main()
 {
@@ -39,10 +41,11 @@ int main()
 	int sock_fd,conn_fd;
 	socklen_t len;
     struct sockaddr_in cli_addr,serv_addr;
-    pthread_t thid;
+    pthread_t pid;
+    MYSQL_RES *result;
     
-    PACK recv_t;
-    PACK *recv_pack; 
+    PACK *pack;
+    PACK recv_pack; 
     int ret;
 
     int epfd,nfds;   
@@ -50,8 +53,6 @@ int main()
     len = sizeof(struct sockaddr_in);
 
 
-    if(signal(SIGINT, handler_sigint) == SIG_ERR)
-        my_err("signal", __LINE__);
 
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init(&cond, NULL);
@@ -119,8 +120,8 @@ int main()
             }
             else if(events[i].events & EPOLLIN)
             {
-                ret = recv(events[i].data.fd, &recv_t, sizeof(PACK), MSG_WAITALL);
-                recv_t.data.send_fd = events[i].data.fd;
+                ret = recv(events[i].data.fd, &pack, sizeof(PACK), MSG_WAITALL);
+                pack->data.send_fd = events[i].data.fd;
 
                 if(ret < 0)
                 {
@@ -149,8 +150,8 @@ int main()
 					{
                         recv_pack.type = ACCOUNT_ERROR;
                         memset(recv_pack.data.mes, 0, sizeof(recv_pack.data.mes));
-                        printf("$$sad\n");
-                        strcpy(recv_pack.data.mes, "password error");
+                        printf("登录错误\n");
+                        strcpy(recv_pack.data.mes, "0");
                         if (send(events[i].data.fd, &recv_pack, sizeof(PACK), 0) < 0) 
 						{
                             my_err("send", __LINE__);
@@ -161,13 +162,12 @@ int main()
  		        	sprintf(need, "update user_data set user_socket = %d where nickname = %s", events[i].data.fd, recv_pack.data.send_user);
  	    	    	mysql_query(&mysql, need); 
 				} 
-                recv_pack= (PACK*)malloc(sizeof(PACK));
-                memcpy(recv_pack, &recv_t, sizeof(PACK));
-                pthread_create(&pid,NULL,deal,(void *)recv_pack);
+                pack= (PACK*)malloc(sizeof(PACK));
+                memcpy(pack, &recv_pack, sizeof(PACK));
+                pthread_create(&pid,NULL,deal,(void *)pack);
             }
         }
     }
-
     close(sock_fd);
     close(epfd);
 
@@ -178,7 +178,7 @@ int main()
 void *deal(void *recv_pack_t)
 {
 	PACK *recv_pack = (PACK *)recv_pack_t;
-	switch(recv_pack.type)
+	switch(recv_pack->type)
 	{
 		case LOGIN:
 			login(recv_pack);
@@ -195,11 +195,9 @@ void registe(PACK *recv_pack_t)
 {
 	char need[1000];
 	PACK *recv_pack = (PACK *)recv_pack_t;
-	user_number=1000;
 	
 	memset(need, 0, sizeof(need));
-	sprintf(need, "insert into user_data values(%d,\"%s\",\"%s\",%d,%d)", user_number++, recv_pack->data.send_user, recv_pack->data.mes, 0, recv_pack->data.recv_fd);
-	recv_pack.data.send_account= user_number;
+	sprintf(need, "insert into user_data values(\"%s\",\"%s\",%d,%d)",  recv_pack->data.send_user, recv_pack->data.mes, 0, recv_pack->data.recv_fd);
 	mysql_query(&mysql, need);
 	memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
     strcpy(recv_pack->data.mes, "1");
@@ -215,9 +213,38 @@ void login(PACK *recv_pack_t)
 	PACK *recv_pack = (PACK *)recv_pack_t;
 	MYSQL_RES          *result = NULL;
     MYSQL_ROW          row;
+    int ret;
 	
 	memset(need, 0, sizeof(need));
 	sprintf(need, "select *from user_data where nickname = %s", recv_pack->data.send_user);
     pthread_mutex_lock(&mutex);	
-    ret = mysql_query(&mysql, need); 
+    ret = mysql_query(&mysql, need);
+    
+    
+    memset(need, 0, sizeof(need));
+    sprintf(need, "select *from user_data where nickname = %s", recv_pack->data.send_user);
+    mysql_query(&mysql, need);
+    result = mysql_store_result(&mysql);
+    if (!mysql_fetch_row(result))
+	{
+        recv_pack->type = ACCOUNT_ERROR;
+        memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+        printf("登录错误\n");
+        strcpy(recv_pack->data.mes, "0");
+        if (send(recv_pack->data.recv_fd, &recv_pack, sizeof(PACK), 0) < 0) 
+		{
+            my_err("send", __LINE__);
+        }
+    }
+    else
+	{
+		recv_pack->type = REGISTE;
+        memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+        strcpy(recv_pack->data.mes, "1");
+        printf("登录成功\n");
+        if (send(recv_pack->data.recv_fd, &recv_pack, sizeof(PACK), 0) < 0) 
+		{
+            my_err("send", __LINE__);
+        }
+	} 
 }
