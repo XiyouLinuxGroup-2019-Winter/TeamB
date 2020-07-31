@@ -1,21 +1,21 @@
 #ifndef _CHAT_H
 #define _CHAT_H
 
-#include <stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<errno.h>
 
-#define EXIT          -1
-#define REGISTE        1
-#define LOGIN          2
-#define ACCOUNT_ERROR -2
+#define EXIT               -1
+#define REGISTE             1
+#define LOGIN               2
+#define ACCOUNT_ERROR      -2
 
-#define MAX_CHAR          200
-#define FRI_MAX          300
-#define BUFSIZE          1000
+#define MAX_CHAR            200
+#define FRI_MAX             300
+#define BUFSIZE             1000
 
 
 
@@ -66,14 +66,6 @@ typedef struct _record
     char message[MAX_CHAR];
 }RECORD_INFO;
 
-typedef struct {
-    char  file_name[MAX_CHAR];       
-    char  file_send_name[MAX_CHAR];  
-    char  file_recv_name[MAX_CHAR];  
-    int   file_size;                 
-    int   file_size_now;             
-    int   flag ;                   
-} FIle;
 
 typedef struct {
     int               send_fd;
@@ -86,7 +78,6 @@ typedef struct {
 typedef struct {
     int               type;
     DATA              data;
-    FIle file;
     FRI_INFO fri_info;
     GROUP_INFO grp_info;
     RECORD_INFO rec_info[55];
