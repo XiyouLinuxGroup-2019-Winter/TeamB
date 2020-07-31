@@ -15,7 +15,7 @@ void my_err(const char *str,int line)
 int main(int argc,char **argv)
 {
     struct sockaddr_in serv_addr;
-    int conn_fd,ret;
+    int ret;
     int serv_port;
     char recv_buf[1024];
     memset(recv_buf,0,sizeof(recv_buf));
@@ -54,48 +54,16 @@ int main(int argc,char **argv)
         printf("Usage: [-p] [serv_port] [-a] [serv_addr]\n");
         exit(1);
     }
-    int chose=0;
-    while(chose!=3){
-        chose=print_login();
-        switch(chose){
-            case 1:
-            //创建TCP套接字
-            conn_fd=socket(AF_INET,SOCK_STREAM,0);
-            if(conn_fd<0){
-                my_err("socket",__LINE__);
-            }
-            //链接服务器
-            if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
-                my_err("connect",__LINE__);
-            }
-            login(conn_fd);
-            break;
-            case 2:
-            //创建TCP套接字
-            conn_fd=socket(AF_INET,SOCK_STREAM,0);
-            if(conn_fd<0){
-                my_err("socket",__LINE__);
-            }
-            //链接服务器
-            if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
-                my_err("connect",__LINE__);
-            }
-            uregister(conn_fd);
-            break;
-            case 3:
-            printf("再见\n");
-            break;
-        }
-    }
-    close(conn_fd);
-    /*//创建TCP套接字
-    conn_fd=socket(AF_INET,SOCK_STREAM,0);
-    if(conn_fd<0){
+    //创建TCP套接字
+    connfd=socket(AF_INET,SOCK_STREAM,0);
+    if(connfd<0){
         my_err("socket",__LINE__);
     }
     //链接服务器
-    if(connect(conn_fd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
+    if(connect(connfd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
         my_err("connect",__LINE__);
-    }*/
-
+    }
+    print_main();
+    close(connfd);
+    return 0;
 }

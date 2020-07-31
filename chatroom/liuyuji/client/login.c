@@ -6,12 +6,14 @@
  ************************************************************************/
 
 #include"client.h"
-int login(int connfd)
+int login()
 {
     printf("请输入您的用户id\n");
     char id[10];
     memset(id,0,sizeof(id));
     scanf("%s",id);
+    memset(user_id,0,sizeof(user_id));
+    sprintf(user_id,"%s",id);//储存id
     printf("请输入您的密码\n");
     char psw[32];
     memset(psw,0,sizeof(psw));
@@ -20,7 +22,7 @@ int login(int connfd)
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",id,psw);
-    printf("%s",send_buf);//
+    printf("send_buf len is %ld",strlen(send_buf));//
     if(send_pack(connfd,LOGIN,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -32,9 +34,11 @@ int login(int connfd)
     printf("login recv_buf is %s\n",recv_buf);
     if(recv_buf[0]=='1'){
         printf("欢迎登录\n");
-        sprintf(user_id,"%s",id);
-        print_main();
-        exit(0);
+        printf("user_id is %s\n",user_id);
+        pthread_t tid;
+        pthread_create(&tid,NULL,msgbox,NULL);
+        print_meau();
+        return 0;
     }
     else{
         printf("用户id或密码错误\n");

@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include"client.h"
-int uregister(int connfd)
+int uregister()
 {
     printf("请输入您的用户名\n");
     char name[32];
@@ -37,5 +37,6 @@ int uregister(int connfd)
         my_err("read",__LINE__);
     }
     printf("您的ID为%s",recv_buf);
+    return 0;
 }
 
