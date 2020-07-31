@@ -1,27 +1,27 @@
 /*************************************************************************
-	> File Name: addfriend.c
+	> File Name: findfriend.c
 	> Author: 
 	> Mail: 
-	> Created Time: 2020年07月30日 星期四 10时05分09秒
+	> Created Time: 2020年07月31日 星期五 21时12分31秒
  ************************************************************************/
 
 #include"client.h"
-int addfriend()
+int findfriend()
 {
     P_LOCK;
-    printf("请输入对方ID\n");
+    printf("请输入需要查找的ID\n");
     P_UNLOCK;
-    char fid[10];
+    char id[10];
+    memset(id,0,sizeof(id));
     S_LOCK;
-    scanf("%s",fid);
+    scanf("%s",id);
     S_UNLOCK;
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
-    sprintf(send_buf,"%s\n%s\n",user_id,fid);
-    printf("addfriend send_buf is %s",send_buf);//
-    if(send_pack(connfd,ADDFRIEND,strlen(send_buf),send_buf)<0){
+    sprintf(send_buf,"%s\n",id);
+    printf("findfriend send_buf is %s",send_buf);//
+    if(send_pack(connfd,FINDFRIEND,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
     return 0;
 }
-

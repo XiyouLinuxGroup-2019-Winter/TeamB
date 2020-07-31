@@ -10,6 +10,7 @@ int print_meau()
 {
     int chose;
     while(1){
+        P_LOCK;
         printf("1.好友管理\n");
         printf("2.群管理\n");
         printf("3.发送文件\n");
@@ -17,7 +18,10 @@ int print_meau()
         printf("5.消息盒子\n");
         printf("0.注销\n");
         printf("请输入您的选择\n");
+        P_UNLOCK;
+        S_LOCK;
         scanf("%d",&chose);
+        S_UNLOCK;
         switch(chose){
             case 1:
             print_friend();
@@ -35,9 +39,12 @@ int print_meau()
             print_box();
             break;*/
             case 0:
+            exit_flag=1;
+            char data[11];
+            sprintf(data,"%s\n",user_id);
+            send_pack(connfd,OVER,strlen(data),data);
             return 0;
             break;
         }
     }
 }
-

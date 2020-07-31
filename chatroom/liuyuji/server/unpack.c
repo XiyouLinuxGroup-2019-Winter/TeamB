@@ -31,6 +31,7 @@ int my_read(int conn_fd,void *buf,int len)
 }
 void *unpack(void *arg)
 {
+    printf("unpack start\n");//
     int conn_fd=*(int *)arg;
     
     //接收数据类型
@@ -66,6 +67,7 @@ void *unpack(void *arg)
     //判断type，将对应处理函数放进线程池
     int type=atoi(ty);
     pthread_t tid;
+    printf("real type is %d\n",type);
     switch(type){
         case LOGIN:
         add_work(login,(void *)argv);
@@ -79,16 +81,16 @@ void *unpack(void *arg)
         case ADDFRIEND:
         add_work(addfriend,(void *)argv);
         break;
-        /*case DELFRIEND:
-        add_work(delfriend,(void *)arg);
+        case DELFRIEND:
+        add_work(delfriend,(void *)argv);
         break;
-        case FINDFRIEN:
-        add_work(findfriend,(void *)arg);
+        case FINDFRIEND:
+        add_work(findfriend,(void *)argv);
         break;
         case FRIENDLIST:
-        add_work(friendlist,(void *)arg);
+        add_work(friendlist,(void *)argv);
         break;
-        case FCHATMSG:
+        /*case FCHATMSG:
         add_work(fchatmsg,(void *)arg);
         break;
         case BLOCKFRIEND:
@@ -121,5 +123,9 @@ void *unpack(void *arg)
         case DELMEMBER:
         add_work(delmember,(void *)arg);
         break;*/
+        case OVER:
+        add_work(over,(void *)argv);
+        break;
     }
+    printf("unpack is over\n");//
 }

@@ -16,8 +16,8 @@ void *uregister(void *arg)
     if((len=get_arg(arg,name,20))<0){
         fprintf(log,"get_arg failed\n");
     }
-    printf("name is %s\n",name);
     name[len]=0;
+    printf("name is %s\n",name);
     //获取密码
     char psw[32];
     if((len=get_arg(arg,psw,32))<0){

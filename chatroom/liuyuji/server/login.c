@@ -8,7 +8,7 @@
 #include"chat.h"
 void *login(void *arg)
 {
-    //printf("login arg is %s",arg);
+    printf("login start\n");
     int len=0;
     //获取用户id
     char id[10];
@@ -58,39 +58,39 @@ void *login(void *arg)
             my_err("write",__LINE__);
         }
         //close(atoi(fd));
-        return 0;
     }
     if(row[0]!=NULL){
         if(strcmp(psw,row[0])==0){
             sprintf(data,"1\n");
+            if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
+               my_err("write",__LINE__);
+            }
+            //修改mysql信息
+            memset(cmd,0,sizeof(cmd));
+            sprintf(cmd,"update user_data set state = 1 where id = '%s'",id);
+            if(mysql_query(&mysql, cmd)<0){
+                my_err("mysql_query",__LINE__);
+            }
+            memset(cmd,0,sizeof(cmd));
+            sprintf(cmd,"update user_data set socket = %s where id = '%s'",fd,id);
+            printf("cmd is %s\n",cmd);//
+            if(mysql_query(&mysql, cmd)<0){
+                my_err("mysql_query",__LINE__);
+            }
+            //检查是否有离线信息
+            free(arg);
         }
         else{
             sprintf(data,"0\n");
             free(arg);
+            printf("send_pack login failed\n");
             if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
-            my_err("write",__LINE__);
+                my_err("write",__LINE__);
             }
             //close(atoi(fd));
-            return 0;
         }
     }
-    if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
-       my_err("write",__LINE__);
-    }
-    //修改mysql信息
-    memset(cmd,0,sizeof(cmd));
-    sprintf(cmd,"update user_data set state = 1 where id = '%s'",id);
-    if(mysql_query(&mysql, cmd)<0){
-        my_err("mysql_query",__LINE__);
-    }
-    memset(cmd,0,sizeof(cmd));
-    sprintf(cmd,"update user_data set socket = %s where id = '%s'",fd,id);
-    printf("cmd is %s\n",cmd);//
-    if(mysql_query(&mysql, cmd)<0){
-        my_err("mysql_query",__LINE__);
-    }
-    //检查是否有离线信息
-    free(arg);
+    printf("login over\n");
     return 0;
 }
 

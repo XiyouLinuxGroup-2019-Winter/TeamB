@@ -63,7 +63,11 @@ int main(int argc,char **argv)
     if(connect(connfd,(struct sockaddr*)&serv_addr,sizeof(struct sockaddr_in))<0){
         my_err("connect",__LINE__);
     }
+    pthread_mutex_init(&p_mutex,NULL);
+    pthread_mutex_init(&s_mutex,NULL);
     print_main();
     close(connfd);
+    pthread_mutex_destroy(&p_mutex);
+    pthread_mutex_destroy(&s_mutex);
     return 0;
 }

@@ -25,19 +25,18 @@ void *addfriend(void *arg)
     }
     fid[len]=0;
     printf("fid is %s\n",fid);//
+    //获取用户socket
     char fd[4];
     if((len=get_arg(arg,fd,4))<0){
         fprintf(log,"get_arg failed\n");
     }
     fd[len]=0;
-    printf("fd is %s\n",fd);//
-    
+    printf("fd is %s\n",fd);    
     char msg[1024];
     memset(msg,0,sizeof(msg));
     //查询好友是否存在以及在线情况
     char cmd[1024];
     memset(cmd,0,sizeof(cmd));
-    printf("sprinf cmd\n");//
     sprintf(cmd,"select state from user_data where id = %s",fid);
     printf("cmd is %s\n",cmd);//
     if(mysql_query(&mysql, cmd)<0){
@@ -63,7 +62,6 @@ void *addfriend(void *arg)
     char state=row[0][0];//记录在线状态
     //查询好友表中有几条好友关系
     memset(cmd,0,sizeof(cmd));
-    printf("sprinf cmd\n");//
     sprintf(cmd,"select * from friend where (user='%s'&&friend='%s') || (user='%s'&&friend='%s')",uid,fid,fid,uid);
     printf("cmd is %s\n",cmd);//
     if(mysql_query(&mysql, cmd)<0){
@@ -73,6 +71,13 @@ void *addfriend(void *arg)
     int count=0;//好友关系数
     while(row=mysql_fetch_row(result)){
         count++;
+    }
+    if(count==2){
+        sprintf(msg,"3\n");
+        if(send_pack(atoi(fd),ADDFRIEND,strlen(msg),msg)<0){
+            my_err("write",__LINE__);
+        }
+        return 0;
     }
     //判断好友是否存在
     //好友存在
@@ -109,7 +114,8 @@ void *addfriend(void *arg)
                     my_err("write",__LINE__);
                 }
                 memset(cmd,0,sizeof(cmd));
-                sprintf(cmd,"update friend_request set state = 1 where user='%s' && friend='%s'",uid,fid);
+                sprintf(cmd,"update friend_request set state = 1 where send_id='%s' && recv_id='%s'",uid,fid);
+                printf("%s\n",cmd);//
                 if(mysql_query(&mysql, cmd)<0){
                     my_err("mysql_query",__LINE__);
                 }
@@ -151,6 +157,7 @@ void *addfriend(void *arg)
         }
     }
     free(arg);
+    printf("addfriend over\n");
     return 0;
 }
 

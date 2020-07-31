@@ -9,30 +9,38 @@
 int print_friend()
 {
     while(1){
+        P_LOCK;
         printf("1.查看好友列表\n");
         printf("2.添加好友\n");
         printf("3.删除好友\n");
-        printf("4.拉黑好友\n");
-        printf("5.聊天\n");
-        printf("6.返回\n");
+        printf("4.查找好友\n");
+        printf("5.拉黑好友\n");
+        printf("6.聊天\n");
+        printf("7.返回\n");
+        P_UNLOCK;
         int chose;
+        S_LOCK;
         scanf("%d",&chose);
+        S_UNLOCK;
         switch(chose){
-            /*case 1:
-            
-            break;*/
+            case 1:
+            friendlist();
+            break;
             case 2:
             addfriend();
             break;
-            /*case 3:
+            case 3:
+            delfriend();
             break;
-            case 1:
+            case 4:
+            findfriend();
             break;
+            /*
             case 1:
             break;
             case 1:
             break;*/
-            case 6:
+            case 7:
             return 0;
             break;
         }

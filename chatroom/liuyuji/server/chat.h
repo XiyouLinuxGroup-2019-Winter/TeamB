@@ -43,6 +43,7 @@ enum{
     GCHATMSG,
     SETSTATE,
     DELMEMBER,
+    OVER,
 };
 
 typedef struct{
@@ -50,6 +51,7 @@ typedef struct{
     char len[2];
     char data[1024];
 }Pack;
+
 MYSQL mysql;
 FILE* log;
 pthread_key_t key;
@@ -65,7 +67,11 @@ void my_err(const char *str,int line);
 void *login(void *arg);
 void *uregister(void *arg);
 void *addfriend(void *arg);
-/*void *(void *arg);
+void *over(void *arg);
+void *friendlist(void *arg);
+void *findfriend(void *arg);
+void *delfriend(void *arg);
+/*
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);

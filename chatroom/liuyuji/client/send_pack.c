@@ -14,7 +14,7 @@ int send_pack(int connfd,int type,int len,char *value)
     sprintf(send_buf.len,"%d",len);
     int lenth=atoi(send_buf.len)+4;
     sprintf(send_buf.data,"%s",value);
-    printf("send_pack is %d byte\n",lenth);
+    printf("send_pack is %d byte\n",lenth);//
     if(my_write(connfd,(char *)&send_buf,lenth)<0){
         return -1;
     }
