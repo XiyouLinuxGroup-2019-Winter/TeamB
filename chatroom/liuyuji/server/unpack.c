@@ -36,7 +36,7 @@ void *unpack(void *arg)
     //接收数据类型
     char ty[3];
     memset(ty,0,sizeof(3));
-    if(my_read(conn_fd,&ty,2)<0){
+    if(my_read(conn_fd,ty,2)<0){
         my_err("read",__LINE__);
     }
     fprintf(stderr,"数据type为%s\n",ty);
@@ -44,7 +44,7 @@ void *unpack(void *arg)
     //接收数据长度
     char len[3];
     memset(len,0,sizeof(len));
-    if(my_read(conn_fd,&len,2)<0){
+    if(my_read(conn_fd,len,2)<0){
         my_err("read",__LINE__);
     }
     fprintf(stderr,"数据len为%s\n",len);

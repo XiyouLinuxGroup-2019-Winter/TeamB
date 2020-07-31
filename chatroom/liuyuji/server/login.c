@@ -57,7 +57,7 @@ void *login(void *arg)
         if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
             my_err("write",__LINE__);
         }
-        close(atoi(fd));
+        //close(atoi(fd));
         return 0;
     }
     if(row[0]!=NULL){
@@ -70,7 +70,7 @@ void *login(void *arg)
             if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
             my_err("write",__LINE__);
             }
-            close(atoi(fd));
+            //close(atoi(fd));
             return 0;
         }
     }

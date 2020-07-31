@@ -123,12 +123,13 @@ int main()
                 setnoblock(connfd);
                 
                 ev.data.fd=connfd;
-                ev.events=EPOLLIN | EPOLLET | EPOLLHUP;
+                ev.events=EPOLLIN | EPOLLHUP | EPOLLET;
                 epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&ev);
             }
             //若有客户请求
             else if(ep_events[i].events & EPOLLIN){
                 //将解包函数放入线程池
+                printf("socket %d ep_have data\n",ep_events[i].data.fd);
                 add_work(unpack,&ep_events[i].data.fd);
                 //printf("add_work\n");
                 //pthread_t tid;//
@@ -137,9 +138,10 @@ int main()
             }
             //若客户挂断
             else if(ep_events[i].events & EPOLLHUP){
+                printf("close\n");
                 close(ep_events[i].data.fd);  
                 epoll_ctl(epfd,EPOLL_CTL_DEL,ep_events[i].data.fd,NULL);
-                //fprintf(log,"%d is be closed\n",ep_events[i].data.fd);
+                fprintf(stderr,"%d is be closed\n",ep_events[i].data.fd);
             }
         }
     }

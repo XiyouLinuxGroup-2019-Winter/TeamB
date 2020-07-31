@@ -82,5 +82,6 @@ void *uregister(void *arg)
         my_err("write",__LINE__);
     }
     free(arg);
+    return 0;
 }
 
