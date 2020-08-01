@@ -75,9 +75,9 @@ void *unpack(void *arg)
         case UREGISTER:
         add_work(uregister,(void *)argv);
         break;
-        /*case FHCAT:
+        case FCHAT:
         add_work(fchat,(void *)argv);
-        break;*/
+        break;
         case ADDFRIEND:
         add_work(addfriend,(void *)argv);
         break;
@@ -92,10 +92,11 @@ void *unpack(void *arg)
         break;
         /*case FCHATMSG:
         add_work(fchatmsg,(void *)arg);
-        break;
+        break;*/
         case BLOCKFRIEND:
-        add_work(blockfriend,(void *)arg);
+        add_work(blockfriend,(void *)argv);
         break;
+        /*
         case GCHAT:
         add_work(gchat,(void *)arg);
         break;
