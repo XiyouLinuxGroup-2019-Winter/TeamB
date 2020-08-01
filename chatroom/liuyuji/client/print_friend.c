@@ -35,11 +35,12 @@ int print_friend()
             case 4:
             findfriend();
             break;
-            /*
-            case 1:
+            case 5:
+            blockfriend();
             break;
-            case 1:
-            break;*/
+            case 6:
+            fchat();
+            break;
             case 7:
             return 0;
             break;

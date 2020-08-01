@@ -82,5 +82,7 @@ int friendlist();
 int addfriend();
 int findfriend();
 int delfriend();
+int blockfriend();
+int fchat();
 
 #endif

@@ -151,7 +151,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);
+            printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t好友不存在\n");
@@ -160,6 +160,24 @@ void *msgbox(void *arg)
             else if(flag[0]=='1'){
                 P_LOCK;
                 printf("\t\t\t\t\t删除成功\n");
+            }
+            break;
+        }
+        case BLOCKFRIEND:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t好友不存在\n");
+                P_UNLOCK;
+            }
+            else if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t拉黑成功\n");
             }
             break;
         }
