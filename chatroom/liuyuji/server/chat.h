@@ -71,9 +71,9 @@ void *over(void *arg);
 void *friendlist(void *arg);
 void *findfriend(void *arg);
 void *delfriend(void *arg);
-/*
-void *(void *arg);
-void *(void *arg);
+void *blockfriend(void *arg);
+void *fchat(void *arg);
+/*void *(void *arg);
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);

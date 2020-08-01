@@ -12,6 +12,8 @@ int friendlist()
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n",user_id);
     printf("friendlist send_buf is %s",send_buf);//
+    P_LOCK;
+    printf("\t\t\t\t\t用户ID   用户名   在线状态\n");
     if(send_pack(connfd,FRIENDLIST,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
