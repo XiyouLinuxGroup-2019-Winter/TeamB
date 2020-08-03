@@ -12,6 +12,13 @@
 #define REGISTE             1
 #define LOGIN               2
 #define ACCOUNT_ERROR      -2
+#define LOOK_FRI            3
+#define GET_FRI_STA         4
+#define ADD_FRI             5
+#define DEL_FRI             6
+#define SHI_FRI             7
+#define REL_FRI             8
+#define CHAT_ONE            9
 
 #define MAX_CHAR            200
 #define FRI_MAX             300
