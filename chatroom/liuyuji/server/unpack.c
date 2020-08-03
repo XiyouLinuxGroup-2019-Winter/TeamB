@@ -99,10 +99,13 @@ void *unpack(void *arg)
         /*
         case GCHAT:
         add_work(gchat,(void *)arg);
-        break;
+        break;*/
+        case GROUPLIST:
+        add_work(grouplist,(void *)argv);
         case CREATEGROUP:
-        add_work(creategroup,(void *)arg);
+        add_work(creategroup,(void *)argv);
         break;
+        /*
         case DELGROUP:
         add_work(delgroup,(void *)arg);
         break;
@@ -124,6 +127,9 @@ void *unpack(void *arg)
         case DELMEMBER:
         add_work(delmember,(void *)arg);
         break;*/
+        case FRIEND:
+        add_work(friends,(void *)argv);
+        break;
         case OVER:
         add_work(over,(void *)argv);
         break;

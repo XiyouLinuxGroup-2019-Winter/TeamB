@@ -16,12 +16,13 @@ int print_friend()
         printf("4.查找好友\n");
         printf("5.拉黑好友\n");
         printf("6.聊天\n");
-        printf("7.返回\n");
+        printf("7.查看好友消息\n");
+        printf("0.返回\n");
         P_UNLOCK;
         int chose;
-        S_LOCK;
+        //S_LOCK;
         scanf("%d",&chose);
-        S_UNLOCK;
+        //S_UNLOCK;
         switch(chose){
             case 1:
             friendlist();
@@ -42,6 +43,9 @@ int print_friend()
             fchat();
             break;
             case 7:
+            printnode();
+            break;
+            case 0:
             return 0;
             break;
         }

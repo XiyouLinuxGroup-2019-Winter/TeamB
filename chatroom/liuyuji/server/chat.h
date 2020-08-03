@@ -22,6 +22,7 @@
 #include "thread_pool.h"
 #include<pthread.h>
 #include<errno.h>
+#include<signal.h>
 #define SERV_PORT 8848//服务器端口号
 
 enum{
@@ -43,7 +44,9 @@ enum{
     GCHATMSG,
     SETSTATE,
     DELMEMBER,
+    FRIEND,
     OVER,
+    GROUPLIST,
 };
 
 typedef struct{
@@ -73,9 +76,10 @@ void *findfriend(void *arg);
 void *delfriend(void *arg);
 void *blockfriend(void *arg);
 void *fchat(void *arg);
+void *friends(void *arg);
+void *creategroup(void *arg);
+void *grouplist(void *arg);
 /*void *(void *arg);
-void *(void *arg);
-void *(void *arg);
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);

@@ -14,6 +14,11 @@ void my_err(const char *str,int line)
 }
 int main(int argc,char **argv)
 {
+    //Msg=(Msghead *)malloc(sizeof(Msghead));
+    memset(&Msg,0,sizeof(Msghead));
+    Msg.head=NULL;
+    Msg.tail=NULL;
+    Msg.num=0;
     struct sockaddr_in serv_addr;
     int ret;
     int serv_port;
@@ -65,9 +70,13 @@ int main(int argc,char **argv)
     }
     pthread_mutex_init(&p_mutex,NULL);
     pthread_mutex_init(&s_mutex,NULL);
+    pthread_mutex_init(&mutex,NULL);
+    pthread_cond_init(&cond,NULL);
     print_main();
     close(connfd);
     pthread_mutex_destroy(&p_mutex);
     pthread_mutex_destroy(&s_mutex);
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&cond);
     return 0;
 }

@@ -29,6 +29,10 @@ void setnoblock(int sock)
 }
 int main()
 {
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set,SIGPIPE);
+    sigprocmask(SIG_BLOCK,&set,NULL);
     //log=fopen("log","w");
     //初始化线程私有数据
     pthread_key_create(&key,NULL);
@@ -83,7 +87,7 @@ int main()
 	//fprintf(log,"连接mysql数据库成功!\n");
 
     //初始化线程池
-    pool_init(6);
+    pool_init(3);
     
     //初始化epoll
     int epfd=epoll_create(20);

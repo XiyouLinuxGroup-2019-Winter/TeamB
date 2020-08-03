@@ -15,7 +15,6 @@ int print_meau()
         printf("2.群管理\n");
         printf("3.发送文件\n");
         printf("4.聊天记录\n");
-        printf("5.消息盒子\n");
         printf("0.注销\n");
         printf("请输入您的选择\n");
         P_UNLOCK;
@@ -26,17 +25,14 @@ int print_meau()
             case 1:
             print_friend();
             break;
-            /*case 2:
+            case 2:
             print_group();
-            break;
+            break;/*
             case 3:
             print_file();
             break;
             case 4:
             print_chatmsg();
-            break;
-            case 5:
-            print_box();
             break;*/
             case 0:
             exit_flag=1;

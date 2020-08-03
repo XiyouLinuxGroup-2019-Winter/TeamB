@@ -40,39 +40,9 @@ void *fchat(void *arg)
     printf("fd is %s\n",fd);    
     char cmd[1024];
     memset(cmd,0,sizeof(cmd));
-    //查询好友是否存在
-    sprintf(cmd,"select state,link from friend where (user = %s && friend = %s) || (user = %s && friend = %s)",uid,fid,fid,uid);
-    printf("cmd is %s\n",cmd);//
-    if(mysql_query(&mysql, cmd)<0){
-        my_err("mysql_query",__LINE__);
-    }
     MYSQL_RES *result=NULL;
 	MYSQL_ROW row;
     char data[1024];
-
-    result=mysql_store_result(&mysql);
-    row=mysql_fetch_row(result);
-    if(row==NULL){
-        memset(data,0,sizeof(data));
-        sprintf(data,"0\n");
-        if(send_pack(atoi(fd),FCHAT,strlen(data),data)<0){
-            my_err("write",__LINE__);
-        }
-        free(arg);
-        printf("fchat over\n");
-        return NULL;
-    }
-    //判断好友关系是否正常
-    if(strcmp(row[0],"0") || strcmp(row[1],"0")==0){
-        memset(data,0,sizeof(data));
-        sprintf(data,"0\n");
-        if(send_pack(atoi(fd),FCHAT,strlen(data),data)<0){
-            my_err("write",__LINE__);
-        }
-        free(arg);
-        printf("fchat over\n");
-        return NULL;
-    }
     //将消息储存起来
     memset(cmd,0,sizeof(cmd));
     sprintf(cmd,"insert into chat_msg(send_id,recv_id,msg) values(%s,%s,'%s')",uid,fid,msg);
@@ -89,7 +59,8 @@ void *fchat(void *arg)
     result=mysql_store_result(&mysql);
     row=mysql_fetch_row(result);
     //若不在线
-    if(strcmp(row[0],"0")){
+    if(strcmp(row[0],"0")==0){
+        printf("对方不在线\n");
         free(arg);
         printf("fchat over\n");
         return NULL;
@@ -104,7 +75,9 @@ void *fchat(void *arg)
     //将消息状态改为1已发送
     memset(cmd,0,sizeof(cmd));
     sprintf(cmd,"update chat_msg set state = 1 where send_id = %s && recv_id = %s && msg = '%s'",uid,fid,msg);
+    printf("cmd is %s\n",cmd);
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
+    printf("fchat over\n");
 }

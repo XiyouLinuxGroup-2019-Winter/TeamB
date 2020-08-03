@@ -160,6 +160,7 @@ void *msgbox(void *arg)
             else if(flag[0]=='1'){
                 P_LOCK;
                 printf("\t\t\t\t\t删除成功\n");
+                P_UNLOCK;
             }
             break;
         }
@@ -179,6 +180,73 @@ void *msgbox(void *arg)
                 P_LOCK;
                 printf("\t\t\t\t\t拉黑成功\n");
             }
+            break;
+        }
+        case FRIEND:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t好友不存在\n");
+                P_UNLOCK;
+                C_SIGNAL;
+                break;
+            }
+            else if(flag[0]=='1'){
+                chat_flag=1;
+                C_SIGNAL;
+                break;
+            }
+        }
+        case FCHAT:{
+            char send_id[10];
+            memset(send_id,0,sizeof(send_id));
+            if(get_arg(recv_buf,send_id,sizeof(send_id))<0){
+                my_err("read",__LINE__);
+            }
+            char recv_id[10];
+            memset(recv_id,0,sizeof(recv_id));
+            if(get_arg(recv_buf,recv_id,sizeof(recv_id))<0){
+                my_err("read",__LINE__);
+            }
+            char msg[500];
+            memset(msg,0,sizeof(msg));
+            if(get_arg(recv_buf,msg,sizeof(msg))<0){
+                my_err("read",__LINE__);
+            }
+            if(chat_flag==1 && strcmp(send_id,chat_id)==0){
+                P_LOCK;
+                printf("\t\t\t%s--->%s:%s\n",send_id,recv_id,msg);
+                P_UNLOCK;
+            }
+            else{
+                P_LOCK;
+                printf("\t\t\t\t\t您有一条新消息!!!\n");
+                //printf("\t\t\t%s--->%s:%s\n",send_id,recv_id,msg);
+                P_UNLOCK;
+                addnode(send_id,recv_id,msg);
+            }
+            break;
+        }
+        case CREATEGROUP:{
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            if(gid[0]=='0'){
+                P_LOCK;
+                printf("群名重复，请重新创建群\n");
+                P_UNLOCK;
+                break;
+            }
+            P_LOCK;
+            printf("您所创建的群ID为%s\n",gid);
+            P_UNLOCK;
             break;
         }
         }
