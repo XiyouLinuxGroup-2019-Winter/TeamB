@@ -195,7 +195,7 @@ void *get_back(void *arg)
                 {
                     printf("\n\t\t\e[1;33m您有新消息啦!\e[0m\n");
                     sign_ive[sign] = ACTIVE;
-                    sprintf(mes_box[sign], "好友%s想要与你一起探讨人生...", recv_pack.data.send_user);
+                    sprintf(mes_box[sign], "好友%s想要与你聊天...", recv_pack.data.send_user);
                     sign++;
                 }
                 else if(flag == 2)
@@ -205,7 +205,7 @@ void *get_back(void *arg)
                 }
                 else if(flag == 3)
                 {
-                    printf("\n\t\t该好友已被屏蔽!\n");
+                    printf("\n\t\t该好友被屏蔽!\n");
                     pthread_cond_signal(&cond);           
                 }
                 else if(flag == 6)
@@ -216,6 +216,7 @@ void *get_back(void *arg)
                 else
                     printf("\n\t\t\e[1;34m%s\n\t\t%s:\e[0m %s\n", recv_pack.data.recv_user, recv_pack.data.send_user, recv_pack.data.mes);
                 break;
+                
 		}
 	}
 }
@@ -245,22 +246,23 @@ int login_menu()
         printf("\t\t\033[;34m\33[1m*\033[0m        0.退出               \033[;34m\33[1m*\033[0m \n");
         printf("\t\t\033[;34m\33[1m*******************************\033[0m\n");
         printf("\t\tchoice：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         switch(choice)
         {  
             case 1:
+            	printf("这里没问题5\n");
                 if(login() == 1)
                     return 1;
                 break;
             case 2:
+            	printf("这里没问题6\n");
                 registe();
                 break;
             default:
                 break;
         }
     }while(choice!=0);
-    flag = EXIT;
-    send_pack(flag, user, "server", " ");
+    printf("这里没问题7\n");
     return 0;
 } 
 
@@ -273,9 +275,9 @@ void registe()
     PACK recv_registe;
     int recv_registe_flag;
 
-    printf("\t\t输入你想要注册账号的名称：");
+    printf("\t\t输入想要注册账号的名称：");
     scanf("%s",registe_name);
-    printf("\t\t输入你想要注册账号的密码：");
+    printf("\t\t输入想要注册账号的密码：");
     scanf("%s",registe_passwd);
     
     send_pack(flag, registe_name, "server", registe_passwd);
@@ -287,7 +289,7 @@ void registe()
         printf("\t\t注册成功!\n");
     else
     {
-        printf("\t\t该用户名已存在，请重新输入\n");
+        printf("\t\t注册失败\n");
     } 
 }
 
@@ -338,7 +340,7 @@ void Menu()
         printf("\t\t\e[1;32m|\e[0m         0.注销            \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t请选择：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         
         switch(choice)
         {
@@ -368,14 +370,14 @@ void Menu_friends()
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t\e[1;32m|\e[0m         4.屏蔽好友        \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
-        printf("\t\t\e[1;32m|\e[0m         5.解除屏蔽好友        \e[1;32m|\e[0m\n");
+        printf("\t\t\e[1;32m|\e[0m         5.解除屏蔽好友    \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t\e[1;32m|\e[0m         6.私聊            \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t\e[1;32m|\e[0m         0.返回            \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t请选择：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         
         switch(choice)
         {
@@ -402,6 +404,7 @@ void Menu_friends()
         case 6:
             chat_one();
             break; 
+            
 
         default:
             break;
@@ -497,7 +500,7 @@ void chat_one()
     int i = 0;
     memset(mes, 0, sizeof(mes));
     memset(&rec_info, 0, sizeof(rec_info));
-    rec_info[0].message[0] = '0';
+    rec_info[0].messages[0] = '0';
     pthread_mutex_lock(&mutex);
     printf("\n\t\t输入聊天对象的名字 ");
     scanf("%s",chat_name);
@@ -506,13 +509,13 @@ void chat_one()
     
     pthread_cond_wait(&cond, &mutex);
     printf("\n\t\t\e[1;34m***********Message***********\e[0m\n");
-    if(rec_info[0].message[0] == '0')
+    if(rec_info[0].messages[0] == '0')
         printf("\t\t暂无未读消息\n");
     else
     {
-        while(rec_info[i].message[0] != '0')
+        while(rec_info[i].messages[0] != '0')
         {
-            printf("\t\t\e[1;35m%s-->%s: \e[0m%s\n",rec_info[i].name1, rec_info[i].name2, rec_info[i].message);
+            printf("\t\t\e[1;35m%s-->%s: \e[0m%s\n",rec_info[i].send_user, rec_info[i].recv_user, rec_info[i].messages);
             i++;
         }
     }
@@ -529,3 +532,4 @@ void chat_one()
 
     pthread_mutex_unlock(&mutex);
 }
+

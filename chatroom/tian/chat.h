@@ -29,9 +29,9 @@
 
 typedef struct _user
 {
-    char name[MAX_CHAR];
-    char passwd[MAX_CHAR];
-    int statu_s;
+    char nickname[MAX_CHAR];
+    char password[MAX_CHAR];
+    int user_state;
     int fd;
     char chat[MAX_CHAR];
     struct _user *next;
@@ -39,17 +39,17 @@ typedef struct _user
 
 typedef struct _relation
 {
-    char name1[MAX_CHAR];
-    char name2[MAX_CHAR];
-    int statu_s;
+    char user[MAX_CHAR];
+    char friend_user[MAX_CHAR];
+    int realtion;
     struct _relation *next;
 }Relation;
 
 typedef struct _recordinfo
 {
-    char name1[MAX_CHAR];
-    char name2[MAX_CHAR];
-    char message[BUFSIZE];
+    char send_user[MAX_CHAR];
+    char recv_user[MAX_CHAR];
+    char messages[BUFSIZE];
     struct _recordinfo *next;
 }Recordinfo;
 
@@ -68,9 +68,9 @@ typedef struct _group
 
 typedef struct _record
 {
-    char name1[MAX_CHAR];
-    char name2[MAX_CHAR];
-    char message[MAX_CHAR];
+    char send_user[MAX_CHAR];
+    char recv_user[MAX_CHAR];
+    char messages[MAX_CHAR];
 }RECORD_INFO;
 
 
