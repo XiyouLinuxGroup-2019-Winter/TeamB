@@ -246,22 +246,23 @@ int login_menu()
         printf("\t\t\033[;34m\33[1m*\033[0m        0.退出               \033[;34m\33[1m*\033[0m \n");
         printf("\t\t\033[;34m\33[1m*******************************\033[0m\n");
         printf("\t\tchoice：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         switch(choice)
         {  
             case 1:
+            	printf("这里没问题5\n");
                 if(login() == 1)
                     return 1;
                 break;
             case 2:
+            	printf("这里没问题6\n");
                 registe();
                 break;
             default:
                 break;
         }
     }while(choice!=0);
-    flag = EXIT;
-    send_pack(flag, user, "server", " ");
+    printf("这里没问题7\n");
     return 0;
 } 
 
@@ -274,9 +275,9 @@ void registe()
     PACK recv_registe;
     int recv_registe_flag;
 
-    printf("\t\t输入你想要注册账号的名称：");
+    printf("\t\t输入想要注册账号的名称：");
     scanf("%s",registe_name);
-    printf("\t\t输入你想要注册账号的密码：");
+    printf("\t\t输入想要注册账号的密码：");
     scanf("%s",registe_passwd);
     
     send_pack(flag, registe_name, "server", registe_passwd);
@@ -288,7 +289,7 @@ void registe()
         printf("\t\t注册成功!\n");
     else
     {
-        printf("\t\t该用户名已存在，请重新输入\n");
+        printf("\t\t注册失败\n");
     } 
 }
 
@@ -339,7 +340,7 @@ void Menu()
         printf("\t\t\e[1;32m|\e[0m         0.注销            \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t请选择：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         
         switch(choice)
         {
@@ -376,7 +377,7 @@ void Menu_friends()
         printf("\t\t\e[1;32m|\e[0m         0.返回            \e[1;32m|\e[0m\n");
         printf("\t\t\e[1;32m-----------------------------\e[0m\n");
         printf("\t\t请选择：");
-        scanf("%d",choice);
+        scanf("%d",&choice);
         
         switch(choice)
         {
@@ -531,3 +532,4 @@ void chat_one()
 
     pthread_mutex_unlock(&mutex);
 }
+
