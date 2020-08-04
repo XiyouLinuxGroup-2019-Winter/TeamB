@@ -102,33 +102,37 @@ void *unpack(void *arg)
         break;*/
         case GROUPLIST:
         add_work(grouplist,(void *)argv);
+        break;
         case CREATEGROUP:
         add_work(creategroup,(void *)argv);
         break;
         /*
         case DELGROUP:
         add_work(delgroup,(void *)arg);
-        break;
+        break;*/
         case ADDGROUP:
-        add_work(addgroup,(void *)arg);
+        add_work(addgroup,(void *)argv);
         break;
         case EXITGROUP:
-        add_work(exitgroup,(void *)arg);
-        break;
+        add_work(exitgroup,(void *)argv);
+        break;/*
         case GROUPMEMBER:
         add_work(groupmember,(void *)arg);
         break;
         case GCHATMSG:
         add_work(gchatmsg,(void *)arg);
-        break;
+        break;*/
         case SETSTATE:
-        add_work(setstate,(void *)arg);
-        break;
+        add_work(gsetstate,(void *)argv);
+        break;/*
         case DELMEMBER:
         add_work(delmember,(void *)arg);
         break;*/
         case FRIEND:
         add_work(friends,(void *)argv);
+        break;
+        case DEALGROUP:
+        add_work(dealgroup,(void *)argv);
         break;
         case OVER:
         add_work(over,(void *)argv);

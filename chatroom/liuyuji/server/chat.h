@@ -47,6 +47,7 @@ enum{
     FRIEND,
     OVER,
     GROUPLIST,
+    DEALGROUP,
 };
 
 typedef struct{
@@ -79,11 +80,11 @@ void *fchat(void *arg);
 void *friends(void *arg);
 void *creategroup(void *arg);
 void *grouplist(void *arg);
+void *addgroup(void *arg);
+void *dealgroup(void *arg);
+void *exitgroup(void *arg);
+void *gsetstate(void *arg);
 /*void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);

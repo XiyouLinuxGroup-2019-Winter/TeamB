@@ -43,8 +43,10 @@ enum{
     FRIEND,
     OVER,
     GROUPLIST,
+    DEALGROUP,
 };
-
+#define GM_LOCK pthread_mutex_lock(&gm_mutex)
+#define GM_UNLOCK pthread_mutex_unlock(&gm_mutex)
 #define LOCK pthread_mutex_lock(&mutex)
 #define UNLOCK pthread_mutex_unlock(&mutex)
 #define P_LOCK pthread_mutex_lock(&p_mutex)
@@ -59,20 +61,33 @@ typedef struct {
     char len[2];
     char data[1024];
 }Pack;
+
 typedef struct node{
     char send_id[10];
     char recv_id[10];
     struct node* next;
     char msg[500];
-}Node;
+}Fmsg;
+
+typedef struct gnode{
+    char member_id[10];
+    char group_id[10];
+    struct gnode* next;
+}GM;
 
 typedef struct msg{
-    Node *head;
-    Node *tail;
+    Fmsg *head;
+    Fmsg *tail;
     int num;
 }Msghead;
 
+typedef struct gmember{
+    GM *head;
+    GM *tail;
+    int num;
+}GMhead;
 Msghead Msg;
+GMhead Gm;
 int exit_flag;//用户注销标识
 char user_id[10];//用户id
 int connfd;//socket
@@ -81,7 +96,7 @@ char chat_id[10];//聊天对象
 int read_len;
 
 //读写锁
-pthread_mutex_t p_mutex,s_mutex,mutex;
+pthread_mutex_t p_mutex,s_mutex,mutex,gm_mutex;
 pthread_cond_t cond;
 int send_pack(int connfd,int type,int len,char *value);
 int unpack(int connfd,char *recv_buf,int lenth);
@@ -95,6 +110,9 @@ int get_arg(char *read_buf,char *recv_buf,int len);
 int addnode(char *send_id,char *recv_id,char *msg);
 int delnode();
 int printnode();
+
+int addgnode(char *member_id,char *group_id);
+int delgnode();
 
 int print_main();
 int login();
@@ -111,6 +129,10 @@ int fchat();
 
 int print_group();
 int creategroup();
-
+int grouplist();
+int addgroup();
+int dealgroup();
+int exitgroup();
+int gsetstate();
 
 #endif

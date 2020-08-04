@@ -44,7 +44,6 @@ void *creategroup(void *arg)
     char data[10];
     result=mysql_store_result(&mysql);
     row=mysql_fetch_row(result);
-    printf("panduan row!=NULL\n");
     if(row!=NULL){
         memset(data,0,sizeof(data));
         sprintf(data,"0\n");
@@ -65,7 +64,7 @@ void *creategroup(void *arg)
     memset(cmd,0,sizeof(cmd));
     //查询群id并返回
     sprintf(cmd,"select group_id from my_groups where group_name = '%s'",name);
-    printf("cmd is %s",cmd);//
+    printf("cmd is %s\n",cmd);//
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }

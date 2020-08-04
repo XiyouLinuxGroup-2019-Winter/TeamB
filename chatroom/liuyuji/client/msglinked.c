@@ -8,14 +8,12 @@
 #include"client.h"
 int addnode(char *send_id,char *recv_id,char *msg)
 {
-    Node *operate=(Node*)malloc(sizeof(Node));
-    memset(operate,0,sizeof(Node));
+    Fmsg *operate=(Fmsg*)malloc(sizeof(Fmsg));
+    memset(operate,0,sizeof(Fmsg));
     strcpy(operate->send_id,send_id);
     strcpy(operate->recv_id,recv_id);
     strcpy(operate->msg,msg);
     operate->next=NULL;
-    P_LOCK;
-    P_UNLOCK;
     LOCK;
     if(Msg.num==0){
         Msg.head=operate;
@@ -23,18 +21,37 @@ int addnode(char *send_id,char *recv_id,char *msg)
         Msg.num++;
     }
     else{
-        Node *record=Msg.tail;
+        Fmsg *record=Msg.tail;
         record->next=operate;
         Msg.num++;
     }
     UNLOCK;
-    printf("addnode over\n");
+}
+int addgnode(char *member_id,char *group_id)
+{
+    GM *operate=(GM*)malloc(sizeof(GM));
+    memset(operate,0,sizeof(GM));
+    strcpy(operate->member_id,member_id);
+    strcpy(operate->group_id,group_id);
+    operate->next=NULL;
+    GM_LOCK;
+    if(Gm.num==0){
+        Gm.head=operate;
+        Gm.tail=operate;
+        Gm.num++;
+    }
+    else{
+        GM *record=Gm.tail;
+        record->next=operate;
+        Gm.num++;
+    }
+    GM_UNLOCK;
 }
 int delnode()
 {
     LOCK;
-    Node *operate=Msg.head;
-    Node *record=operate->next;
+    Fmsg *operate=Msg.head;
+    Fmsg *record=operate->next;
     free(operate);
     Msg.num--;
     Msg.head=record;
@@ -43,9 +60,22 @@ int delnode()
     }
     UNLOCK;
 }
+int delgnode()
+{
+    GM *operate=Gm.head;
+    GM *record;
+    while(operate){
+        record=operate->next;
+        free(operate);
+        Gm.num--;
+        operate=record;
+    }
+    Gm.head=NULL;
+    Gm.tail=NULL;
+}
 int printnode()
 {
-    Node *operate;
+    Fmsg *operate;
     LOCK;
     operate=Msg.head;
     for(int i=0;i<Msg.num;i++){

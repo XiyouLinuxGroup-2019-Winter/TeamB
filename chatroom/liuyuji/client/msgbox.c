@@ -35,6 +35,8 @@ void *msgbox(void *arg)
             my_err("read",__LINE__);
         }
         fprintf(stderr,"数据为%s\n",recv_buf);
+
+        printf("收到数据%s",recv_buf);
         
         //判断type，分别处理
         int type=atoi(ty);
@@ -248,6 +250,147 @@ void *msgbox(void *arg)
             printf("您所创建的群ID为%s\n",gid);
             P_UNLOCK;
             break;
+        }
+        case GROUPLIST:{
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            if(gid[0]=='0'){
+                P_LOCK;
+                printf("您没有加入任何群\n");
+                P_UNLOCK;
+                break;
+            }
+            char gname[20];
+            memset(gname,0,sizeof(gname));
+            if(get_arg(recv_buf,gname,sizeof(gname))<0){
+                my_err("read",__LINE__);
+            }
+            char state[3];
+            memset(state,0,sizeof(state));
+            if(get_arg(recv_buf,state,sizeof(state))<0){
+                my_err("read",__LINE__);
+            }
+            P_LOCK;
+            printf("\t\t\t\t\tgroup_id:%s  group_name:%s  state:%s\n",gid,gname,state);
+            P_UNLOCK;
+            break;
+        }
+        case ADDGROUP:{
+            char mid[10];
+            memset(mid,0,sizeof(mid));
+            if(get_arg(recv_buf,mid,sizeof(mid))<0){
+                my_err("read",__LINE__);
+            }
+            if(mid[0]=='0'){
+                P_LOCK;
+                printf("此群不存在\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(mid[0]=='a'){
+                P_LOCK;
+                printf("您已是群成员\n");
+                P_UNLOCK;
+                break;
+            }
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            P_LOCK;
+            printf("\t\t\t\t\t您收到一条群验证消息\n");
+            P_UNLOCK;
+            addgnode(mid,gid);
+            break;
+        }
+        case DEALGROUP:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t您加入群%s的申请已通过\n",gid);
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='2'){
+                P_LOCK;
+                printf("\t\t\t\t\t您加入群%s的申请未通过\n",gid);
+                P_UNLOCK;
+                break;
+            }
+        }
+        case EXITGROUP:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t您已成功退出该群\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t您不在该群中\n");
+                P_UNLOCK;
+                break;
+            }
+        }
+        case SETSTATE:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t您的权限不够\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t您不在该群中\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='2'){
+                P_LOCK;
+                printf("\t\t\t\t\t此成员不在该群中\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='3'){
+                P_LOCK;
+                printf("\t\t\t\t\t此成员已是管理员\n");
+                P_UNLOCK;
+                break;
+            }
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            if(flag[0]=='4'){
+                printf("\t\t\t\t\t您已成为群%s的管理员\n",gid);
+            }
         }
         }
     }

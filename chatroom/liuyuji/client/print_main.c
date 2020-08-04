@@ -14,7 +14,7 @@ int print_main()
         printf("请选择您所要执行的操作\n");
         printf("\t1.登录\n");
         printf("\t2.注册\n");
-        printf("\t3.爪巴\n");
+        printf("\t0.爪巴\n");
         scanf("%d",&chose);
         switch(chose){
             case 1:
@@ -23,7 +23,7 @@ int print_main()
             case 2:
             uregister();
             break;
-            case 3:
+            case 0:
             printf("再见\n");
             return 0;
             break;

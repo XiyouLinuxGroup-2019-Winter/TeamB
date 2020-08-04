@@ -18,6 +18,7 @@ int print_group()
         printf("6.踢人\n");
         printf("7.解散群\n");
         printf("8.群聊\n");
+        printf("9.处理群请求\n");
         printf("0.返回\n");
         P_UNLOCK;
         int chose;
@@ -29,12 +30,18 @@ int print_group()
             case 2:
             creategroup();
             break;
-            /*case 3:
-            print_file();
+            case 3:
+            addgroup();
             break;
             case 4:
-            print_chatmsg();
-            break;*/
+            exitgroup();
+            break;
+            case 5:
+            gsetstate();
+            break;
+            case 9:
+            dealgroup();
+            break;
             case 0:
             return 0;
             break;
