@@ -21,6 +21,7 @@
 
 #define FRIEND 1
 #define FRI_BLK 2
+#define FRI_WHI  3 
 
 #define OFFLINE 0
 #define ONLINE 1
@@ -55,6 +56,8 @@ User *pHead = NULL;
 Relation *pStart = NULL;
 Recordinfo *pRec = NULL;
 PACK Mex_Box[100];
+int sign;
+int book;
 
 int main()
 {
@@ -261,6 +264,38 @@ Relation *R_read()
     return pStart;
 }
 
+Recordinfo *RC_read()
+{
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+    char query_str[1000];
+    int rows;
+    int fields;
+
+    Recordinfo *pEnd, *pNew;
+
+    sprintf(query_str, "select * from chat_messages");
+    mysql_real_query(&mysql, query_str, strlen(query_str));
+    res = mysql_store_result(&mysql);
+    rows = mysql_num_rows(res);
+    fields = mysql_num_fields(res);
+
+    while(row = mysql_fetch_row(res))
+    {
+        pNew = (Recordinfo *)malloc(sizeof(Recordinfo));
+        strcpy(pNew->send_user, row[0]);
+        strcpy(pNew->recv_user, row[1]);
+        strcpy(pNew->messages, row[2]);
+        pNew->next = NULL;
+        if(pRec == NULL)
+            pRec = pNew;
+        else
+            pEnd->next = pNew;
+        pEnd = pNew;
+    }
+    return pRec;
+}
+
 void *deal(void *recv_pack_t)
 {
 	PACK *recv_pack = (PACK *)recv_pack_t;
@@ -363,6 +398,7 @@ void login(PACK *recv_pack_t)
 
 void look_fri(PACK *recv_pack_t)
 {
+	PACK *recv_pack = (PACK *)recv_pack_t;
     MYSQL_RES *res = NULL;
     MYSQL_ROW row;
     char need[1000];
@@ -405,7 +441,7 @@ void look_fri(PACK *recv_pack_t)
     }
     recv_pack->type = LOOK_FRI;
     memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-    strcpy(recv_pack->data.mes, " ")
+    strcpy(recv_pack->data.mes, ""); 
     if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
         my_err("send", __LINE__);
 }
@@ -435,7 +471,7 @@ void get_fri_sta(PACK *recv_pack_t)
     
     recv_pack->type = GET_FRI_STA;
     memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-    strcpy(recv_pack->data.mes, "ch")
+    strcpy(recv_pack->data.mes, "ch");
     if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
         my_err("send", __LINE__);
 }
@@ -470,7 +506,7 @@ void add_fri(PACK *recv_pack_t)
         ch[1] = '\0';
         recv_pack->type = ADD_FRI;
         memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-        strcpy(recv_pack->data.mes, "ch")
+        strcpy(recv_pack->data.mes, "ch");
         if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
             my_err("send", __LINE__);
             
@@ -483,7 +519,7 @@ void add_fri(PACK *recv_pack_t)
     {
         while(t)
         {
-            if(strcmp(t->name, recv_pack->data.recv_user) == 0)
+            if(strcmp(t->nickname, recv_pack->data.recv_user) == 0)
             {
                 flag_2 = 1;
                 break;
@@ -498,7 +534,7 @@ void add_fri(PACK *recv_pack_t)
             
             recv_pack->type = ADD_FRI;
             memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-            strcpy(recv_pack->data.mes, "ch")
+            strcpy(recv_pack->data.mes, "ch");
             if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
                 my_err("send", __LINE__);
                 
@@ -511,7 +547,6 @@ void add_fri(PACK *recv_pack_t)
         {
             if(t->user_state != OFFLINE)
             {
-                fd = t->fd;
                 if(recv_pack->data.mes[0] == '0')
                     ch[0] = '0';
                 else if(recv_pack->data.mes[0] == 'y')
@@ -535,7 +570,7 @@ void add_fri(PACK *recv_pack_t)
                 strcpy(recv_pack->data.send_user, ss);
                 recv_pack->type = ADD_FRI;
                 memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-                strcpy(recv_pack->data.mes, "ch")
+                strcpy(recv_pack->data.mes, "ch");
                 if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
                     my_err("send", __LINE__);
                 
@@ -589,7 +624,7 @@ void del_fri(PACK *recv_pack_t)
     ch[1] = '\0';
     recv_pack->type = DEL_FRI;
     memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-    strcpy(recv_pack->data.mes, "ch")
+    strcpy(recv_pack->data.mes, "ch");
     if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
         my_err("send", __LINE__);
 }
@@ -651,7 +686,7 @@ void shi_fri(PACK *recv_pack_t)
     ch[1] = '\0';
     recv_pack->type = SHI_FRI;
     memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-    strcpy(recv_pack->data.mes, "ch")
+    strcpy(recv_pack->data.mes, "ch");
     if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
         my_err("send", __LINE__);
 }
@@ -681,14 +716,248 @@ void rel_fri(PACK *recv_pack_t)
     {
         q->realtion = FRI_BLK;
         memset(need, 0, strlen(need));
-        sprintf(need, "update friends set realtion=%d where user='%s' and friend_user='%s'", FRI_BLK, recv_pack->data.send_user, recv_pack->data.mes);
+        sprintf(need, "update friends set realtion=%d where user='%s' and friend_user='%s'", FRI_WHI, recv_pack->data.send_user, recv_pack->data.mes);
         mysql_real_query(&mysql, need, strlen(need));
         ch[0] = '1';
     }
     ch[1] = '\0';
     recv_pack->type = REL_FRI;
     memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
-    strcpy(recv_pack->data.mes, "ch")
+    strcpy(recv_pack->data.mes, "ch");
     if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
         my_err("send", __LINE__);
+}
+
+
+void chat_one(PACK *recv_pack_t)
+{
+	PACK *recv_pack = (PACK *)recv_pack_t;
+    char need[1000];
+    
+    
+    
+    printf("111\n");
+    int flag = CHAT_ONE;
+    char ch[5];
+    int fd = recv_pack->data.send_fd;
+    char ss[MAX_CHAR];
+    time_t now;
+    char *str;
+    
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+    char query_str[1500];
+    int rows;
+    int fields;
+    RECORD_INFO rec_info[55];
+    int i = 0,j;
+    
+    User *t = pHead;
+    Relation *q = pStart;
+    Recordinfo *p = pRec;
+    int flag_2 = 0;
+    int flag_2_2 = 0;
+
+    Recordinfo *pNew = (Recordinfo *)malloc(sizeof(Recordinfo));
+
+    if(strcmp(recv_pack->data.mes, "q") == 0)
+    {
+        while(t)
+        {
+            if(strcmp(t->nickname, recv_pack->data.send_user) == 0)
+            {
+                t->user_state = ONLINE;
+                t->chat[0] = '\0';
+                free(pNew);
+                pNew = NULL;
+                return;
+            }
+            t = t->next;
+        }
+    }
+
+    while(q)
+    {
+        if((strcmp(q->user,recv_pack->data.send_user) == 0 && strcmp(q->friend_user, recv_pack->data.recv_user) == 0) && (q->realtion == FRI_BLK))
+        {
+            ch[0] = '3';
+            ch[1] = '\0';
+            recv_pack->type = CHAT_ONE;
+            memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+            strcpy(recv_pack->data.mes, "ch");
+            if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+                my_err("send", __LINE__);
+            free(pNew);
+            pNew = NULL;
+            return;
+        }
+        q = q->next;
+    }
+
+    t = pHead;
+    while(t)
+    {
+        if(strcmp(t->nickname, recv_pack->data.recv_user) == 0)
+        {
+            flag_2 = 1;
+            break;
+        }
+        t = t->next;
+    }
+
+    if(flag_2 == 0)
+    {
+        ch[0] = '0';
+        ch[1] = '\0';
+        recv_pack->type = CHAT_ONE;
+        memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+        strcpy(recv_pack->data.mes, "ch");
+        if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+            my_err("send", __LINE__);
+        free(pNew);
+        pNew = NULL;
+        return;
+    }
+    else
+    {
+        if(recv_pack->data.mes[0] == '1')
+        {
+            memset(query_str, 0, strlen(query_str));
+            sprintf(query_str, "select * from chat_messages where send_user='%s' and recv_user='%s'", recv_pack->data.send_user, recv_pack->data.recv_user);
+            mysql_real_query(&mysql, query_str, strlen(query_str));
+            res = mysql_store_result(&mysql);
+            rows = mysql_num_rows(res);
+            fields = mysql_num_fields(res);
+            while(row = mysql_fetch_row(res))
+            {
+                strcpy(pNew->send_user, row[0]);
+                strcpy(pNew->recv_user, row[1]);
+                strcpy(pNew->messages, row[2]);
+                Insert_RC(pNew);
+                memset(query_str, 0, strlen(query_str));
+                sprintf(query_str, "insert into chat_messages values('%s', '%s', '%s')", row[0], row[1], row[2]);
+                mysql_real_query(&mysql, query_str, strlen(query_str));
+                
+                strcpy(recv_pack->rec_info[i].recv_user, row[0]);
+                strcpy(recv_pack->rec_info[i].send_user, row[1]);
+                strcpy(recv_pack->rec_info[i].messages, row[2]);
+                i++;
+                if(i > 50)
+                    break;                          
+            }
+            recv_pack->rec_info[i].messages[0] = '0';
+            recv_pack->type = CHAT_ONE;
+            memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+            strcpy(recv_pack->data.mes, "6");
+            if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+                my_err("send", __LINE__);
+
+            memset(query_str, 0, strlen(query_str));
+            sprintf(query_str, "delete from chat_messages where send_user='%s' and recv_user='%s'", recv_pack->data.send_user, recv_pack->data.recv_user);
+            mysql_real_query(&mysql, query_str, strlen(query_str));
+            
+            t = pHead;
+            while(t)
+            {
+                if(strcmp(t->nickname, recv_pack->data.send_user) == 0)
+                {
+                    t->user_state = CHAT_ONE;
+                    strcpy(t->chat, recv_pack->data.recv_user);
+                    break;
+                }
+                t = t->next;
+            }
+            t = pHead;
+            while(t)
+            {
+                if(strcmp(t->nickname, recv_pack->data.recv_user) == 0 && (t->user_state != OFFLINE))
+                {
+                    flag_2_2 = 1;
+                    break;
+                }
+                t = t->next;
+            }
+            if(flag_2_2 == 1)
+            {
+                ch[0] = '1';
+                fd = t->fd;
+                strcpy(ss,recv_pack->data.recv_user);
+                strcpy(recv_pack->data.recv_user, recv_pack->data.send_user);
+                strcpy(recv_pack->data.send_user, ss);
+                ch[1] = '\0';
+                recv_pack->type = CHAT_ONE;
+                memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+                strcpy(recv_pack->data.mes, "ch");
+                if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+                    my_err("send", __LINE__);
+            }
+            else 
+            {
+                ch[0] = '2';
+                ch[1] = '\0';
+                recv_pack->type = CHAT_ONE;
+                memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+                strcpy(recv_pack->data.mes, "ch");
+                if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+                    my_err("send", __LINE__);
+                    
+                memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));
+            }
+        }
+        else
+        {
+            t = pHead;
+            while(t)
+            {
+                if(strcmp(t->nickname, recv_pack->data.recv_user) == 0 && strcmp(t->chat, recv_pack->data.send_user) == 0 && (t->user_state == CHAT_ONE))
+                {
+                    fd = t->fd;
+                    strcpy(pNew->recv_user, recv_pack->data.send_user);
+                    strcpy(pNew->send_user, recv_pack->data.recv_user);
+                    strcpy(pNew->messages, recv_pack->data.mes);
+                    Insert_RC(pNew);
+
+                    memset(query_str, 0, strlen(query_str));
+                    sprintf(query_str, "insert into chat_messages values('%s', '%s', '%s')", recv_pack->data.send_user, recv_pack->data.recv_user, recv_pack->data.mes);
+                    mysql_real_query(&mysql, query_str, strlen(query_str));
+                    
+                    memset(ss, 0, MAX_CHAR);
+                    strcpy(ss,recv_pack->data.recv_user);
+                    strcpy(recv_pack->data.recv_user, recv_pack->data.send_user);
+                    time(&now);
+                    str = ctime(&now);
+                    str[strlen(str) - 1] = '\0';
+                    memcpy(recv_pack->data.send_user, str, strlen(str));
+                  
+                    ch[1] = '\0';
+                    recv_pack->type = CHAT_ONE;
+                    memset(recv_pack->data.mes, 0, sizeof(recv_pack->data.mes));
+                    strcpy(recv_pack->data.mes, "ch");
+                    if(send(recv_pack->data.send_fd, &recv_pack, sizeof(PACK), 0) < 0)
+                        my_err("send", __LINE__);
+        
+                    return;
+                }
+                else if(strcmp(t->nickname, recv_pack->data.recv_user) == 0 && strcmp(t->chat, recv_pack->data.send_user) != 0)
+                {
+                    memset(query_str, 0, strlen(query_str));
+                    sprintf(query_str, "insert into off_recordinfo values('%s', '%s', '%s')", recv_pack->data.send_user, recv_pack->data.recv_user, recv_pack->data.mes);
+                    mysql_real_query(&mysql, query_str, strlen(query_str));
+                    free(pNew);
+                    pNew = NULL;
+                    return;
+                }
+                t = t->next;
+            }
+        }
+    }
+}
+
+void Insert_RC(Recordinfo *pNew)
+{
+    Recordinfo *p = pRec;
+    while(p && p->next != NULL)
+        p = p->next;
+    p->next = pNew;
+    pNew->next = NULL;
 }
