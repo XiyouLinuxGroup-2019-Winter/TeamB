@@ -204,6 +204,26 @@ void *msgbox(void *arg)
                 break;
             }
         }
+        case GROUP:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t群不存在或您未加入此群\n");
+                P_UNLOCK;
+                C_SIGNAL;
+                break;
+            }
+            else if(flag[0]=='1'){
+                chat_flag=2;
+                C_SIGNAL;
+                break;
+            }
+        }
         case FCHAT:{
             char send_id[10];
             memset(send_id,0,sizeof(send_id));
@@ -227,10 +247,40 @@ void *msgbox(void *arg)
             }
             else{
                 P_LOCK;
-                printf("\t\t\t\t\t您有一条新消息!!!\n");
+                printf("\t\t\t\t\t您有一条好友消息!!!\n");
                 //printf("\t\t\t%s--->%s:%s\n",send_id,recv_id,msg);
                 P_UNLOCK;
-                addnode(send_id,recv_id,msg);
+                addfmsg(send_id,recv_id,msg);
+            }
+            break;
+        }
+        case GCHAT:{
+            char mid[10];
+            memset(mid,0,sizeof(mid));
+            if(get_arg(recv_buf,mid,sizeof(mid))<0){
+                my_err("read",__LINE__);
+            }
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            char msg[500];
+            memset(msg,0,sizeof(msg));
+            if(get_arg(recv_buf,msg,sizeof(msg))<0){
+                my_err("read",__LINE__);
+            }
+            if(chat_flag==2 && strcmp(gid,chat_id)==0){
+                P_LOCK;
+                printf("\t\t\t%s在群%s中说:%s\n",mid,gid,msg);
+                P_UNLOCK;
+            }
+            else{
+                P_LOCK;
+                printf("\t\t\t\t\t您有一条群消息!!!\n");
+                //printf("\t\t\t%s--->%s:%s\n",send_id,recv_id,msg);
+                P_UNLOCK;
+                addgmsg(mid,gid,msg);
             }
             break;
         }
@@ -313,6 +363,12 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t此请求已被其他管理人员处理\n");
+                P_UNLOCK;
+                break;
+            }
             printf("flag is %c\n",flag[0]);//
             char gid[10];
             memset(gid,0,sizeof(gid));
@@ -389,7 +445,151 @@ void *msgbox(void *arg)
                 my_err("read",__LINE__);
             }
             if(flag[0]=='4'){
+                P_LOCK;
                 printf("\t\t\t\t\t您已成为群%s的管理员\n",gid);
+                P_UNLOCK;
+            }
+        }
+        case DELMEMBER:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t此群不存在\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t您不是管理人员\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='2'){
+                P_LOCK;
+                printf("\t\t\t\t\t该用户不在此群中\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='3'){
+                P_LOCK;
+                printf("\t\t\t\t\t您的权限不够\n");
+                P_UNLOCK;
+                break;
+            }
+            char gid[10];
+            memset(gid,0,sizeof(gid));
+            if(get_arg(recv_buf,gid,sizeof(gid))<0){
+                my_err("read",__LINE__);
+            }
+            if(flag[0]=='4'){
+                P_LOCK;
+                printf("\t\t\t\t\t您已成功将其踢出群%s\n",gid);
+                P_UNLOCK;
+            }
+            else if(flag[0]=='5'){
+                P_LOCK;
+                printf("\t\t\t\t\t您已被管理员踢出群%s\n",gid);
+                P_UNLOCK;
+            }
+            break;
+        }
+        case DELGROUP:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t此群不存在\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t您不是群主\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='2'){
+                P_LOCK;
+                printf("\t\t\t\t\t您已成功解散该群\n");
+                P_UNLOCK;
+                break;
+            }
+        }
+        case USER:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t用户不存在\n");
+                P_UNLOCK;
+                C_SIGNAL;
+                break;
+            }
+            char request[32];
+            memset(request,0,sizeof(request));
+            if(get_arg(recv_buf,request,sizeof(request))<0){
+                my_err("read",__LINE__);
+            }
+            else if(flag[0]=='1'){
+                findpsw_flag=1;
+                P_LOCK;
+                printf("您的密保问题是%s\n",request);
+                P_UNLOCK;
+                C_SIGNAL;
+                break;
+            }
+        }
+        case ANSWER:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t答案错误\n");
+                P_UNLOCK;
+                C_SIGNAL;
+                break;
+            }
+            else if(flag[0]=='1'){
+                findpsw_flag=1;
+                C_SIGNAL;
+                break;
+            }
+        }
+        case FINDPSW:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t密码重置失败\n");
+                P_UNLOCK;
+                break;
+            }
+            else if(flag[0]=='1'){
+                P_LOCK;
+                printf("\t\t\t\t\t密码重置成功\n");
+                P_UNLOCK;
+                break;
             }
         }
         }

@@ -35,7 +35,7 @@ enum{
     FRIENDLIST,
     FCHATMSG,
     BLOCKFRIEND,
-    QCHAT,
+    GCHAT,
     CREATEGROUP,
     DELGROUP,
     ADDGROUP,
@@ -48,6 +48,10 @@ enum{
     OVER,
     GROUPLIST,
     DEALGROUP,
+    GROUP,
+    FINDPSW,
+    USER,
+    ANSWER,
 };
 
 typedef struct{
@@ -59,6 +63,7 @@ typedef struct{
 MYSQL mysql;
 FILE* log;
 pthread_key_t key;
+int epfd;
 
 void setnoblock(int sock);
 void *unpack(void *arg);
@@ -84,14 +89,14 @@ void *addgroup(void *arg);
 void *dealgroup(void *arg);
 void *exitgroup(void *arg);
 void *gsetstate(void *arg);
+void *gchat(void *arg);
+void *group(void *arg);
+void *delmember(void *arg);
+void *delgroup(void *arg);
+void *user(void *arg);
+void *answer(void *arg);
+void *findpsw(void *arg);
 /*void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);

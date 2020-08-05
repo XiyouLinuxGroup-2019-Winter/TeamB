@@ -40,14 +40,33 @@ void *dealgroup(void *arg)
     printf("fd is %s\n",fd);
     char cmd[1024];
     char msg[1024];
+    //查询请求是否已被处理
+    memset(cmd,0,sizeof(cmd));
+    sprintf(cmd,"select link from group_request where send_id = %s && group_id = %s",mid,gid);
+    if(mysql_query(&mysql, cmd)<0){
+        my_err("mysql_query",__LINE__);
+    }
+    MYSQL_RES *result=NULL;
+	MYSQL_ROW row;
+    result=mysql_store_result(&mysql);
+    row=mysql_fetch_row(result);
+    if(strcmp(row[0],"1")==0){
+        //发送消息
+        memset(msg,0,sizeof(msg));
+        sprintf(msg,"0\n");
+        if(send_pack(atoi(fd),DEALGROUP,strlen(msg),msg)<0){
+            my_err("write",__LINE__);
+        }
+        free(arg);
+        printf("dealgroup over\n");
+        return NULL;
+    }
     //查询成员fd
     memset(cmd,0,sizeof(cmd));
     sprintf(cmd,"select socket from user_data where id = %s",mid);
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
-    MYSQL_RES *result=NULL;
-	MYSQL_ROW row;
     result=mysql_store_result(&mysql);
     row=mysql_fetch_row(result);
     if(flag[0]=='1'){
@@ -76,6 +95,12 @@ void *dealgroup(void *arg)
         if(send_pack(atoi(row[0]),DEALGROUP,strlen(msg),msg)<0){
             my_err("write",__LINE__);
         }
+    }
+    //修改处理状态
+    memset(cmd,0,sizeof(cmd));
+    sprintf(cmd,"update group_request set link = 1 where send_id = %s && group_id = %s",mid,gid);
+    if(mysql_query(&mysql, cmd)<0){
+        my_err("mysql_query",__LINE__);
     }
     free(arg);
     printf("dealgroup over\n");

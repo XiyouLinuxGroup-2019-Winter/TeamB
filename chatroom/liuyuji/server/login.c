@@ -50,13 +50,13 @@ void *login(void *arg)
     row=mysql_fetch_row(result);
     char data[5];
     memset(data,0,sizeof(data));
-    printf("row jiancha\n");
     if(row==NULL){
         sprintf(data,"0\n");
         free(arg);
         if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){
             my_err("write",__LINE__);
         }
+        return NULL;
         //close(atoi(fd));
     }
     if(row[0]!=NULL){

@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include"client.h"
-int addnode(char *send_id,char *recv_id,char *msg)
+int addfmsg(char *send_id,char *recv_id,char *msg)
 {
     Fmsg *operate=(Fmsg*)malloc(sizeof(Fmsg));
     memset(operate,0,sizeof(Fmsg));
@@ -24,6 +24,27 @@ int addnode(char *send_id,char *recv_id,char *msg)
         Fmsg *record=Msg.tail;
         record->next=operate;
         Msg.num++;
+    }
+    UNLOCK;
+}
+int addgmsg(char *mid,char *gid,char *msg)
+{
+    Gmsg *operate=(Gmsg*)malloc(sizeof(Gmsg));
+    memset(operate,0,sizeof(Gmsg));
+    strcpy(operate->mid,mid);
+    strcpy(operate->gid,gid);
+    strcpy(operate->msg,msg);
+    operate->next=NULL;
+    LOCK;
+    if(Gsg.num==0){
+        Gsg.head=operate;
+        Gsg.tail=operate;
+        Gsg.num++;
+    }
+    else{
+        Gmsg *record=Gsg.tail;
+        record->next=operate;
+        Gsg.num++;
     }
     UNLOCK;
 }
@@ -81,6 +102,19 @@ int printnode()
     for(int i=0;i<Msg.num;i++){
         P_LOCK;
         printf("\t\t\t%s--->%s:%s\n",operate->send_id,operate->recv_id,operate->msg);
+        P_UNLOCK;
+        operate=operate->next;
+    }
+    UNLOCK;
+}
+int printgnode()
+{
+    Gmsg *operate;
+    LOCK;
+    operate=Gsg.head;
+    for(int i=0;i<Gsg.num;i++){
+        P_LOCK;
+        printf("\t\t\t%s在群%s中说:%s\n",operate->mid,operate->gid,operate->msg);
         P_UNLOCK;
         operate=operate->next;
     }

@@ -9,6 +9,7 @@
 #include"thread_pool.h"
 void *over(void *arg)
 {
+    printf("over start\n");
     int len=0;
     //获取用户id
     char uid[10];
@@ -17,6 +18,7 @@ void *over(void *arg)
     }
     uid[len]=0;
     printf("uid is %s\n",uid);//
+    //获取用户fd
     char fd[4];
     if((len=get_arg(arg,fd,4))<0){
         fprintf(log,"get_arg failed\n");
@@ -30,5 +32,6 @@ void *over(void *arg)
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
+    printf("over over\n");
 }
 

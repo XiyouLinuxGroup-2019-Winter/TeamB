@@ -90,7 +90,7 @@ int main()
     pool_init(3);
     
     //初始化epoll
-    int epfd=epoll_create(20);
+    epfd=epoll_create(20);
     if(epfd<0){
         my_err("epoll_create",__LINE__);
     }
@@ -127,8 +127,17 @@ int main()
                 setnoblock(connfd);
                 
                 ev.data.fd=connfd;
-                ev.events=EPOLLIN | EPOLLHUP | EPOLLET;
+                ev.events=EPOLLIN | EPOLLRDHUP | EPOLLET;
                 epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&ev);
+                continue;
+            }
+            //若客户挂断
+            else if(ep_events[i].events & EPOLLRDHUP){
+                printf("有客户挂断\n");
+                close(ep_events[i].data.fd);  
+                epoll_ctl(epfd,EPOLL_CTL_DEL,ep_events[i].data.fd,NULL);
+                fprintf(stderr,"%d is be closed\n",ep_events[i].data.fd);
+                continue;
             }
             //若有客户请求
             else if(ep_events[i].events & EPOLLIN){
@@ -139,13 +148,7 @@ int main()
                 //pthread_t tid;//
                 //pthread_create(&tid,NULL,unpack,&ep_events[i].data.fd);
                 //unpack(&ep_events[i].data.fd);
-            }
-            //若客户挂断
-            else if(ep_events[i].events & EPOLLHUP){
-                printf("close\n");
-                close(ep_events[i].data.fd);  
-                epoll_ctl(epfd,EPOLL_CTL_DEL,ep_events[i].data.fd,NULL);
-                fprintf(stderr,"%d is be closed\n",ep_events[i].data.fd);
+                continue;
             }
         }
     }
