@@ -9,9 +9,10 @@
 #include<errno.h>
 
 #define EXIT               -1
+#define ACCOUNT_ERROR      -2
+
 #define REGISTE             1
 #define LOGIN               2
-#define ACCOUNT_ERROR      -2
 #define LOOK_FRI            3
 #define GET_FRI_STA         4
 #define ADD_FRI             5
@@ -19,10 +20,25 @@
 #define SHI_FRI             7
 #define REL_FRI             8
 #define CHAT_ONE            9
+#define CHECK_MES_FRI       10 
+#define CRE_GRP             11 
+#define ADD_GRP             12 
+#define OUT_GRP             13 
+#define DEL_GRP             14 
+#define SET_GRP_ADM         15 
+#define KICK_GRP            16 
+#define CHECK_GRP           17 
+#define CHECK_MEM_GRP       18 
+#define CHAT_MANY           19
+#define CHECK_MES_GRP       20
+#define SEND_FILE           21
+#define RECV_FILE           22
 
 #define MAX_CHAR            200
 #define FRI_MAX             300
 #define BUFSIZE             1000
+#define MAX_FILE             10000
+#define MAX_THREAD_NUM             1000
 
 
 
@@ -73,21 +89,34 @@ typedef struct _record
     char messages[MAX_CHAR];
 }RECORD_INFO;
 
+typedef struct file
+{
+    int size;
+    char mes[MAX_FILE];
+    char file_name[MAX_THREAD_NUM][MAX_CHAR];
+    char file_send_name[MAX_THREAD_NUM][MAX_CHAR];
+    int sign_file;
+}File;
 
-typedef struct {
-    int               send_fd;
-    int               recv_fd;
-    char              send_user[50];
-    char              recv_user[50];
-    char              mes[MAX_CHAR];
+
+
+typedef struct 
+{
+    int send_fd;
+    int recv_fd;
+    char send_user[50];
+    char recv_user[50];
+    char mes[MAX_CHAR];
 } DATA;
 
-typedef struct {
-    int               type;
-    DATA              data;
+typedef struct 
+{
+    int type;
+    DATA data;
+    File file;
     FRI_INFO fri_info;
     GROUP_INFO grp_info;
-    RECORD_INFO rec_info[55];
+    RECORD_INFO rec_info[100];
 } PACK;
 
 
