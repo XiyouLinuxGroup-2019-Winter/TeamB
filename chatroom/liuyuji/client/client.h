@@ -48,6 +48,9 @@ enum{
     FINDPSW,
     USER,
     ANSWER,
+    SENDFILE,
+    SENDFILE,
+    RECVFILE,
 };
 #define GM_LOCK pthread_mutex_lock(&gm_mutex)
 #define GM_UNLOCK pthread_mutex_unlock(&gm_mutex)
@@ -166,5 +169,9 @@ int delmember();
 int delgroup();
 int groupmember();
 int gchatmsg();
+
+int print_file();
+int send_file();
+int recv_file();
 
 #endif

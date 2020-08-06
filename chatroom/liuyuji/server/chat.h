@@ -52,6 +52,9 @@ enum{
     FINDPSW,
     USER,
     ANSWER,
+    SENDFILE,
+    RECVFILE,
+    REALFILE,
 };
 
 typedef struct{
@@ -100,9 +103,7 @@ void *findpsw(void *arg);
 void *groupmember(void *arg);
 void *fchatmsg(void *arg);
 void *gchatmsg(void *arg);
-/*void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);*/
-
+void *send_file(void *arg);
+void *recv_file(void *arg);
+void *realfile(void *arg);
 #endif

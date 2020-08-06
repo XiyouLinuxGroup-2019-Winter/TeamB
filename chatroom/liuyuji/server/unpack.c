@@ -144,6 +144,15 @@ void *unpack(void *arg)
         case ANSWER:
         add_work(answer,(void *)argv);
         break;
+        case SENDFILE:
+        add_work(send_file,(void *)argv);
+        break;
+        case RECVFILE:
+        add_work(recv_file,(void *)argv);
+        break;
+        case REALFILE:
+        add_work(realfile,(void *)argv);
+        break;
         case OVER:
         add_work(over,(void *)argv);
         break;
