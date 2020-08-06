@@ -73,6 +73,7 @@ int send_pack(int connfd,int type,int len,char *value);
 int my_write(int connfd,char *send_buf,int len);
 void my_err(const char *str,int line);
 
+int offline(char *id,int connfd);
 void *login(void *arg);
 void *uregister(void *arg);
 void *addfriend(void *arg);
@@ -96,10 +97,10 @@ void *delgroup(void *arg);
 void *user(void *arg);
 void *answer(void *arg);
 void *findpsw(void *arg);
+void *groupmember(void *arg);
+void *fchatmsg(void *arg);
+void *gchatmsg(void *arg);
 /*void *(void *arg);
-void *(void *arg);
-void *(void *arg);
-void *(void *arg);
 void *(void *arg);
 void *(void *arg);
 void *(void *arg);*/

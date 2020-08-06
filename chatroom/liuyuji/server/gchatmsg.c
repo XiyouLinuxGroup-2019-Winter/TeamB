@@ -1,14 +1,14 @@
 /*************************************************************************
-	> File Name: group.c
+	> File Name: gchatmsg.c
 	> Author: 
 	> Mail: 
-	> Created Time: 2020年08月05日 星期三 15时13分41秒
+	> Created Time: 2020年08月06日 星期四 15时33分24秒
  ************************************************************************/
 
 #include"chat.h"
-void *group(void *arg)
+void *gchatmsg(void *arg)
 {
-    printf("group start\n");
+    printf("gchatmsg start\n");
     int len=0;
     //获取用户id
     char uid[10];
@@ -41,38 +41,52 @@ void *group(void *arg)
     }
     MYSQL_RES *result=NULL;
 	MYSQL_ROW row;
-    char data[3];
+    char data[1024];
 
     result=mysql_store_result(&mysql);
     row=mysql_fetch_row(result);
     if(row==NULL){
         memset(data,0,sizeof(data));
         sprintf(data,"0\n");
-        if(send_pack(atoi(fd),GROUP,strlen(data),data)<0){
+        if(send_pack(atoi(fd),GCHATMSG,strlen(data),data)<0){
             my_err("write",__LINE__);
         }
         free(arg);
-        printf("group over\n");
+        printf("gchatmsg over\n");
         return NULL;
     }
-    else if(row[0][0]=='0'){
+    if(row[0][0]=='0'){
         memset(data,0,sizeof(data));
         sprintf(data,"0\n");
-        if(send_pack(atoi(fd),GROUP,strlen(data),data)<0){
+        if(send_pack(atoi(fd),GCHATMSG,strlen(data),data)<0){
             my_err("write",__LINE__);
         }
         free(arg);
-        printf("group over\n");
+        printf("gchatmsg over\n");
         return NULL;
     }
-    else{
+    //查询非用户群成员
+    sprintf(cmd,"select member_id from group_member where member_id != %s && group_id = %s",uid,gid);
+    printf("cmd is %s\n",cmd);//
+    if(mysql_query(&mysql, cmd)<0){
+        my_err("mysql_query",__LINE__);
+    }
+    result=mysql_store_result(&mysql);
+    row=mysql_fetch_row(result);
+    //查询群消息记录
+    sprintf(cmd,"select send_id,msg from group_chatmsg where (recv_id = %s && group_id = %s) || (send_id = %s && group_id = %s && recv_id = %s)",uid,gid,uid,gid,row[0]);
+    printf("cmd is %s\n",cmd);//
+    if(mysql_query(&mysql, cmd)<0){
+        my_err("mysql_query",__LINE__);
+    }
+    result=mysql_store_result(&mysql);
+    while(row=mysql_fetch_row(result)){
         memset(data,0,sizeof(data));
-        sprintf(data,"1\n");
-        if(send_pack(atoi(fd),GROUP,strlen(data),data)<0){
+        sprintf(data,"%s\n%s\n",row[0],row[1]);
+        if(send_pack(atoi(fd),GCHATMSG,strlen(data),data)<0){
             my_err("write",__LINE__);
         }
-        free(arg);
-        printf("group over\n");
-        return NULL;
     }
+   free(arg);
+   printf("gchatmsg over\n");
 }

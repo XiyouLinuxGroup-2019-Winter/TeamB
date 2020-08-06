@@ -11,15 +11,17 @@ int print_group()
     while(1){ 
         P_LOCK;
         printf("1.查看群列表\n");
-        printf("2.创建群\n");
-        printf("3.添加群\n");
-        printf("4.退出群\n");
-        printf("5.设置管理员\n");
-        printf("6.踢人\n");
-        printf("7.解散群\n");
-        printf("8.群聊\n");
-        printf("9.处理群请求\n");
-        printf("10.查看群消息\n");
+        printf("2.查看群成员\n");
+        printf("3.创建群\n");
+        printf("4.添加群\n");
+        printf("5.退出群\n");
+        printf("6.设置管理员\n");
+        printf("7.踢人\n");
+        printf("8.解散群\n");
+        printf("9.群聊\n");
+        printf("10.处理群请求\n");
+        printf("11.查看群消息\n");
+        printf("12.查看群消息记录\n");
         printf("0.返回\n");
         P_UNLOCK;
         int chose;
@@ -29,31 +31,37 @@ int print_group()
             grouplist();
             break;
             case 2:
-            creategroup();
+            groupmember();
             break;
             case 3:
-            addgroup();
+            creategroup();
             break;
             case 4:
-            exitgroup();
+            addgroup();
             break;
             case 5:
-            gsetstate();
+            exitgroup();
             break;
             case 6:
-            delmember();
+            gsetstate();
             break;
             case 7:
-            delgroup();
+            delmember();
             break;
             case 8:
-            gchat();
+            delgroup();
             break;
             case 9:
-            dealgroup();
+            gchat();
             break;
             case 10:
+            dealgroup();
+            break;
+            case 11:
             printgnode();
+            break;
+            case 12:
+            gchatmsg();
             break;
             case 0:
             return 0;

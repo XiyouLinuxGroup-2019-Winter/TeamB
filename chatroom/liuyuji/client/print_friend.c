@@ -17,6 +17,7 @@ int print_friend()
         printf("5.拉黑好友\n");
         printf("6.聊天\n");
         printf("7.查看好友消息\n");
+        printf("8.查看好友聊天记录\n");
         printf("0.返回\n");
         P_UNLOCK;
         int chose;
@@ -44,6 +45,9 @@ int print_friend()
             break;
             case 7:
             printnode();
+            break;
+            case 8:
+            fchatmsg();
             break;
             case 0:
             return 0;

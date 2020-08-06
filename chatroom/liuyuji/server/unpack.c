@@ -90,9 +90,9 @@ void *unpack(void *arg)
         case FRIENDLIST:
         add_work(friendlist,(void *)argv);
         break;
-        /*case FCHATMSG:
-        add_work(fchatmsg,(void *)arg);
-        break;*/
+        case FCHATMSG:
+        add_work(fchatmsg,(void *)argv);
+        break;
         case BLOCKFRIEND:
         add_work(blockfriend,(void *)argv);
         break;
@@ -113,13 +113,13 @@ void *unpack(void *arg)
         break;
         case EXITGROUP:
         add_work(exitgroup,(void *)argv);
-        break;/*
+        break;
         case GROUPMEMBER:
-        add_work(groupmember,(void *)arg);
+        add_work(groupmember,(void *)argv);
         break;
         case GCHATMSG:
-        add_work(gchatmsg,(void *)arg);
-        break;*/
+        add_work(gchatmsg,(void *)argv);
+        break;
         case SETSTATE:
         add_work(gsetstate,(void *)argv);
         break;

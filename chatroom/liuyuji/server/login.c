@@ -78,6 +78,7 @@ void *login(void *arg)
                 my_err("mysql_query",__LINE__);
             }
             //检查是否有离线信息
+            offline(id,atoi(fd));
             free(arg);
         }
         else{

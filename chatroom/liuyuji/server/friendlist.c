@@ -40,7 +40,7 @@ void *friendlist(void *arg)
     result=mysql_store_result(&mysql);
     int i=0;
     while(row=mysql_fetch_row(result)){
-        strcpy(friend[i],row[i]);
+        strcpy(friend[i],row[0]);
         printf("friend[%d] is %s\n",i,friend[i]);
         i++;
     }

@@ -142,6 +142,7 @@ int delgnode();
 int print_main();
 int login();
 int uregister();
+int findpsw();
 int print_meau();
 
 int print_friend();
@@ -151,6 +152,7 @@ int findfriend();
 int delfriend();
 int blockfriend();
 int fchat();
+int fchatmsg();
 
 int print_group();
 int creategroup();
@@ -162,6 +164,7 @@ int gsetstate();
 int gchat();
 int delmember();
 int delgroup();
-int findpsw();
+int groupmember();
+int gchatmsg();
 
 #endif
