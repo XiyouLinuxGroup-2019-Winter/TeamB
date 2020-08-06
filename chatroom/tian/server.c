@@ -209,7 +209,7 @@ int main()
 					mysql_query(&mysql, need);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, events[i].data.fd, &ev);
 				}
-				printf("这里没问题4\n");
+				printf("准备进入线程\n");
                 pack= (PACK*)malloc(sizeof(PACK));
                 memcpy(pack, &recv_pack, sizeof(PACK));
                 if(pthread_create(&pid,NULL,deal,(void *)pack) != 0)
@@ -255,105 +255,10 @@ void send_pack(int fd, PACK *recv_pack, char *ch)
         my_err("send", __LINE__);
 }
 
-User *U_read()
-{
-    MYSQL_RES *res = NULL;
-    MYSQL_ROW row;
-    char need[1000];
-    int rows;
-    int fields;
-
-    User *pEnd, *pNew;
-
-    sprintf(need, "select * from user_data");
-    mysql_real_query(&mysql, need, strlen(need));
-    res = mysql_store_result(&mysql);
-    rows = mysql_num_rows(res);
-    fields = mysql_num_fields(res);
-
-    while(row = mysql_fetch_row(res))
-    {
-        pNew = (User *)malloc(sizeof(User));
-        strcpy(pNew->nickname, row[0]);
-        strcpy(pNew->password, row[1]);
-        pNew->user_state = OFFLINE;
-        pNew->next = NULL;
-        if(pHead == NULL)
-            pHead = pNew;
-        else
-            pEnd->next = pNew;
-        pEnd = pNew;
-    }
-    return pHead;
-}
-
-Relation *R_read()
-{
-    MYSQL_RES *res = NULL;
-    MYSQL_ROW row;
-    char need[1000];
-    int rows;
-    int fields;
-
-    Relation *pEnd, *pNew;
-
-    sprintf(need, "select * from friends");
-    mysql_real_query(&mysql, need, strlen(need));
-    res = mysql_store_result(&mysql);
-    rows = mysql_num_rows(res);
-    fields = mysql_num_fields(res);
-
-    while(row = mysql_fetch_row(res))
-    {
-        pNew = (Relation *)malloc(sizeof(Relation));
-        strcpy(pNew->user, row[0]);
-        strcpy(pNew->friend_user, row[1]);
-        pNew->realtion = row[2][0] - '0';
-        pNew->next = NULL;
-        if(pStart == NULL)
-            pStart = pNew;
-        else
-            pEnd->next = pNew;
-        pEnd = pNew;
-    }
-    return pStart;
-}
-
-Recordinfo *RC_read()
-{
-    MYSQL_RES *res = NULL;
-    MYSQL_ROW row;
-    char need[1000];
-    int rows;
-    int fields;
-
-    Recordinfo *pEnd, *pNew;
-
-    sprintf(need, "select * from chat_messages");
-    mysql_real_query(&mysql, need, strlen(need));
-    res = mysql_store_result(&mysql);
-    rows = mysql_num_rows(res);
-    fields = mysql_num_fields(res);
-
-    while(row = mysql_fetch_row(res))
-    {
-        pNew = (Recordinfo *)malloc(sizeof(Recordinfo));
-        strcpy(pNew->send_user, row[0]);
-        strcpy(pNew->recv_user, row[1]);
-        strcpy(pNew->messages, row[2]);
-        pNew->next = NULL;
-        if(pRec == NULL)
-            pRec = pNew;
-        else
-            pEnd->next = pNew;
-        pEnd = pNew;
-    }
-    return pRec;
-}
-
 void *deal(void *recv_pack_t)
 {
 	PACK *recv_pack = (PACK *)recv_pack_t;
+	printf("进入线程成功\n");
 	printf("recv_pack : %d\n",recv_pack->type);
 	switch(recv_pack->type)
 	{
@@ -494,9 +399,7 @@ void registe(PACK *recv_pack_t)
         ch[0] = '0';
     
     ch[1] = '\0';
-	
-
-	send_pack(fd, recv_pack, ch);	
+	send_pack(fd, recv_pack, ch);
 }
 
 void Insert(User *pNew)
@@ -511,8 +414,8 @@ void Insert(User *pNew)
 void login(PACK *recv_pack_t)
 {
 	
-	pthread_t pid;
-    
+	pthread_t pid1;
+    pthread_t pid2;
     PACK *recv_pack = (PACK *)recv_pack_t;
 	char ch[5];
     int fd = recv_pack->data.recv_fd;
@@ -563,13 +466,13 @@ void login(PACK *recv_pack_t)
         }
         if((ch[0] == '1') && strcmp(recv_pack->data.send_user, Mex_Box[i].data.recv_user) == 0 && (Mex_Box[i].type == ADD_FRI))
         {
-			if(pthread_create(&pid,NULL,deal,(void *)&Mex_Box[i]) != 0)
+			if(pthread_create(&pid1,NULL,deal,(void *)&Mex_Box[i]) != 0)
                 my_err("pthread_create",__LINE__);  
             book++;
         }
         if((ch[0] == '1') && strcmp(recv_pack->data.send_user, Mex_Box[i].data.send_user) == 0 && (Mex_Box[i].type == ADD_GRP))
         {
-			if(pthread_create(&pid,NULL,deal,(void *)&Mex_Box[i]) != 0)
+			if(pthread_create(&pid2,NULL,deal,(void *)&Mex_Box[i]) != 0)
                 my_err("pthread_create",__LINE__); 
             book++;
         }
@@ -578,7 +481,7 @@ void login(PACK *recv_pack_t)
             send_more(fd, Mex_Box[i].type, &Mex_Box[i], "6");
             book++;
         }
-        if((ch[0] == '1') && strcmp(recv_pack->data.send_user, Mex_Box[i].data.recv_user) == 0 && strcmp(Mex_Box[i].data.mes, "13nb") == 0)
+        if((ch[0] == '1') && strcmp(recv_pack->data.send_user, Mex_Box[i].data.recv_user) == 0 && strcmp(Mex_Box[i].data.mes, "ok") == 0)
         {
             send_file(&Mex_Box[i]);
             book++;
@@ -910,7 +813,6 @@ void chat_one(PACK *recv_pack_t)
 {
 	PACK *recv_pack = (PACK *)recv_pack_t;
      
-    printf("111\n");
     char ch[5];
     int fd = recv_pack->data.send_fd;
     char ss[MAX_CHAR];
@@ -2076,3 +1978,98 @@ void send_file(PACK *recv_pack_t)
     pthread_mutex_unlock(&mutex);
 }
 
+User *U_read()
+{
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+    char need[1000];
+    int rows;
+    int fields;
+
+    User *pEnd, *pNew;
+
+    sprintf(need, "select * from user_data");
+    mysql_real_query(&mysql, need, strlen(need));
+    res = mysql_store_result(&mysql);
+    rows = mysql_num_rows(res);
+    fields = mysql_num_fields(res);
+
+    while(row = mysql_fetch_row(res))
+    {
+        pNew = (User *)malloc(sizeof(User));
+        strcpy(pNew->nickname, row[0]);
+        strcpy(pNew->password, row[1]);
+        pNew->user_state = OFFLINE;
+        pNew->next = NULL;
+        if(pHead == NULL)
+            pHead = pNew;
+        else
+            pEnd->next = pNew;
+        pEnd = pNew;
+    }
+    return pHead;
+}
+
+Relation *R_read()
+{
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+    char need[1000];
+    int rows;
+    int fields;
+
+    Relation *pEnd, *pNew;
+
+    sprintf(need, "select * from friends");
+    mysql_real_query(&mysql, need, strlen(need));
+    res = mysql_store_result(&mysql);
+    rows = mysql_num_rows(res);
+    fields = mysql_num_fields(res);
+
+    while(row = mysql_fetch_row(res))
+    {
+        pNew = (Relation *)malloc(sizeof(Relation));
+        strcpy(pNew->user, row[0]);
+        strcpy(pNew->friend_user, row[1]);
+        pNew->realtion = row[2][0] - '0';
+        pNew->next = NULL;
+        if(pStart == NULL)
+            pStart = pNew;
+        else
+            pEnd->next = pNew;
+        pEnd = pNew;
+    }
+    return pStart;
+}
+
+Recordinfo *RC_read()
+{
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+    char need[1000];
+    int rows;
+    int fields;
+
+    Recordinfo *pEnd, *pNew;
+
+    sprintf(need, "select * from chat_messages");
+    mysql_real_query(&mysql, need, strlen(need));
+    res = mysql_store_result(&mysql);
+    rows = mysql_num_rows(res);
+    fields = mysql_num_fields(res);
+
+    while(row = mysql_fetch_row(res))
+    {
+        pNew = (Recordinfo *)malloc(sizeof(Recordinfo));
+        strcpy(pNew->send_user, row[0]);
+        strcpy(pNew->recv_user, row[1]);
+        strcpy(pNew->messages, row[2]);
+        pNew->next = NULL;
+        if(pRec == NULL)
+            pRec = pNew;
+        else
+            pEnd->next = pNew;
+        pEnd = pNew;
+    }
+    return pRec;
+}
