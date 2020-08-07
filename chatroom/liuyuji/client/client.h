@@ -119,6 +119,7 @@ int findpsw_flag;//找回密码标志
 int file_flag;
 char chat_id[10];//聊天对象
 int read_len;
+int realfile_read_len;
 
 //读写锁
 pthread_mutex_t p_mutex,s_mutex,mutex,gm_mutex;
@@ -175,5 +176,6 @@ int print_file();
 int send_file();
 int recv_file();
 void *realfile(void *arg);
+int realfile_get_arg(char *read_buf,char *recv_buf,int len);
 
 #endif

@@ -36,7 +36,7 @@ void *unpack(void *arg)
     
     //接收数据类型
     char ty[3];
-    memset(ty,0,sizeof(3));
+    memset(ty,0,sizeof(ty));
     if(my_read(conn_fd,ty,2)<0){
         my_err("read",__LINE__);
     }
@@ -45,11 +45,22 @@ void *unpack(void *arg)
     //接收数据长度
     char len[3];
     memset(len,0,sizeof(len));
+    /*if(atoi(ty)==REALFILE){
+        if(my_read(conn_fd,len,3)<0){
+            my_err("read",__LINE__);
+        }
+        fprintf(stderr,"数据len为%s\n",len);
+    }
+    else{
+        if(my_read(conn_fd,len,2)<0){
+            my_err("read",__LINE__);
+        }
+        fprintf(stderr,"数据len为%s\n",len);
+    }*/
     if(my_read(conn_fd,len,2)<0){
         my_err("read",__LINE__);
     }
     fprintf(stderr,"数据len为%s\n",len);
-    
     //接收数据
     char recv_buf[1024];
     memset(recv_buf,0,sizeof(recv_buf));
@@ -60,7 +71,7 @@ void *unpack(void *arg)
     
     //准备参数
     char *argv=(char *)malloc(atoi(len)+4);
-    if(atoi(ty)==REALFILE){
+    /*if(atoi(ty)==REALFILE){
         memset(argv,0,sizeof(argv));
         sprintf(argv,"%s",recv_buf);
         fprintf(stderr,"文件数据为%s",argv);
@@ -69,7 +80,10 @@ void *unpack(void *arg)
         memset(argv,0,sizeof(argv));
         sprintf(argv,"%s%d\n",recv_buf,conn_fd);
         fprintf(stderr,"参数为%s",argv);
-    }
+    }*/
+    memset(argv,0,sizeof(argv));
+    sprintf(argv,"%s%d\n",recv_buf,conn_fd);
+    fprintf(stderr,"参数为%s",argv);
     //判断type，将对应处理函数放进线程池
     int type=atoi(ty);
     pthread_t tid;

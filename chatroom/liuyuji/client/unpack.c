@@ -31,13 +31,15 @@ int my_read(int conn_fd,void *buf,int len)
 int unpack(int connfd,char *recv_buf,int lenth)
 {
     //接收数据类型
-    char ty[2];
+    char ty[3];
+    memset(ty,0,sizeof(ty));
     if(read(connfd,ty,2)<0){
         my_err("read",__LINE__);
     }
 
     //接收数据长度
-    char len[2];
+    char len[3];
+    memset(len,0,sizeof(len));
     if(read(connfd,len,2)<0){
         my_err("read",__LINE__);
     }

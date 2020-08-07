@@ -68,6 +68,7 @@ FILE* log;
 pthread_key_t key;
 int epfd;
 
+void setblock(int sock);
 void setnoblock(int sock);
 void *unpack(void *arg);
 int my_read(int conn_fd,void *buf,int len);

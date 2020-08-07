@@ -638,7 +638,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,filename,sizeof(filename))<0){
                 my_err("read",__LINE__);
             }
-            char buffer[513];
+            char buffer[100];
             memset(buffer,0,sizeof(buffer));
             sprintf(buffer,"%s",recv_buf+read_len);
             /*if(get_arg(recv_buf,buffer,sizeof(buffer))<0){
@@ -646,7 +646,7 @@ void *msgbox(void *arg)
             }*/
             //printf("buffer is %s",buffer);
             FILE *fp=fopen(filename,"a");
-            if(fwrite(buffer,sizeof(char),strlen(buffer),fp)<strlen(buffer))
+            if(fwrite(buffer,sizeof(char),99,fp)<99)
             {
                 printf("File:\t%s Write Failed\n", filename);
             }

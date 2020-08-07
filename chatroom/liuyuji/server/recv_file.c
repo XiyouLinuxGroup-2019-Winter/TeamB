@@ -62,14 +62,14 @@ void *recv_file(void *arg)
     FILE *fp=fopen(filename,"r");
     char send_buf[1024];
     // 每读取一段数据，便将其发送给服务器，循环直到文件读完为止
-    char buffer[513];
+    char buffer[100];
     memset(buffer,0,sizeof(buffer));
-    while((len=fread(buffer,sizeof(char),512,fp)) > 0)
+    while((len=fread(buffer,sizeof(char),99,fp)) > 0)
     {
         memset(send_buf,0,sizeof(send_buf));
-        sprintf(send_buf,"1\n%s\n%s\n",filename,buffer);
+        sprintf(send_buf,"1\n%s\n%s",filename,buffer);
         printf("recvfile send_buf is %s",send_buf);//
-        if(send_pack(atoi(fd),RECVFILE,strlen(send_buf),send_buf)<0){
+        if(send_pack(atoi(fd),RECVFILE,len,send_buf)<0){
             my_err("write",__LINE__);
         }
         memset(buffer,0,sizeof(buffer));
