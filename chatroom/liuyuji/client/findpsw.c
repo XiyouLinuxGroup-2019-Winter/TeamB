@@ -14,7 +14,7 @@ int findpsw()
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n",uid);
-    printf("user send_buf is %s",send_buf);//
+    //printf("user send_buf is %s",send_buf);//
     if(send_pack(connfd,USER,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -48,7 +48,7 @@ int findpsw()
     scanf("%s",answer);
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",uid,answer);
-    printf("answer send_buf is %s",send_buf);//
+    //printf("answer send_buf is %s",send_buf);//
     if(send_pack(connfd,ANSWER,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -73,7 +73,7 @@ int findpsw()
     scanf("%s",psw);
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",uid,psw);
-    printf("findpsw send_buf is %s",send_buf);//
+    //printf("findpsw send_buf is %s",send_buf);//
     if(send_pack(connfd,FINDPSW,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }

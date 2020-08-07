@@ -12,31 +12,26 @@ void *realfile(void *arg)
     int len=0;
     int lenth=0;
     //获取文件名
-    char filename[32];
-    if((len=get_arg(arg,filename,10))<0){
+    char filename[256];
+    if((len=get_arg(arg,filename,256))<0){
         fprintf(stderr,"get_arg failed\n");
     }
     filename[len]=0;
     printf("filename is %s\n",filename);//
     //获取文件数据
     char buffer[1024];
-    if((lenth=get_arg(arg,filename,1024))<0){
+    sprintf(buffer,"%s",(char *)arg+len+1);
+    /*if((lenth=get_arg(arg,buffer,1024))<0){
         fprintf(stderr,"get_arg failed\n");
     }
-    buffer[lenth]=0;
+    buffer[lenth]=0;*/
     printf("filedata is %s\n",buffer);
-    //获取用户socket
-    char fd[4];
-    if((len=get_arg(arg,fd,4))<0){
-        fprintf(log,"get_arg failed\n");
-    }
-    fd[len]=0;
-    printf("fd is %s\n",fd);
     FILE *fp=fopen(filename,"a");
-    if(fwrite(buffer,sizeof(char),lenth,fp) < lenth)
+    if(fwrite(buffer,sizeof(char),strlen(buffer),fp) < strlen(buffer))
     {
         printf("File:\t%s Write Failed\n", filename);
     }
+    fclose(fp);
     free(arg);
     printf("realfile over\n");
 }

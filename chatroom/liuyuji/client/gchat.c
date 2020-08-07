@@ -17,7 +17,7 @@ int gchat()
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",user_id,gid);
-    printf("group send_buf is %s",send_buf);//
+    //printf("group send_buf is %s",send_buf);//
     if(send_pack(connfd,GROUP,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -41,7 +41,7 @@ int gchat()
         }
         memset(send_buf,0,sizeof(send_buf));
         sprintf(send_buf,"%s\n%s\n%s\n",user_id,gid,msg);
-        printf("gchat send_buf is %s",send_buf);//
+        //printf("gchat send_buf is %s",send_buf);//
         if(send_pack(connfd,GCHAT,strlen(send_buf),send_buf)<0){
             my_err("write",__LINE__);
         }

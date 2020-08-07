@@ -87,7 +87,7 @@ int main()
 	//fprintf(log,"连接mysql数据库成功!\n");
 
     //初始化线程池
-    pool_init(3);
+    pool_init(10);
     
     //初始化epoll
     epfd=epoll_create(20);

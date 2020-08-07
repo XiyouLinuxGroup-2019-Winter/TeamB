@@ -36,7 +36,7 @@ void *msgbox(void *arg)
         }
         fprintf(stderr,"数据为%s\n",recv_buf);
 
-        printf("收到数据%s",recv_buf);
+        //printf("收到数据%s",recv_buf);
         
         //判断type，分别处理
         int type=atoi(ty);
@@ -153,7 +153,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t好友不存在\n");
@@ -172,7 +172,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t好友不存在\n");
@@ -181,19 +181,21 @@ void *msgbox(void *arg)
             else if(flag[0]=='1'){
                 P_LOCK;
                 printf("\t\t\t\t\t拉黑成功\n");
+                P_UNLOCK;
             }
             break;
         }
         case FRIEND:{
+            printf("friend start!!!\n");
             char flag[2];
             memset(flag,0,sizeof(flag));
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
-                printf("\t\t\t\t\t好友不存在\n");
+                printf("\t\t\t\t\t红色感叹号！\n");
                 P_UNLOCK;
                 C_SIGNAL;
                 break;
@@ -210,7 +212,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t群不存在或您未加入此群\n");
@@ -225,6 +227,7 @@ void *msgbox(void *arg)
             }
         }
         case FCHAT:{
+            printf("fchat start???\n");
             char send_id[10];
             memset(send_id,0,sizeof(send_id));
             if(get_arg(recv_buf,send_id,sizeof(send_id))<0){
@@ -369,7 +372,7 @@ void *msgbox(void *arg)
                 P_UNLOCK;
                 break;
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             char gid[10];
             memset(gid,0,sizeof(gid));
             if(get_arg(recv_buf,gid,sizeof(gid))<0){
@@ -394,7 +397,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='1'){
                 P_LOCK;
                 printf("\t\t\t\t\t您已成功退出该群\n");
@@ -414,7 +417,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='1'){
                 P_LOCK;
                 printf("\t\t\t\t\t您的权限不够\n");
@@ -456,7 +459,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t此群不存在\n");
@@ -504,7 +507,7 @@ void *msgbox(void *arg)
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
                 my_err("read",__LINE__);
             }
-            printf("flag is %c\n",flag[0]);//
+            //printf("flag is %c\n",flag[0]);//
             if(flag[0]=='0'){
                 P_LOCK;
                 printf("\t\t\t\t\t此群不存在\n");
@@ -598,6 +601,56 @@ void *msgbox(void *arg)
             P_LOCK;
             printf("\t\t\t\t\t%s说:%s\n",send_id,msg);
             P_UNLOCK;
+            break;
+        }
+        case SENDFILE:{
+            char send_id[10];
+            memset(send_id,0,sizeof(send_id));
+            if(get_arg(recv_buf,send_id,sizeof(send_id))<0){
+                my_err("read",__LINE__);
+            }
+            char filename[256];
+            memset(filename,0,sizeof(filename));
+            if(get_arg(recv_buf,filename,sizeof(filename))<0){
+                my_err("read",__LINE__);
+            }
+            P_LOCK;
+            printf("%s向您发送了文件%s\n",send_id,filename);
+            P_UNLOCK;
+            break;
+        }
+        case RECVFILE:{
+            char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            //printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t对方未向您发送文件\n");
+                P_UNLOCK;
+                break;
+            }
+            printf("why??");
+            char filename[256];
+            memset(filename,0,sizeof(filename));
+            if(get_arg(recv_buf,filename,sizeof(filename))<0){
+                my_err("read",__LINE__);
+            }
+            char buffer[513];
+            memset(buffer,0,sizeof(buffer));
+            sprintf(buffer,"%s",recv_buf+read_len);
+            /*if(get_arg(recv_buf,buffer,sizeof(buffer))<0){
+                my_err("read",__LINE__);
+            }*/
+            //printf("buffer is %s",buffer);
+            FILE *fp=fopen(filename,"a");
+            if(fwrite(buffer,sizeof(char),strlen(buffer),fp)<strlen(buffer))
+            {
+                printf("File:\t%s Write Failed\n", filename);
+            }
+            fclose(fp);
             break;
         }
         }

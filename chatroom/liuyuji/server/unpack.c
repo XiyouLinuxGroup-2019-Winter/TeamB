@@ -60,10 +60,16 @@ void *unpack(void *arg)
     
     //准备参数
     char *argv=(char *)malloc(atoi(len)+4);
-    memset(argv,0,sizeof(argv));
-    sprintf(argv,"%s%d\n",recv_buf,conn_fd);
-    fprintf(stderr,"参数为%s",argv);
-
+    if(atoi(ty)==REALFILE){
+        memset(argv,0,sizeof(argv));
+        sprintf(argv,"%s",recv_buf);
+        fprintf(stderr,"文件数据为%s",argv);
+    }
+    else{
+        memset(argv,0,sizeof(argv));
+        sprintf(argv,"%s%d\n",recv_buf,conn_fd);
+        fprintf(stderr,"参数为%s",argv);
+    }
     //判断type，将对应处理函数放进线程池
     int type=atoi(ty);
     pthread_t tid;

@@ -49,8 +49,8 @@ enum{
     USER,
     ANSWER,
     SENDFILE,
-    SENDFILE,
     RECVFILE,
+    REALFILE,
 };
 #define GM_LOCK pthread_mutex_lock(&gm_mutex)
 #define GM_UNLOCK pthread_mutex_unlock(&gm_mutex)
@@ -116,6 +116,7 @@ char user_id[10];//用户id
 int connfd;//socket
 int chat_flag;//聊天标志1好友2群
 int findpsw_flag;//找回密码标志
+int file_flag;
 char chat_id[10];//聊天对象
 int read_len;
 
@@ -173,5 +174,6 @@ int gchatmsg();
 int print_file();
 int send_file();
 int recv_file();
+void *realfile(void *arg);
 
 #endif

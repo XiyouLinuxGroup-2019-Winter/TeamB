@@ -17,7 +17,7 @@ int fchat()
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",user_id,fid);
-    printf("friend send_buf is %s",send_buf);//
+    //printf("friend send_buf is %s",send_buf);//
     if(send_pack(connfd,FRIEND,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -41,7 +41,7 @@ int fchat()
         }
         memset(send_buf,0,sizeof(send_buf));
         sprintf(send_buf,"%s\n%s\n%s\n",user_id,fid,msg);
-        printf("fchat send_buf is %s",send_buf);//
+        //printf("fchat send_buf is %s",send_buf);//
         if(send_pack(connfd,FCHAT,strlen(send_buf),send_buf)<0){
             my_err("write",__LINE__);
         }

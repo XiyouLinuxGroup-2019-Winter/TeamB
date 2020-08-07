@@ -22,7 +22,7 @@ int login()
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",id,psw);
-    printf("send_buf len is %ld",strlen(send_buf));//
+    //printf("send_buf len is %ld",strlen(send_buf));//
     if(send_pack(connfd,LOGIN,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
@@ -31,10 +31,10 @@ int login()
     if(unpack(connfd,recv_buf,sizeof(recv_buf))<0){
         my_err("read",__LINE__);
     }
-    printf("login recv_buf is %s\n",recv_buf);
+    //printf("login recv_buf is %s\n",recv_buf);
     if(recv_buf[0]=='1'){
         printf("欢迎登录\n");
-        printf("user_id is %s\n",user_id);
+        printf("user_id:%s\n",user_id);
         pthread_t tid;
         pthread_create(&tid,NULL,msgbox,NULL);
         print_meau();

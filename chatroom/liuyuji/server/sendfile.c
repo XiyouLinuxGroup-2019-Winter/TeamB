@@ -25,8 +25,8 @@ void *send_file(void *arg)
     fid[len]=0;
     printf("fid is %s\n",fid);//
     //获取文件名
-    char filename[32];
-    if((len=get_arg(arg,filename,10))<0){
+    char filename[256];
+    if((len=get_arg(arg,filename,256))<0){
         fprintf(stderr,"get_arg failed\n");
     }
     filename[len]=0;

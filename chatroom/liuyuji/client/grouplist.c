@@ -11,7 +11,7 @@ int grouplist()
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n",user_id);
-    printf("grouplist send_buf is %s",send_buf);//
+    //printf("grouplist send_buf is %s",send_buf);//
     if(send_pack(connfd,GROUPLIST,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
