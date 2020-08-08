@@ -37,11 +37,13 @@ void *realfile(void *arg)
     //printf("filedata is %s\n",buffer);
     FILE *fp=fopen(filename,"w");
     int length = 0;
-    setblock(atoi(fd));
+    //setblock(atoi(fd));
     char buffer[1024];
     memset(buffer,0,sizeof(buffer));
+    sleep(2);
     while((length=recv(atoi(fd),buffer,sizeof(buffer),0))>0)
     {
+        printf("recv file data %s\n",buffer);
         if(fwrite(buffer,sizeof(char),length,fp)<length)
         {
             printf("File:\t%s Write Failed\n", filename);
@@ -49,6 +51,7 @@ void *realfile(void *arg)
         }
         memset(buffer,0,sizeof(buffer));
     }
+    //setnoblock(atoi(fd));
     struct epoll_event ev;
     ev.events=EPOLLIN | EPOLLRDHUP | EPOLLET;
     ev.data.fd=atoi(fd);

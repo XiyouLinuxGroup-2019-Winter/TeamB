@@ -40,7 +40,7 @@ void *msgbox(void *arg)
         
         //判断type，分别处理
         int type=atoi(ty);
-        printf("msgbox type is %d\n",type);
+        //printf("msgbox type is %d\n",type);
         switch(type){
         case ADDFRIEND:{
             char flag[2];
@@ -620,6 +620,7 @@ void *msgbox(void *arg)
             break;
         }
         case RECVFILE:{
+            //printf("recv_buf is %s",recv_buf);
             char flag[2];
             memset(flag,0,sizeof(flag));
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
@@ -632,13 +633,13 @@ void *msgbox(void *arg)
                 P_UNLOCK;
                 break;
             }
-            printf("why??");
+            //printf("why??");
             char filename[256];
             memset(filename,0,sizeof(filename));
             if(get_arg(recv_buf,filename,sizeof(filename))<0){
                 my_err("read",__LINE__);
             }
-            char buffer[100];
+            char buffer[256];
             memset(buffer,0,sizeof(buffer));
             sprintf(buffer,"%s",recv_buf+read_len);
             /*if(get_arg(recv_buf,buffer,sizeof(buffer))<0){
@@ -646,7 +647,7 @@ void *msgbox(void *arg)
             }*/
             //printf("buffer is %s",buffer);
             FILE *fp=fopen(filename,"a");
-            if(fwrite(buffer,sizeof(char),99,fp)<99)
+            if(fwrite(buffer,sizeof(char),atoi(len)-3-strlen(filename),fp)<atoi(len)-3-strlen(filename))
             {
                 printf("File:\t%s Write Failed\n", filename);
             }

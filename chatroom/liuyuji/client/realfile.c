@@ -59,7 +59,7 @@ void *realfile(void *arg)
     }
     // 关闭文件
     fclose(fp);
-    sleep(1);
+    sleep(2);
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n%s\n",user_id,fid,filename);
     //printf("sendfile send_buf is %s",send_buf);//

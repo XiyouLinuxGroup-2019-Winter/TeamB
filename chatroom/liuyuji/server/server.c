@@ -34,7 +34,7 @@ void setblock(int sock)
         my_err("fcntl",__LINE__);
         exit(1);
     }
-    flag&=O_NONBLOCK; 
+    flag=flag&~O_NONBLOCK; 
     if(fcntl(sock,F_SETFL,flag)<0)
     {
         my_err("fcntl(sock,SETFL,opts)",__LINE__);
