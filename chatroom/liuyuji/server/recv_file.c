@@ -68,7 +68,7 @@ void *recv_file(void *arg)
     {
         memset(send_buf,0,sizeof(send_buf));
         sprintf(send_buf,"1\n%s\n%s",filename,buffer);
-        printf("recvfile send_buf is %s",send_buf);//
+        //printf("recvfile send_buf is %s",send_buf);//
         if(send_pack(atoi(fd),RECVFILE,len+3+strlen(filename),send_buf)<0){
             my_err("write",__LINE__);
         }

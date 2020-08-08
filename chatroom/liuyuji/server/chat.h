@@ -55,6 +55,7 @@ enum{
     SENDFILE,
     RECVFILE,
     REALFILE,
+    START,
 };
 
 typedef struct{
@@ -62,7 +63,11 @@ typedef struct{
     char len[2];
     char data[1024];
 }Pack;
-
+typedef struct {
+    char type;
+    char len[4];
+    char data[1024];
+}File_pack;
 MYSQL mysql;
 FILE* log;
 pthread_key_t key;

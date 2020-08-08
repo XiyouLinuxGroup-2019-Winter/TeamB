@@ -45,21 +45,42 @@ void *realfile(void *arg)
     if(send_pack(connfd,REALFILE,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
     }
-    sleep(1);
-    char buffer[1024];
-    memset(buffer,0,sizeof(buffer));
-    while((len=fread(buffer,sizeof(char),sizeof(buffer),fp))>0)
+    //sleep(1);//阻塞
+    S_LOCK;
+    //printf("S_LOCK\n");
+    C_WAIT;
+    S_UNLOCK;
+    //printf("fread start\n");
+    File_pack buffer;
+    memset(&buffer,0,sizeof(buffer));
+    while((len=fread(buffer.data,sizeof(char),512,fp))>0)
     {
-        if(send(connfd,buffer,len,0)<0)
+        //printf("len is %d\n",len);
+        buffer.type='1';
+        sprintf(buffer.len,"%d",len);
+        //printf("buffer.data is %s",buffer.data);
+        if(send(connfd,&buffer,len+5,0)<0)
         {
             printf("Send File:%s Failed./n", filename);
             break;
         }
-        memset(buffer,0,sizeof(buffer));
+        //sleep(1);
+        memset(&buffer,0,sizeof(buffer));
     }
+    //sleep(1);
+    memset(&buffer,0,sizeof(buffer));
+    buffer.type='0';
+    if(send(connfd,&buffer,1,0)<0){
+        printf("Send File:%s Failed./n", filename);
+    }
+    //printf("send over\n");
     // 关闭文件
     fclose(fp);
-    sleep(2);
+    //sleep(2);//阻塞
+    S_LOCK;
+    C_WAIT;
+    S_UNLOCK;
+    //printf("wait over\n");
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n%s\n",user_id,fid,filename);
     //printf("sendfile send_buf is %s",send_buf);//
@@ -68,7 +89,7 @@ void *realfile(void *arg)
     }
     free(arg);
     P_LOCK;
-    printf("文件已发送至服务器，等待好友接收\n");
+    printf("\t\t\t\t\t文件已发送至服务器，等待好友接收\n");
     P_UNLOCK;
     pthread_exit(NULL);
 }

@@ -1,7 +1,7 @@
 CC=gcc
-OBJ = zzychat_client
+OBJ = server
 all:
-	$(CC)  -o  $(OBJ)  *.h    *.c     -lpthread  -I/usr/include/mysql/ -L/usr/lib/mysql -lmysqlclient   -g
+	$(CC)  -o  $(OBJ)  *.h    *.c     -lpthread  -lmysqlclient
 #	rm -rf *.o
  
 clean:

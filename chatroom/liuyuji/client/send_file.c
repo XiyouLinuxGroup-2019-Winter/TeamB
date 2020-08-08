@@ -18,6 +18,12 @@ int send_file()
     P_UNLOCK;
     char filename[1024];
     scanf("%s",filename);
+    FILE *fp;
+    if((fp=fopen(filename,"r"))==NULL){
+        printf("请输入正确的文件路径\n");
+        return 0;
+    }
+    fclose(fp);
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
     sprintf(send_buf,"%s\n%s\n",user_id,fid);
@@ -42,7 +48,7 @@ int send_file()
     memset(arg,0,sizeof(arg));
     sprintf(arg,"%s\n%s\n",fid,filename);
     P_LOCK;
-    printf("正在发送文件至服务器\n");
+    printf("\t\t\t\t\t正在发送文件至服务器\n");
     P_UNLOCK;
     pthread_create(&tid,NULL,realfile,(void *)arg);
 }

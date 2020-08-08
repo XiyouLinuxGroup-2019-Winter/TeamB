@@ -18,7 +18,7 @@ void *msgbox(void *arg)
         if(my_read(connfd,ty,2)<0){
             my_err("read",__LINE__);
         }
-        fprintf(stderr,"数据type为%s\n",ty);
+        //fprintf(stderr,"数据type为%s\n",ty);
     
         //接收数据长度
         char len[3];
@@ -26,7 +26,7 @@ void *msgbox(void *arg)
         if(my_read(connfd,len,2)<0){
             my_err("read",__LINE__);
         }
-        fprintf(stderr,"数据len为%s\n",len);
+        //fprintf(stderr,"数据len为%s\n",len);
         
         //接收数据
         char recv_buf[1024];
@@ -34,7 +34,7 @@ void *msgbox(void *arg)
         if(my_read(connfd,recv_buf,atoi(len))<0){
             my_err("read",__LINE__);
         }
-        fprintf(stderr,"数据为%s\n",recv_buf);
+        //fprintf(stderr,"数据为%s\n",recv_buf);
 
         //printf("收到数据%s",recv_buf);
         
@@ -186,7 +186,7 @@ void *msgbox(void *arg)
             break;
         }
         case FRIEND:{
-            printf("friend start!!!\n");
+            //printf("friend start!!!\n");
             char flag[2];
             memset(flag,0,sizeof(flag));
             if(get_arg(recv_buf,flag,sizeof(flag))<0){
@@ -653,6 +653,28 @@ void *msgbox(void *arg)
             }
             fclose(fp);
             break;
+        }
+        case START:{
+            /*char flag[2];
+            memset(flag,0,sizeof(flag));
+            if(get_arg(recv_buf,flag,sizeof(flag))<0){
+                my_err("read",__LINE__);
+            }
+            //printf("flag is %c\n",flag[0]);//
+            if(flag[0]=='0'){
+                P_LOCK;
+                printf("\t\t\t\t\t红色感叹号！\n");
+                P_UNLOCK;*/
+            //printf("signal coming\n");    
+            C_SIGNAL;
+            
+            break;
+            /*}
+            else if(flag[0]=='1'){
+                chat_flag=1;
+                C_SIGNAL;
+                break;
+            }*/
         }
         }
     }

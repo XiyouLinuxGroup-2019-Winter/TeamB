@@ -16,9 +16,7 @@ int print_file()
         printf("0.返回\n");
         printf("请输入您的选择\n");
         P_UNLOCK;
-        S_LOCK;
         scanf("%d",&chose);
-        S_UNLOCK;
         switch(chose){
             case 1:
             send_file();

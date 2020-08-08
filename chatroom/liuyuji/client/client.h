@@ -51,6 +51,7 @@ enum{
     SENDFILE,
     RECVFILE,
     REALFILE,
+    START,
 };
 #define GM_LOCK pthread_mutex_lock(&gm_mutex)
 #define GM_UNLOCK pthread_mutex_unlock(&gm_mutex)
@@ -68,6 +69,11 @@ typedef struct {
     char len[2];
     char data[1024];
 }Pack;
+typedef struct {
+    char type;
+    char len[4];
+    char data[1024];
+}File_pack;
 //好友消息
 typedef struct fmsg{
     char send_id[10];
