@@ -12,7 +12,12 @@ int fchat()
     printf("请输入您要私聊的好友ID\n");
     P_UNLOCK;
     char fid[10];
+    memset(fid,0,sizeof(fid));
     scanf("%s",fid);
+    if(strcmp(user_id,fid)==0){
+        printf("请不要与自己聊天\n");
+        return 0;
+    }
     strcpy(chat_id,fid);
     char send_buf[1024];
     memset(send_buf,0,sizeof(send_buf));
