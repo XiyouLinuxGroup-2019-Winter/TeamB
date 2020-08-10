@@ -23,6 +23,7 @@ int print_file()
             break;
             case 2:
             recv_file();
+            break;
             case 0:
             return 0;
             break;

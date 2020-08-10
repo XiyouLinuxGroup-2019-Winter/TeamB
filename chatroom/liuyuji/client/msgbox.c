@@ -9,7 +9,7 @@
 void *msgbox(void *arg)
 {
     //printf("msgbox is running\n");
-    while(exit_flag!=1){
+    while(1){
         //接收数据类型
         //printf("msgbox is while\n");
         read_len=0;
@@ -42,6 +42,10 @@ void *msgbox(void *arg)
         int type=atoi(ty);
         //printf("msgbox type is %d\n",type);
         switch(type){
+        case OVER:{
+            //printf("msgbox is over\n");
+            pthread_exit(NULL);
+        }
         case ADDFRIEND:{
             char flag[2];
             memset(flag,0,sizeof(flag));
@@ -615,7 +619,7 @@ void *msgbox(void *arg)
                 my_err("read",__LINE__);
             }
             P_LOCK;
-            printf("%s向您发送了文件%s\n",send_id,filename);
+            printf("\t\t\t\t\t%s向您发送了文件%s\n",send_id,filename);
             P_UNLOCK;
             break;
         }
@@ -678,4 +682,5 @@ void *msgbox(void *arg)
         }
         }
     }
+    printf("msgbox is over\n");
 }

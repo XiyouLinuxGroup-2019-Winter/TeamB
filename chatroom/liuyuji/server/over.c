@@ -32,6 +32,13 @@ void *over(void *arg)
     if(mysql_query(&mysql, cmd)<0){
         my_err("mysql_query",__LINE__);
     }
+    //发送消息
+    char data[5];
+    memset(data,0,sizeof(data));
+    sprintf(data,"1\n");
+    if(send_pack(atoi(fd),OVER,strlen(data),data)<0){
+        my_err("write",__LINE__);
+    }
     printf("over over\n");
 }
 

@@ -27,7 +27,7 @@ void *login(void *arg)
     //获取connfd
     char fd[4];
     if((len=get_arg(arg,fd,4))<0){
-        fprintf(log,"get_arg failed\n");
+        printf("get_arg failed\n");
     }
     fd[len]=0;
     printf("fd is %s\n",fd);
@@ -60,6 +60,7 @@ void *login(void *arg)
         //close(atoi(fd));
     }
     if(row[0]!=NULL){
+        printf("mysql data is %s\n",row[0]);
         if(strcmp(psw,row[0])==0){
             sprintf(data,"1\n");
             if(send_pack(atoi(fd),LOGIN,strlen(data),data)<0){

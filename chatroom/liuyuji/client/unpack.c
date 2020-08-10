@@ -43,7 +43,7 @@ int unpack(int connfd,char *recv_buf,int lenth)
     if(read(connfd,len,2)<0){
         my_err("read",__LINE__);
     }
-
+    //printf("pack len is %s\n",len);
     //接收数据
     int ret;
     memset(recv_buf,0,sizeof(recv_buf));

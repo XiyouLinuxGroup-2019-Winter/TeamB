@@ -28,6 +28,7 @@ int login()
     }
     char recv_buf[5];
     memset(recv_buf,0,sizeof(recv_buf));
+    //printf("unpack\n");
     if(unpack(connfd,recv_buf,sizeof(recv_buf))<0){
         my_err("read",__LINE__);
     }

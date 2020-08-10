@@ -35,6 +35,7 @@ int send_file()
     printf("正在处理中\n");
     P_UNLOCK;
     S_LOCK;
+    //printf("wait?\n");
     C_WAIT;
     //printf("char_flag = %d\n",chat_flag);
     if(chat_flag==0){

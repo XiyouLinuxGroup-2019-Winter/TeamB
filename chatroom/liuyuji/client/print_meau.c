@@ -13,7 +13,7 @@ int print_meau()
         P_LOCK;
         printf("1.好友管理\n");
         printf("2.群管理\n");
-        printf("3.发送文件\n");
+        printf("3.文件传输\n");
         printf("0.注销\n");
         printf("请输入您的选择\n");
         P_UNLOCK;
@@ -30,13 +30,13 @@ int print_meau()
             case 3:
             print_file();
             break;
-            case 0:
-            exit_flag=1;
-            char data[11];
-            sprintf(data,"%s\n",user_id);
-            send_pack(connfd,OVER,strlen(data),data);
-            return 0;
-            break;
+            case 0:{
+                char data[11];
+                sprintf(data,"%s\n",user_id);
+                send_pack(connfd,OVER,strlen(data),data);
+                return 0;
+                break;
+            }
         }
     }
 }
