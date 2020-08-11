@@ -17,8 +17,6 @@
 #include<arpa/inet.h>
 #include<errno.h>
 
-#define SERV_PORT 8848 
-
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
@@ -39,20 +37,19 @@
 #define CHAT_ONE        17 
 #define CHAT_MANY       18 
 #define CHECK_MES_FRI   19 
-#define CHECK_MES_GRP   20 
+#define CHECK_MES_GRP   20
 #define SEND_FILE       21 
 #define RECV_FILE       22 
-
-#define PASSIVE 0
-#define ACTIVE 1
 
 #define BUFSIZE 1024
 #define MAX_CHAR 100
 #define FRI_MAX 100
 #define MAX_FILE 10000
 
-#define ECHOFLAGS (ECHO | ECHOE | ECHOK | ECHONL)
+#define SERV_PORT 8848
 
+#define PASSIVE 0
+#define ACTIVE 1
 
 typedef struct _user
 {
@@ -132,7 +129,7 @@ void my_err(const char *err_string,int line)
     exit(1);
 }
 
-void *get_back(void *arg);
+void *recv_back(void *arg);
 int login_menu();       
 int login();            
 void registe();
@@ -167,23 +164,13 @@ void Menu_mes_box();
 void send_pack(int type, char *send_name, char *recv_name, char *mes);
 int get_choice(char *choice_t);
 char *s_gets(char *s, int n);
-int set_disp_mode(int fd,int option);
-int getpasswd(char* passwd, int size);
-
-
-
-pthread_mutex_t mutex;
-pthread_cond_t cond;
-
-
-
 
 int sock_fd;
-char user[MAX_CHAR];   
+char user[MAX_CHAR];
 char grp_name[MAX_CHAR];
-FRI_INFO fri_info; 
-GROUP_INFO grp_info;  
-RECORD_INFO rec_info[55]; 
+FRI_INFO fri_info;
+GROUP_INFO grp_info;
+RECORD_INFO rec_info[50];
 char mes_file[MAX_CHAR * 3];
 int ffflag;
 
@@ -193,5 +180,7 @@ int mes_box_inc[100];
 int sign;
 int sign_ive[100];
 
-#endif
+pthread_mutex_t mutex;
+pthread_cond_t cond;
 
+#endif

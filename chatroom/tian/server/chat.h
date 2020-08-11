@@ -18,7 +18,6 @@
 #include<sys/epoll.h>
 #include"pool.h"
 
-
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
@@ -43,25 +42,25 @@
 #define RECV_FILE       21 
 #define SEND_FILE       22 
 
-#define FRIEND 1
-#define FRI_BLK 2
-#define GRP 3
-#define GRP_OWN 4
-#define GRP_ADM 5
+#define FRIEND          1
+#define FRI_BLK         2
+#define GRP             3
+#define GRP_OWN         4
+#define GRP_ADM         5
 
-#define OFFLINE 0
-#define ONLINE 1
-#define ONE_CHAT 2
-#define MANY_CHAT 3
+#define OFFLINE         0
+#define ONLINE          1
+#define ONE_CHAT        2
+#define MANY_CHAT       3
 
-#define BUFSIZE 1024
-#define MAX_CHAR 100
-#define FRI_MAX 100
-#define MAX_FILE 10000
+#define BUFSIZE         1024
+#define MAX_CHAR        100
+#define FRI_MAX         100
+#define MAX_FILE        10000
 
-#define SERV_PORT 8848
-#define LISTENQ 10
-#define MAX_EVENTS 1000
+#define SERV_PORT       8848
+#define LISTENQ         10
+#define MAX_EVENTS      1000
 
 typedef struct _user
 {
@@ -134,15 +133,12 @@ typedef struct _pack
     RECORD_INFO rec_info[55];
 }PACK;
 
-
-
 typedef struct _file
 {
     char file_name[MAX_THREAD_NUM][MAX_CHAR];
     char file_send_name[MAX_THREAD_NUM][MAX_CHAR];
     int sign_file;
 }File;
-
 
 void my_err(const char *err_string,int line)
 {
@@ -160,23 +156,21 @@ Recordinfo *pRec = NULL;
 
 PACK Mex_Box[100];
 int sign;
-int book;
+int sign_1;
 File file;
 
-
-User *U_read();     
-Relation *R_read();         
-Recordinfo *RC_read();
+User *User_list();     
+Relation *Relation_list();         
+Recordinfo *Record_list();
 void Insert(User *pNew);
 void Insert_RC(Recordinfo *pNew);
 void Insert_R(Relation *pNew);
 void Delete_R(Relation *pNew);
-void DeleteLink();	
-void DeleteLink_R();	
-void DeleteLink_RC();
-
+void Delete_User_list();	
+void Delete_Relation_list();	
+void Delete_Record_list();
 		
-void *Menu(void *recv_pack_t);
+void *deal(void *recv_pack_t);
 void Exit(PACK *recv_pack);   
 void registe(PACK *recv_pack);
 void login(PACK *recv_pack);
@@ -200,7 +194,7 @@ void chat_many(PACK *recv_pack);
 void check_mes_grp(PACK *recv_pack);
 void send_file(PACK *recv_pack); 
 void recv_file(PACK *recv_pack);
-void send_more(int fd, int flag, PACK *recv_pack, char *mes);
+void send_mes(int fd, int flag, PACK *recv_pack, char *mes);
 void send_pack(int fd, PACK *recv_pack, char *ch);
 
 #endif
