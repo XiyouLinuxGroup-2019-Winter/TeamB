@@ -190,6 +190,14 @@ void *deal(void *recv_pack_t)
         rel_fri(recv_pack);
         break;
         
+    case CHAT_ONE:
+        chat_one(recv_pack);
+        break;
+        
+    case CHECK_MES_FRI:
+        check_mes_fri(recv_pack);
+        break;
+        
     case CRE_GRP:
         cre_grp(recv_pack);
         break;
@@ -222,16 +230,8 @@ void *deal(void *recv_pack_t)
         check_mem_grp(recv_pack);
         break;
 
-    case CHAT_ONE:
-        chat_one(recv_pack);
-        break;
-
     case CHAT_MANY:
         chat_many(recv_pack);
-        break;
-
-    case CHECK_MES_FRI:
-        check_mes_fri(recv_pack);
         break;
 
     case CHECK_MES_GRP:
@@ -275,7 +275,7 @@ void registe(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     User *t = pHead;
-    int flag_1 = 0;
+    int flag_1 = 0;//检查用户名是否重复 
     User *pNew = (User *)malloc(sizeof(User));
     while(t)
     {
@@ -287,12 +287,12 @@ void registe(PACK *recv_pack)
         t = t->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不重复 
     {
         strcpy(pNew->name, recv_pack->data.send_name);
         strcpy(pNew->passwd, recv_pack->data.mes);
         pNew->statu_s = OFFLINE;
-        Insert(pNew);
+        Insert(pNew);//插入用户数据链表 
         memset(query_str, 0, strlen(query_str));
         sprintf(query_str, "insert into userinfo values('%s', '%s')", recv_pack->data.send_name, recv_pack->data.mes);
         mysql_real_query(&mysql, query_str, strlen(query_str));
@@ -302,7 +302,7 @@ void registe(PACK *recv_pack)
         letter[0] = '0';
     
     letter[1] = '\0';
-    send_pack(fd, recv_pack, letter);
+    send_pack(fd, recv_pack, letter);//给客户端信息 
 }
 
 void login(PACK *recv_pack)
@@ -312,7 +312,7 @@ void login(PACK *recv_pack)
     int i;
 
     User *t = pHead;
-    int flag_1 = 0;
+    int flag_1 = 0;//检查账号密码是否正确 
     while(t)
     {
         if(strcmp(t->name, recv_pack->data.send_name) == 0 && strcmp(t->passwd, recv_pack->data.mes) == 0)
@@ -323,55 +323,55 @@ void login(PACK *recv_pack)
         t = t->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不正确 
         letter[0] = '0';
     else
     {
-        if(t->statu_s == OFFLINE)
+        if(t->statu_s == OFFLINE)//获取用户状态  离线 
         {
             letter[0] = '1';
             t->statu_s = ONLINE;
             t->fd = recv_pack->data.send_fd;
         }
         else 
-            letter[0] = '2';
+            letter[0] = '2';//在线 
     }
     letter[1] = '\0';
-    send_pack(fd, recv_pack, letter);
-    for(i = 0; i < sign; i++)
+    send_pack(fd, recv_pack, letter);//给客户端信息
+    for(i = 0; i < sign; i++)//sign是未读消息，在后面功能函数有用处 ，离线状态下处理 
     {
-        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.recv_name) == 0 && (Mex_Box[i].type == CHAT_ONE))
+        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.recv_name) == 0 && (Mex_Box[i].type == CHAT_ONE))// 私聊 
         {
             send_mes(fd, CHAT_ONE, &Mex_Box[i], "1");
             sign_1++;
         }
-        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.send_name) == 0 && (Mex_Box[i].type == CHAT_MANY))
+        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.send_name) == 0 && (Mex_Box[i].type == CHAT_MANY))//群聊 
         {
             send_mes(fd, CHAT_MANY, &Mex_Box[i], "2");
             sign_1++;
         }
-        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.recv_name) == 0 && (Mex_Box[i].type == ADD_FRI))
+        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.recv_name) == 0 && (Mex_Box[i].type == ADD_FRI))//添加好友 
         {
-            pool_add(deal, (void *)&Mex_Box[i]);  
+            pool_add(deal, (void *)&Mex_Box[i]);  //根据消息盒子里的信息，开启一个线程 
             sign_1++;
         }
-        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.send_name) == 0 && (Mex_Box[i].type == ADD_GRP))
+        if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.send_name) == 0 && (Mex_Box[i].type == ADD_GRP))//加群 
         {
-            pool_add(deal, (void *)&Mex_Box[i]);  
+            pool_add(deal, (void *)&Mex_Box[i]);  //根据消息盒子里的信息，开启一个线程 
             sign_1++;
         }
         if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.mes) == 0)
         {
-            send_mes(fd, Mex_Box[i].type, &Mex_Box[i], "6");
+            send_mes(fd, Mex_Box[i].type, &Mex_Box[i], "6");//设置管理员/踢人 
             sign_1++;
         }
         if((letter[0] == '1') && strcmp(recv_pack->data.send_name, Mex_Box[i].data.recv_name) == 0 && strcmp(Mex_Box[i].data.mes, "ok") == 0)
         {
-            send_file(&Mex_Box[i]);
+            send_file(&Mex_Box[i]);//发送文件 
             sign_1++;
         }
     }
-    if(sign_1 == sign)
+    if(sign_1 == sign)  //将离线进程清空 
         sign = sign_1 = 0;
 }
 
@@ -388,14 +388,14 @@ void check_fri(PACK *recv_pack)
     int statu_s;
 
     memset(query_str, 0, strlen(query_str));
-    sprintf(query_str, "select * from relationinfo where name1='%s' or name2='%s'", recv_pack->data.send_name, recv_pack->data.send_name);
+    sprintf(query_str, "select * from relationinfo where name1='%s' or name2='%s'", recv_pack->data.send_name, recv_pack->data.send_name);//寻找你的用户名 
     mysql_real_query(&mysql, query_str, strlen(query_str));
     
     res = mysql_store_result(&mysql);
     
     rows = mysql_num_rows(res); 
 
-    if(rows == 0)
+    if(rows == 0)//没有好友 
         recv_pack->fri_info.friends_num = 0;
     else
     {
@@ -404,7 +404,7 @@ void check_fri(PACK *recv_pack)
         {
             if(strcmp(row[0], recv_pack->data.send_name) == 0)
             {
-                strcpy(recv_pack->fri_info.friends[i], row[1]);
+                strcpy(recv_pack->fri_info.friends[i], row[1]);//将好友信息存储 
                 statu_s = row[2][0] - '0';
                 recv_pack->fri_info.friends_status[i] = statu_s;
                 i++;
@@ -419,7 +419,7 @@ void check_fri(PACK *recv_pack)
         }
         recv_pack->fri_info.friends_num = i;
     }
-    send_mes(fd, flag, recv_pack, "");
+    send_mes(fd, flag, recv_pack, "");//发送信息给客户端 
 }
 
 void get_fri_sta(PACK *recv_pack)
@@ -429,7 +429,7 @@ void get_fri_sta(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     User *t = pHead;
-    int flag_1 = 0;
+    int flag_1 = 0; 
     while(t)
     {
         if(strcmp(t->name, recv_pack->data.send_name) == 0)
@@ -459,9 +459,9 @@ void add_fri(PACK *recv_pack)
     char ss[MAX_CHAR];
 
     User *t = pHead;
-    int flag_2 = 0;
+    int flag_2 = 0;//判断是否有该账号 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断是否是好友 
     Relation *pNew = (Relation *)malloc(sizeof(Relation));
     while(q)
     {
@@ -481,7 +481,7 @@ void add_fri(PACK *recv_pack)
         pNew = NULL;
         return;
     }
-    else
+    else//不是好友的情况 
     {
         while(t)
         {
@@ -501,9 +501,9 @@ void add_fri(PACK *recv_pack)
             pNew = NULL;
             return;
         }
-        else
+        else//账号存在的情况 
         {
-            if(t->statu_s != OFFLINE)
+            if(t->statu_s != OFFLINE)//在线 
             {
                 fd = t->fd;
                 if(recv_pack->data.mes[0] == '0')
@@ -528,7 +528,7 @@ void add_fri(PACK *recv_pack)
                 strcpy(recv_pack->data.send_name, ss);
                 send_mes(fd, flag, recv_pack, letter);
             }
-            else if(t->statu_s == OFFLINE)
+            else if(t->statu_s == OFFLINE)//离线，存储到消息盒子，利用刚开始登录线程来反馈消息 
             {
                 memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));       
             }
@@ -538,14 +538,14 @@ void add_fri(PACK *recv_pack)
 
 void del_fri(PACK *recv_pack)
 {
-    char query_str[1700];
+    char query_str[1000];
 
     int flag = DEL_FRI;
     char letter[5];
     int fd = recv_pack->data.send_fd;
 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断是否为好友 
     while(q)
     {
         if((strcmp(q->name1, recv_pack->data.mes) == 0 && strcmp(q->name2, recv_pack->data.send_name) == 0) || (strcmp(q->name1, recv_pack->data.send_name) == 0 && strcmp(q->name2, recv_pack->data.mes) == 0))
@@ -556,11 +556,11 @@ void del_fri(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不是好友 
         letter[0] = '0';
-    else
+    else//是好友 
     {
-        Delete_R(q);
+        Delete_R(q);//删除好友链表 
 
         memset(query_str, 0, strlen(query_str));
         sprintf(query_str, "delete from relationinfo where (name1='%s' and name2='%s') or (name1='%s' and name2='%s')", recv_pack->data.send_name, recv_pack->data.mes, recv_pack->data.mes, recv_pack->data.send_name);
@@ -579,7 +579,7 @@ void shi_fri(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断是否为好友 
     while(q)
     {
         if((strcmp(q->name1, recv_pack->data.mes) == 0 && strcmp(q->name2, recv_pack->data.send_name) == 0) || (strcmp(q->name1, recv_pack->data.send_name) == 0 && strcmp(q->name2, recv_pack->data.mes) == 0))
@@ -590,11 +590,11 @@ void shi_fri(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不是好友
         letter[0] = '0';
-    else
+    else//是好友
     {
-        q->statu_s = FRI_BLK;
+        q->statu_s = FRI_BLK;//给好友屏蔽信号 
         memset(query_str, 0, strlen(query_str));
         sprintf(query_str, "update relationinfo set status=%d where (name1='%s' and name2='%s') or (name1='%s' and name2='%s')", FRI_BLK, recv_pack->data.send_name, recv_pack->data.mes, recv_pack->data.mes, recv_pack->data.send_name);
         mysql_real_query(&mysql, query_str, strlen(query_str));
@@ -613,7 +613,7 @@ void rel_fri(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断是否为好友 
     while(q)
     {
         if((strcmp(q->name1, recv_pack->data.mes) == 0 && strcmp(q->name2, recv_pack->data.send_name) == 0) || (strcmp(q->name1, recv_pack->data.send_name) == 0 && strcmp(q->name2, recv_pack->data.mes) == 0))
@@ -624,11 +624,11 @@ void rel_fri(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不是好友
         letter[0] = '0';
-    else
+    else//是好友
     {
-        q->statu_s = FRIEND;
+        q->statu_s = FRIEND;//解除屏蔽状态 
         memset(query_str, 0, strlen(query_str));
         sprintf(query_str, "update relationinfo set status=%d where (name1='%s' and name2='%s') or (name1='%s' and name2='%s')", FRIEND, recv_pack->data.send_name, recv_pack->data.mes, recv_pack->data.mes, recv_pack->data.send_name);
         mysql_real_query(&mysql, query_str, strlen(query_str));
@@ -658,12 +658,12 @@ void chat_one(PACK *recv_pack)
     User *t = pHead;
     Relation *q = pStart;
     Recordinfo *p = pRec;
-    int flag_2 = 0;
-    int flag_1 = 0;
+    int flag_2 = 0;//判断是否存在 
+    int flag_1 = 0;//判断是否在线 
 
     Recordinfo *pNew = (Recordinfo *)malloc(sizeof(Recordinfo));
 
-    if(strcmp(recv_pack->data.mes, "q") == 0)
+    if(strcmp(recv_pack->data.mes, "q") == 0)//判断是否退出 
     {
         while(t)
         {
@@ -679,11 +679,11 @@ void chat_one(PACK *recv_pack)
         }
     }
 
-    while(q)
+    while(q)//读取用户信息 
     {
         if(((strcmp(q->name1,recv_pack->data.send_name) == 0 && strcmp(q->name2, recv_pack->data.recv_name) == 0) || (strcmp(q->name2,recv_pack->data.send_name) == 0 && strcmp(q->name1, recv_pack->data.recv_name) == 0)) && (q->statu_s == FRI_BLK))
         {
-            letter[0] = '3';
+            letter[0] = '3';//被屏蔽了 
             send_mes(fd, flag, recv_pack, letter);
             free(pNew);
             pNew = NULL;
@@ -693,7 +693,7 @@ void chat_one(PACK *recv_pack)
     }
 
     t = pHead;
-    while(t)
+    while(t)//读取用户信息 
     {
         if(strcmp(t->name, recv_pack->data.recv_name) == 0)
         {
@@ -703,7 +703,7 @@ void chat_one(PACK *recv_pack)
         t = t->next;
     }
 
-    if(flag_2 == 0)
+    if(flag_2 == 0)//没有该人物 
     {
         letter[0] = '0';
         send_mes(fd, flag, recv_pack, letter);
@@ -711,9 +711,9 @@ void chat_one(PACK *recv_pack)
         pNew = NULL;
         return;
     }
-    else
+    else//有该人物 
     {
-        if(recv_pack->data.mes[0] == '1')
+        if(recv_pack->data.mes[0] == '1')//客户端发来的1，根据信息来进行消息记录储存 
         {
             memset(query_str, 0, strlen(query_str));
             sprintf(query_str, "select * from off_recordinfo where name1='%s' and name2='%s'", recv_pack->data.recv_name, recv_pack->data.send_name);
@@ -746,7 +746,7 @@ void chat_one(PACK *recv_pack)
             mysql_real_query(&mysql, query_str, strlen(query_str));
             
             t = pHead;
-            while(t)
+            while(t)//查询用户，看是否聊天 
             {
                 if(strcmp(t->name, recv_pack->data.send_name) == 0)
                 {
@@ -757,7 +757,7 @@ void chat_one(PACK *recv_pack)
                 t = t->next;
             }
             t = pHead;
-            while(t)
+            while(t)//查询用户，看是否在线 
             {
                 if(strcmp(t->name, recv_pack->data.recv_name) == 0 && (t->statu_s != OFFLINE))
                 {
@@ -766,7 +766,7 @@ void chat_one(PACK *recv_pack)
                 }
                 t = t->next;
             }
-            if(flag_1 == 1)
+            if(flag_1 == 1)//在线，发送消息 
             {
                 letter[0] = '1';
                 fd = t->fd;
@@ -775,19 +775,19 @@ void chat_one(PACK *recv_pack)
                 strcpy(recv_pack->data.send_name, ss);
                 send_mes(fd, flag, recv_pack, letter);
             }
-            else 
+            else //不在线，存在消息盒子，登录时线程来处理 
             {
                 letter[0] = '2';
                 send_mes(fd, flag, recv_pack, letter);
                 memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));
             }
         }
-        else
+        else//实时聊天 
         {
             t = pHead;
             while(t)
             {
-                if(strcmp(t->name, recv_pack->data.recv_name) == 0 && strcmp(t->chat, recv_pack->data.send_name) == 0 && (t->statu_s == ONE_CHAT))
+                if(strcmp(t->name, recv_pack->data.recv_name) == 0 && strcmp(t->chat, recv_pack->data.send_name) == 0 && (t->statu_s == ONE_CHAT))//A对B聊 
                 {
                     fd = t->fd;
                     strcpy(pNew->name1, recv_pack->data.send_name);
@@ -802,10 +802,14 @@ void chat_one(PACK *recv_pack)
                     memset(ss, 0, MAX_CHAR);
                     strcpy(ss,recv_pack->data.recv_name);
                     strcpy(recv_pack->data.recv_name, recv_pack->data.send_name);
+                    time(&now);
+                    str = ctime(&now);
+                    str[strlen(str) - 1] = '\0';
+                    memcpy(recv_pack->data.send_name, str, strlen(str));//打印时间 
                     send_mes(fd, flag, recv_pack, recv_pack->data.mes);
                     return;
                 }
-                else if(strcmp(t->name, recv_pack->data.recv_name) == 0 && strcmp(t->chat, recv_pack->data.send_name) != 0)
+                else if(strcmp(t->name, recv_pack->data.recv_name) == 0 && strcmp(t->chat, recv_pack->data.send_name) != 0)//B对A聊 
                 {
                     memset(query_str, 0, strlen(query_str));
                     sprintf(query_str, "insert into off_recordinfo values('%s', '%s', '%s')", recv_pack->data.send_name, recv_pack->data.recv_name, recv_pack->data.mes);
@@ -828,7 +832,7 @@ void check_mes_fri(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
     Relation *q = pStart;
     Recordinfo *p = pRec;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断是否好友 
     while(q)
     {
         if(((strcmp(q->name1, recv_pack->data.send_name) == 0 && strcmp(q->name2, recv_pack->data.mes) == 0) || (strcmp(q->name2, recv_pack->data.send_name) == 0 && strcmp(q->name1, recv_pack->data.mes) == 0)) && (q->statu_s == FRIEND)) 
@@ -838,16 +842,16 @@ void check_mes_fri(PACK *recv_pack)
         }
         q = q->next;
     }
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不是好友 
         letter[0] = '0';
-    else
+    else//是好友 
     {
         letter[0] = '1';
         while(p)
         {
             if((strcmp(p->name1, recv_pack->data.send_name) == 0 && strcmp(p->name2, recv_pack->data.mes) == 0) || (strcmp(p->name2, recv_pack->data.send_name) == 0 && strcmp(p->name1, recv_pack->data.mes) == 0))
             {
-                strcpy(recv_pack->rec_info[i].name1, p->name1);
+                strcpy(recv_pack->rec_info[i].name1, p->name1);//存储信息 
                 strcpy(recv_pack->rec_info[i].name2, p->name2);
                 strcpy(recv_pack->rec_info[i].message, p->message);
                 i++;
@@ -871,7 +875,7 @@ void cre_grp(PACK *recv_pack)
     char letter[5];
 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//群名是否被抢 
     Relation *pNew = (Relation *)malloc(sizeof(Relation));
     while(q)
     {
@@ -883,7 +887,7 @@ void cre_grp(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 1)
+    if(flag_1 == 1)//被抢了 
     {
         letter[0] = '0';
     }
@@ -896,7 +900,7 @@ void cre_grp(PACK *recv_pack)
         Insert_R(pNew);
         
         memset(query_str, 0, strlen(query_str));
-        sprintf(query_str, "insert into relationinfo values('%s', '%s', %d)", recv_pack->data.send_name, recv_pack->data.mes, GRP_OWN);
+        sprintf(query_str, "insert into relationinfo values('%s', '%s', %d)", recv_pack->data.send_name, recv_pack->data.mes, GRP_OWN);//插入关系数据库 
         mysql_real_query(&mysql, query_str, strlen(query_str));
     }
     send_mes(fd, flag, recv_pack, letter);
@@ -914,9 +918,9 @@ void add_grp(PACK *recv_pack)
     Relation *q = pStart;
     int flag_1 = 0;
     Relation *pNew = (Relation *)malloc(sizeof(Relation));
-    if(strcmp(recv_pack->data.mes, "y") == 0)
+    if(strcmp(recv_pack->data.mes, "y") == 0)//请求通过 
     {   
-        while(t)
+        while(t)//获取群信息 
         {
             if(strcmp(t->name, recv_pack->data.recv_name) == 0)
             {
@@ -930,7 +934,7 @@ void add_grp(PACK *recv_pack)
         strcpy(pNew->name1, recv_pack->data.recv_name);
         strcpy(pNew->name2, recv_pack->data.send_name);
         pNew->statu_s = GRP;
-        Insert_R(pNew);
+        Insert_R(pNew);//数据插入链表 
 
         memset(query_str, 0, strlen(query_str));
         sprintf(query_str, "insert into relationinfo values('%s', '%s', %d)", recv_pack->data.recv_name, recv_pack->data.send_name, GRP);
@@ -938,7 +942,7 @@ void add_grp(PACK *recv_pack)
         send_mes(fd, flag, recv_pack, letter);
         return;
     }
-    else if(strcmp(recv_pack->data.mes, "n") == 0)
+    else if(strcmp(recv_pack->data.mes, "n") == 0)//请求失败 
     {
         while(t)
         {
@@ -953,7 +957,7 @@ void add_grp(PACK *recv_pack)
         send_mes(fd, flag, recv_pack, letter);
         return;
     }
-    while(q)
+    while(q)//读取群信息 
     {
         if(strcmp(q->name2, recv_pack->data.mes) == 0 && (q->statu_s == GRP_OWN))
         {
@@ -964,11 +968,11 @@ void add_grp(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//群不存在 
     {
         letter[0] = '0';
     }
-    else if(flag_1 == 1)
+    else if(flag_1 == 1)//群存在 
     {
         t = pHead;
         while(t)
@@ -980,7 +984,7 @@ void add_grp(PACK *recv_pack)
                 strcpy(recv_pack->file.mes, recv_pack->data.mes);
                 break;
             }
-            else if(strcmp(recv_pack->data.recv_name, t->name) == 0 && (t->statu_s == OFFLINE))
+            else if(strcmp(recv_pack->data.recv_name, t->name) == 0 && (t->statu_s == OFFLINE))//不在线，存在盒子里 
             {
                 memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));
                 break;
@@ -1000,7 +1004,7 @@ void out_grp(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     Relation *q = pStart;
-    int flag_1 = 0;
+    int flag_1 = 0;//判断群是否存在 
     while(q)
     {
         if(strcmp(q->name2, recv_pack->data.mes) == 0)
@@ -1011,9 +1015,9 @@ void out_grp(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_1 == 0)
+    if(flag_1 == 0)//不在 
         letter[0] = '0';
-    else
+    else//存在 
     {
         letter[0] = '1';
         Delete_R(q);
@@ -1034,8 +1038,8 @@ void del_grp(PACK *recv_pack)
     int fd = recv_pack->data.send_fd;
 
     Relation *q = pStart;
-    int flag_1 = 0;
-    int flag_2 = 0;
+    int flag_1 = 0;//判断群里人是否有权限 
+    int flag_2 = 0;//判断群是否存在 
     while(q)
     {
         if(strcmp(q->name2, recv_pack->data.mes) == 0)
@@ -1057,9 +1061,9 @@ void del_grp(PACK *recv_pack)
         q = q->next;
     }
 
-    if(flag_2 == 0)
+    if(flag_2 == 0)//群不在 
         letter[0] = '0';
-    else if(flag_1 == 1 && flag_2 == 1)
+    else if(flag_1 == 1 && flag_2 == 1)//群在权限够 
     {
         letter[0] = '1';
         q = pStart;
@@ -1073,7 +1077,7 @@ void del_grp(PACK *recv_pack)
         sprintf(query_str, "delete from relationinfo where name2='%s'", recv_pack->data.mes);
         mysql_real_query(&mysql, query_str, strlen(query_str));
     }
-    else if(flag_1 == 0 && flag_2 == 1)
+    else if(flag_1 == 0 && flag_2 == 1)//群在权限不够 
         letter[0] = '2';
     send_mes(fd, flag, recv_pack, letter);
 }
@@ -1138,12 +1142,12 @@ void set_grp_adm(PACK *recv_pack)
         }
         while(t)
         {
-            if(strcmp(t->name, recv_pack->data.mes) == 0 && (t->statu_s != OFFLINE))
+            if(strcmp(t->name, recv_pack->data.mes) == 0 && (t->statu_s != OFFLINE))//在线 
             {
                 fd2 = t->fd;
                 send_mes(fd2, flag, recv_pack, "6");
             }
-            else if(strcmp(t->name, recv_pack->data.mes) == 0 && (t->statu_s == OFFLINE))
+            else if(strcmp(t->name, recv_pack->data.mes) == 0 && (t->statu_s == OFFLINE))//不在线 
             {
                 memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));
             }
@@ -1232,7 +1236,7 @@ void kick_grp(PACK *recv_pack)
             }
             else if(strcmp(t->name, recv_pack->data.mes) == 0 && (t->statu_s == OFFLINE))
             {
-                memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));
+                memcpy(&Mex_Box[sign++], recv_pack, sizeof(PACK));//存在消息盒子 
             }
             t = t->next;
         }
@@ -1456,6 +1460,10 @@ void chat_many(PACK *recv_pack)
                             bzero(ss, MAX_CHAR);
                             strcpy(ss,recv_pack->data.recv_name);
                             strcpy(recv_pack->data.recv_name, recv_pack->data.send_name);
+                            time(&now);
+                            str = ctime(&now);
+                            str[strlen(str) - 1] = '\0';
+                            memcpy(recv_pack->data.send_name, str, strlen(str));
                             send_mes(fd, flag, recv_pack, recv_pack->data.mes);
                             strcpy(recv_pack->data.send_name, ss);
                             bzero(ss, MAX_CHAR);
@@ -1884,4 +1892,3 @@ void Delete_R(Relation *pNew)
         t = t->next;
     }
 }
-
