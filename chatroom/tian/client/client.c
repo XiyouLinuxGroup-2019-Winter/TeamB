@@ -147,7 +147,7 @@ void *recv_back(void *arg)
                 printf("\n\t\t\e[1;33m新消息(在未读消息里查看)\e[0m\n");
                 printf("\n\t\t\e[1;33m按数字选择你需要的功能\e[0m\n");
                 sign_ive[sign] = ACTIVE;
-                sprintf(mes_box[sign], "好友%s向你发起聊天...", recv_pack.data.send_name);
+                sprintf(mes_box[sign], "好友%s向你发起聊天请求", recv_pack.data.send_name);
                 sign++;
             }
             else if(flag == 2)
@@ -184,7 +184,7 @@ void *recv_back(void *arg)
                 {
                     while(rec_info[i].message[0] != '0')
                     {
-                        printf("\t\t\e[1;35m%s-->%s: \e[0m%s\n",rec_info[i].name1, rec_info[i].name2, rec_info[i].message);
+                        printf("\t\t\e[1;35m%s = = >%s: \e[0m%s\n",rec_info[i].name1, rec_info[i].name2, rec_info[i].message);
                         i++;
                     }
                 }
@@ -326,7 +326,7 @@ void *recv_back(void *arg)
                 printf("\n\t\t\e[1;33m新消息(在未读消息里查看)\e[0m\n");
                 printf("\n\t\t\e[1;33m按数字选择你需要的功能\e[0m\n");
                 sign_ive[sign] = ACTIVE;
-                sprintf(mes_box[sign], "群%s有人进入群聊??", recv_pack.data.send_name);
+                sprintf(mes_box[sign], "有人进入群聊%s", recv_pack.data.send_name);
                 sign++;
             }
             else if(flag == 2)
@@ -356,7 +356,7 @@ void *recv_back(void *arg)
                 {
                     while(rec_info[i].message[0] != '0')
                     {
-                        printf("\t\t\e[1;35m%s-->%s: \e[0m%s\n",rec_info[i].name1, rec_info[i].name2, rec_info[i].message);
+                        printf("\t\t\e[1;35m%s = = >%s: \e[0m%s\n",rec_info[i].name1, rec_info[i].name2, rec_info[i].message);
                         i++;
                     }
                 }
@@ -1226,5 +1226,4 @@ char *s_gets(char *s, int n)
     }
     return ss;
 }
-
 
