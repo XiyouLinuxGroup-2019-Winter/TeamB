@@ -21,7 +21,7 @@
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
-#define CHECK_FRI       3
+#define LOOK_FRI       3
 #define GET_FRI_STA     4
 #define ADD_FRI         5
 #define DEL_FRI         6
@@ -31,7 +31,7 @@
 #define ADD_GRP         10 
 #define OUT_GRP         11 
 #define DEL_GRP         12 
-#define SET_GRP_ADM     13 
+#define SET_GRP     13 
 #define KICK_GRP        14 
 #define CHECK_GRP       15 
 #define CHECK_MEM_GRP   16 
@@ -54,7 +54,7 @@
 #define MANY_CHAT       3
 
 #define BUFSIZE         1024
-#define MAX_CHAR        100
+#define MAX_CHAR        200
 #define FRI_MAX         100
 #define MAX_FILE        10000
 
@@ -174,7 +174,7 @@ void *deal(void *recv_pack_t);
 void Exit(PACK *recv_pack);   
 void registe(PACK *recv_pack);
 void login(PACK *recv_pack);
-void check_fri(PACK *recv_pack);
+void look_fri(PACK *recv_pack);
 void get_fri_sta(PACK *recv_pack);  
 void add_fri(PACK *recv_pack);      
 void del_fri(PACK *recv_pack);    
@@ -186,7 +186,7 @@ void cre_grp(PACK *recv_pack);
 void add_grp(PACK *recv_pack);
 void out_grp(PACK *recv_pack);
 void del_grp(PACK *recv_pack);
-void set_grp_adm(PACK *recv_pack);
+void set_grp(PACK *recv_pack);
 void kick_grp(PACK *recv_pack);
 void check_grp(PACK *recv_pack);
 void check_mem_grp(PACK *recv_pack);
