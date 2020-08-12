@@ -20,7 +20,7 @@
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
-#define CHECK_FRI       3
+#define LOOK_FRI       3
 #define GET_FRI_STA     4
 #define ADD_FRI         5
 #define DEL_FRI         6
@@ -30,7 +30,7 @@
 #define ADD_GRP         10 
 #define OUT_GRP         11 
 #define DEL_GRP         12 
-#define SET_GRP_ADM     13 
+#define SET_GRP     13 
 #define KICK_GRP        14 
 #define CHECK_GRP       15 
 #define CHECK_MEM_GRP   16 
@@ -42,7 +42,7 @@
 #define RECV_FILE       22 
 
 #define BUFSIZE 1024
-#define MAX_CHAR 100
+#define MAX_CHAR 200
 #define FRI_MAX 100
 #define MAX_FILE 10000
 
@@ -135,7 +135,7 @@ int login();
 void registe();
 void Menu();    
 void Menu_friends();
-void check_fri();
+void look_fri();
 void add_fri();
 void del_fri();
 void shi_fri();
@@ -150,7 +150,7 @@ void cre_grp();
 void add_grp();
 void out_grp();
 void power_grp_menu(); 
-void set_grp_adm();
+void set_grp();
 void del_grp();
 void kick_grp();
 void chat_many();

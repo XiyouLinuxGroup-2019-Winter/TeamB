@@ -51,7 +51,7 @@ void *recv_back(void *arg)
 
         switch(recv_pack.type)
         {
-        case CHECK_FRI:
+        case LOOK_FRI:
             memcpy(&fri_info, &recv_pack.fri_info, sizeof(FRI_INFO));
             pthread_cond_signal(&cond);           
             break;
@@ -255,7 +255,7 @@ void *recv_back(void *arg)
             pthread_cond_signal(&cond);
             break;
 
-        case SET_GRP_ADM:
+        case SET_GRP:
             flag = recv_pack.data.mes[0] - '0';
             if(flag == 0)
                 printf("\n\t\t该群不存在!\n");
@@ -596,7 +596,7 @@ void Menu_friends()
         switch(choice)
         {
         case 1:
-            check_fri();
+            look_fri();
             break;
 
         case 2:
@@ -629,9 +629,9 @@ void Menu_friends()
     }while(choice != 0);
 }
 
-void check_fri()
+void look_fri()
 {
-    int flag = CHECK_FRI;
+    int flag = LOOK_FRI;
     char mes[MAX_CHAR];
     bzero(mes, MAX_CHAR);
     memset(&fri_info, 0, sizeof(fri_info));
@@ -973,7 +973,7 @@ void power_grp_menu()
             break;
 
         case 2:
-            set_grp_adm();
+            set_grp();
             break;
            
         case 3:
@@ -998,9 +998,9 @@ void del_grp()
     pthread_mutex_unlock(&mutex);
 }
 
-void set_grp_adm()
+void set_grp()
 {
-    int flag = SET_GRP_ADM;
+    int flag = SET_GRP;
     char grp[MAX_CHAR];
     char grp_user[MAX_CHAR];
     pthread_mutex_lock(&mutex);
@@ -1226,4 +1226,3 @@ char *s_gets(char *s, int n)
     }
     return ss;
 }
-
