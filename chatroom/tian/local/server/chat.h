@@ -21,7 +21,7 @@
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
-#define LOOK_FRI       3
+#define LOOK_FRI        3
 #define GET_FRI_STA     4
 #define ADD_FRI         5
 #define DEL_FRI         6
@@ -31,12 +31,12 @@
 #define ADD_GRP         10 
 #define OUT_GRP         11 
 #define DEL_GRP         12 
-#define SET_GRP     13 
+#define SET_GRP         13 
 #define KICK_GRP        14 
 #define CHECK_GRP       15 
-#define CHECK_MEM_GRP   16 
-#define CHAT_ONE        17 
-#define CHAT_MANY       18 
+#define CHECK_MUM_GRP   16 
+#define CHAT_FRI        17 
+#define CHAT_GRP        18 
 #define CHECK_MES_FRI   19 
 #define CHECK_MES_GRP   20
 #define RECV_FILE       21 
@@ -50,15 +50,15 @@
 
 #define OFFLINE         0
 #define ONLINE          1
-#define ONE_CHAT        2
-#define MANY_CHAT       3
+#define FRI_CHAT        2
+#define GRP_CHAT        3
 
 #define BUFSIZE         1024
 #define MAX_CHAR        200
 #define FRI_MAX         100
-#define MAX_FILE        10000
+#define MAX_FILE        1024 
 
-#define SERV_PORT       8848
+#define SERV_PORT       8017 
 #define LISTENQ         10
 #define MAX_EVENTS      1000
 
@@ -76,7 +76,7 @@ typedef struct _relation
 {
     char name1[MAX_CHAR];
     char name2[MAX_CHAR];
-    int statu_s;
+    int relation;
     struct _relation *next;
 }Relation;
 
@@ -88,27 +88,27 @@ typedef struct _recordinfo
     struct _recordinfo *next;
 }Recordinfo;
 
-typedef struct _friends
+typedef struct 
 {
     char friends[FRI_MAX][MAX_CHAR];
     int friends_status[FRI_MAX];
     int friends_num;
 }FRI_INFO;
 
-typedef struct _group
+typedef struct 
 {
     char groups[FRI_MAX][MAX_CHAR];
     int grp_num;
 }GROUP_INFO;
 
-typedef struct _record
+typedef struct 
 {
     char name1[MAX_CHAR];
     char name2[MAX_CHAR];
     char message[MAX_CHAR];
 }RECORD_INFO;
 
-typedef struct _data
+typedef struct 
 {
     int send_fd;
     int recv_fd;
@@ -117,13 +117,13 @@ typedef struct _data
     char mes[MAX_CHAR * 3];
 }DATA;
 
-typedef struct file
+typedef struct 
 {
     int size;
     char mes[MAX_FILE];
 }FIle;
 
-typedef struct _pack
+typedef struct 
 {
     int type;
     DATA data;
@@ -133,7 +133,7 @@ typedef struct _pack
     RECORD_INFO rec_info[55];
 }PACK;
 
-typedef struct _file
+typedef struct 
 {
     char file_name[MAX_THREAD_NUM][MAX_CHAR];
     char file_send_name[MAX_THREAD_NUM][MAX_CHAR];
@@ -180,7 +180,7 @@ void add_fri(PACK *recv_pack);
 void del_fri(PACK *recv_pack);    
 void shi_fri(PACK *recv_pack);      
 void rel_fri(PACK *recv_pack);     
-void chat_one(PACK *recv_pack);  
+void chat_fri(PACK *recv_pack);  
 void check_mes_fri(PACK *recv_pack);
 void cre_grp(PACK *recv_pack);
 void add_grp(PACK *recv_pack);
@@ -189,8 +189,8 @@ void del_grp(PACK *recv_pack);
 void set_grp(PACK *recv_pack);
 void kick_grp(PACK *recv_pack);
 void check_grp(PACK *recv_pack);
-void check_mem_grp(PACK *recv_pack);
-void chat_many(PACK *recv_pack);
+void check_mum_grp(PACK *recv_pack);
+void chat_grp(PACK *recv_pack);
 void check_mes_grp(PACK *recv_pack);
 void send_file(PACK *recv_pack); 
 void recv_file(PACK *recv_pack);

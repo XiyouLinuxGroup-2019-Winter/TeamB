@@ -20,7 +20,7 @@
 #define EXIT           -1
 #define REGISTE         1
 #define LOGIN           2
-#define LOOK_FRI       3
+#define LOOK_FRI        3
 #define GET_FRI_STA     4
 #define ADD_FRI         5
 #define DEL_FRI         6
@@ -30,12 +30,12 @@
 #define ADD_GRP         10 
 #define OUT_GRP         11 
 #define DEL_GRP         12 
-#define SET_GRP     13 
+#define SET_GRP         13 
 #define KICK_GRP        14 
 #define CHECK_GRP       15 
-#define CHECK_MEM_GRP   16 
-#define CHAT_ONE        17 
-#define CHAT_MANY       18 
+#define CHECK_MUM_GRP   16 
+#define CHAT_FRI        17 
+#define CHAT_GRP        18 
 #define CHECK_MES_FRI   19 
 #define CHECK_MES_GRP   20
 #define SEND_FILE       21 
@@ -44,60 +44,34 @@
 #define BUFSIZE 1024
 #define MAX_CHAR 200
 #define FRI_MAX 100
-#define MAX_FILE 10000
+#define MAX_FILE 1024 
 
-#define SERV_PORT 8848
+#define SERV_PORT 8017 
 
 #define PASSIVE 0
 #define ACTIVE 1
 
-typedef struct _user
-{
-    char name[MAX_CHAR];
-    char passwd[MAX_CHAR];
-    int statu_s;
-    int fd;
-    char chat[MAX_CHAR];
-    struct _user *next;
-}User;
-
-typedef struct _relation
-{
-    char name1[MAX_CHAR];
-    char name2[MAX_CHAR];
-    int statu_s;
-    struct _relation *next;
-}Relation;
-
-typedef struct _recordinfo
-{
-    char name1[MAX_CHAR];
-    char name2[MAX_CHAR];
-    char message[BUFSIZE];
-    struct _recordinfo *next;
-}Recordinfo;
-
-typedef struct _friends
+typedef struct
 {
     char friends[FRI_MAX][MAX_CHAR];
     int friends_status[FRI_MAX];
     int friends_num;
 }FRI_INFO;
 
-typedef struct _group
+typedef struct
 {
     char groups[FRI_MAX][MAX_CHAR];
     int grp_num;
 }GROUP_INFO;
 
-typedef struct _record
+typedef struct
 {
     char name1[MAX_CHAR];
     char name2[MAX_CHAR];
     char message[MAX_CHAR];
 }RECORD_INFO;
 
-typedef struct _data
+typedef struct
 {
     int send_fd;
     int recv_fd;
@@ -106,13 +80,13 @@ typedef struct _data
     char mes[MAX_CHAR * 3];
 }DATA;
 
-typedef struct file
+typedef struct
 {
     int size;
     char mes[MAX_FILE];
 }FIle;
 
-typedef struct _pack
+typedef struct
 {
     int type;
     DATA data;
@@ -140,30 +114,28 @@ void add_fri();
 void del_fri();
 void shi_fri();
 void rel_fri();
-void chat_one();
+void chat_fri();
 void check_mes_fri();
 void Menu_groups();
 void check_grp_menu();
 void check_grp();
-void check_mem_grp();
+void check_mum_grp();
 void cre_grp();
 void add_grp();
 void out_grp();
-void power_grp_menu(); 
+void power_grp(); 
 void set_grp();
 void del_grp();
 void kick_grp();
-void chat_many();
+void chat_grp();
 void check_mes_grp();
-void Menu_files();
 void recv_file(PACK *recv_pack);
-int get_file_size(char *send_file_name);
+int get_file(char *send_file_name);
 void send_file();
 void Menu_mes_box();
 
 void send_pack(int type, char *send_name, char *recv_name, char *mes);
-int get_choice(char *choice_t);
-char *s_gets(char *s, int n);
+int get_choice(char *choice);
 
 int sock_fd;
 char user[MAX_CHAR];
@@ -172,7 +144,7 @@ FRI_INFO fri_info;
 GROUP_INFO grp_info;
 RECORD_INFO rec_info[50];
 char mes_file[MAX_CHAR * 3];
-int ffflag;
+int shi_flag;
 
 char name[100][MAX_CHAR];    
 char mes_box[100][MAX_CHAR];
