@@ -47,12 +47,14 @@ int main()
     sigemptyset(&set);
     sigaddset(&set,SIGPIPE);
     sigprocmask(SIG_BLOCK,&set,NULL);
+    //signal(SIGINT,serverover);
+    printf("start\n");
     //log=fopen("log","w");
     //初始化线程私有数据
     pthread_key_create(&key,NULL);
 
     //初始化服务器TCP套接字
-    int listenfd=socket(AF_INET,SOCK_STREAM,0);
+    listenfd=socket(AF_INET,SOCK_STREAM,0);
     if(listenfd<0){
         my_err("socket",__LINE__);
     }
@@ -89,7 +91,7 @@ int main()
 		my_err("mysql_library_init", __LINE__);
 	}
     
-    //连接数据库
+    //连接数据
     if(NULL == mysql_real_connect(&mysql, "127.0.0.1", "root", "Lyj011007.", "chatroom", 0, NULL, 0)){
 		my_err("mysql_real_connect", __LINE__);
 	}
@@ -99,10 +101,19 @@ int main()
 		my_err("mysql_set_character_set", __LINE__);
 	}
 	//fprintf(log,"连接mysql数据库成功!\n");
-
+    
+    char cmd[1024];
+    memset(cmd,0,sizeof(cmd));
+    sprintf(cmd,"update user_data set state=0,socket=0");
+    if(mysql_query(&mysql, cmd)<0){
+        my_err("mysql_query",__LINE__);
+    }
     //初始化线程池
     pool_init(10);
-    
+    pthread_mutex_init(&mutex1,NULL);
+    pthread_cond_init(&cond1,NULL);
+    pthread_t tid;
+    pthread_create(&tid,NULL,send_thread,NULL);
     //初始化epoll
     epfd=epoll_create(20);
     if(epfd<0){
@@ -136,7 +147,7 @@ int main()
                 if((connfd=accept(listenfd,(struct sockaddr*)&client_addr,&client_addr_len))<0){
                     my_err("accept",__LINE__);
                 }
-                //fprintf(log,"client %s connect\n",inet_ntoa(client_addr.sin_addr));
+                fprintf(stderr,"client %s connect\n",inet_ntoa(client_addr.sin_addr));
                 //设置为非阻塞
                 setnoblock(connfd);
                 
@@ -149,6 +160,13 @@ int main()
             else if(ep_events[i].events & EPOLLRDHUP){
                 printf("有客户挂断\n");
                 close(ep_events[i].data.fd);  
+                char cmd[1024];
+                memset(cmd,0,sizeof(cmd));
+                sprintf(cmd,"update user_data set socket = 0 , state = 0 where socket = %d",ep_events[i].data.fd);
+                printf("cmd is %s\n",cmd);//
+                if(mysql_query(&mysql, cmd)<0){
+                    my_err("mysql_query",__LINE__);
+                }
                 epoll_ctl(epfd,EPOLL_CTL_DEL,ep_events[i].data.fd,NULL);
                 fprintf(stderr,"%d is be closed\n",ep_events[i].data.fd);
                 continue;
@@ -171,4 +189,15 @@ int main()
     close(epfd);
     pthread_key_delete(key);
     return 0;
+}
+void serverover(int num)
+{
+    close(listenfd);
+    pool_destroy();
+    close(epfd);
+    pthread_key_delete(key);
+    pthread_mutex_destroy(&mutex1);
+    pthread_cond_destroy(&cond1);
+    printf("server exit\n");
+    exit(0);
 }
