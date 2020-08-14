@@ -47,12 +47,12 @@ int send_file()
     pthread_t tid;
     char *arg=(char *)malloc(1024*sizeof(char));
     memset(arg,0,sizeof(arg));
-    sprintf(arg,"%s",pathname);
+    sprintf(arg,"%s\n%s",fid,pathname);
     P_LOCK;
     printf("\t\t\t\t\t正在发送文件至服务器\n");
     P_UNLOCK;
     pthread_create(&tid,NULL,realfile,(void *)arg);
-    //从路径名中解析出文件名
+    /*//从路径名中解析出文件名
     char filename[257];
     int len=0;
     for(int i=0;i<strlen(pathname);i++){
@@ -69,5 +69,5 @@ int send_file()
     //printf("sendfile send_buf is %s",send_buf);//
     if(send_pack(connfd,SENDFILE,strlen(send_buf),send_buf)<0){
         my_err("write",__LINE__);
-    }
+    }*/
 }
