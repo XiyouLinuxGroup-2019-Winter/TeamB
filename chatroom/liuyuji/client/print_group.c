@@ -66,6 +66,12 @@ int print_group()
             case 0:
             return 0;
             break;
+            default:
+            P_LOCK;
+            printf("\t\t\t\t\t请勿非法输入!\n");
+            P_UNLOCK;
+            while((getchar())!='\n');
+            break;
         }
     }
 }

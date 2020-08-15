@@ -49,8 +49,6 @@ void *realfile(void *arg)
         printf("fopen is Failed\n");
         free(arg);
         pthread_exit(NULL);
-        printf("fopen is Failed\n");
-
     }
     //发送发文件请求
     char send_buf[512];

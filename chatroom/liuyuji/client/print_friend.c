@@ -23,9 +23,7 @@ int print_friend()
         printf("0.返回\n");
         P_UNLOCK;
         int chose;
-        //S_LOCK;
         scanf("%d",&chose);
-        //S_UNLOCK;
         switch(chose){
             case 1:
             friendlist();
@@ -59,6 +57,12 @@ int print_friend()
             break;
             case 0:
             return 0;
+            break;
+            default:
+            P_LOCK;
+            printf("\t\t\t\t\t请勿非法输入!\n");
+            P_UNLOCK;
+            while((getchar())!='\n');
             break;
         }
     }

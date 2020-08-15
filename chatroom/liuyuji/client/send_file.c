@@ -12,12 +12,12 @@ int send_file()
     printf("请输入文件的接收者ID\n");
     P_UNLOCK;
     char fid[10];
-    scanf("%s",fid);
+    Scanf(fid);
     P_LOCK;
     printf("请输入您要发送的文件路径\n");
     P_UNLOCK;
     char pathname[512];
-    scanf("%s",pathname);
+    Scanfs(pathname);
     FILE *fp;
     if((fp=fopen(pathname,"r"))==NULL){
         printf("\t\t\t\t\t请输入正确的文件路径\n");

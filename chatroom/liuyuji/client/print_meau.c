@@ -10,6 +10,7 @@ int print_meau()
 {
     int chose;
     while(1){
+        chose=-1;
         P_LOCK;
         printf("1.好友管理\n");
         printf("2.群管理\n");
@@ -17,9 +18,7 @@ int print_meau()
         printf("0.注销\n");
         printf("请输入您的选择\n");
         P_UNLOCK;
-        S_LOCK;
         scanf("%d",&chose);
-        S_UNLOCK;
         switch(chose){
             case 1:
             print_friend();
@@ -41,6 +40,12 @@ int print_meau()
                 return 0;
                 break;
             }
+            default:
+            P_LOCK;
+            printf("\t\t\t\t\t请勿非法输入!\n");
+            P_UNLOCK;
+            while((getchar())!='\n');
+            break;
         }
     }
 }
