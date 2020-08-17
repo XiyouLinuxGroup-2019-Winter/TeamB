@@ -11,7 +11,7 @@ int fchat()
     P_LOCK;
     printf("请输入您要私聊的好友ID\n");
     P_UNLOCK;
-    char fid[10];
+    char *fid=(char *)malloc(10);
     memset(fid,0,sizeof(fid));
     Scanf(fid);
     if(strcmp(user_id,fid)==0){
@@ -54,5 +54,6 @@ int fchat()
     S_UNLOCK;
     chat_flag=0;
     memset(chat_id,0,sizeof(chat_id));
+    free(fid);
     return 0;
 }

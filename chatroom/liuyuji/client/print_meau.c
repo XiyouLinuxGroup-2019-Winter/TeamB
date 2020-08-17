@@ -12,6 +12,7 @@ int print_meau()
     while(1){
         chose=-1;
         P_LOCK;
+        printf("\n主菜单\n");
         printf("1.好友管理\n");
         printf("2.群管理\n");
         printf("3.文件传输\n");
@@ -19,6 +20,13 @@ int print_meau()
         printf("请输入您的选择\n");
         P_UNLOCK;
         scanf("%d",&chose);
+        if(getchar()!='\n'){
+            P_LOCK;
+            printf("\t\t\t\t\t请勿非法输入!\n");
+            P_UNLOCK;
+            while((getchar())!='\n');
+            continue;
+        }
         switch(chose){
             case 1:
             print_friend();

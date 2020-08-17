@@ -24,7 +24,14 @@ int dealgroup()
         printf("1.同意\t\t2.拒绝\n");
         P_UNLOCK;
         while(1){
-            chose=getchar();
+            scanf("%d",&chose);
+            if(getchar()!='\n'){
+                P_LOCK;
+                printf("\t\t\t\t\t检测到非法输入!请重新输入\n");
+                P_UNLOCK;
+                while((getchar())!='\n');
+                continue;
+            }
             if(chose<1 || chose>3){
                 P_LOCK;
                 printf("\t\t\t\t\t检测到非法输入!请重新输入\n");
