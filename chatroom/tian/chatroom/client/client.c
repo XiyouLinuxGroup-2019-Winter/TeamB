@@ -7,8 +7,34 @@ int main(int argc, char *argv[])
 
     memset(&serv_addr,0,sizeof(struct sockaddr_in));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(SERV_PORT);
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    int i;
+    int serv_port;
+    for(i=1;i<argc;i++)
+	{
+        if(strcmp(argv[i],"-p")==0)
+		{
+            serv_port=atoi(argv[i+1]);
+            if(serv_port<0 || serv_port>65535)
+			{
+                printf("invalid serv_port\n");
+                exit(1);
+            }
+            else
+			{
+                serv_addr.sin_port=htons(serv_port);
+            }
+            continue;
+        }
+        if(strcmp(argv[i],"-a")==0)
+		{
+            if(inet_aton(argv[++i],&serv_addr.sin_addr)==0)
+			{
+                printf("invaild serv_addr\n");
+                exit(1);
+            }
+            continue;
+        }
+    }
 
     sock_fd = socket(AF_INET,SOCK_STREAM,0);
     if(sock_fd < 0)
