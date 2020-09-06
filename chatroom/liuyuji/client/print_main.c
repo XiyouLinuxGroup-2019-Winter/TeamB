@@ -44,7 +44,7 @@ int print_main()
             P_LOCK;
             printf("\t\t\t\t\t请勿非法输入!\n");
             P_UNLOCK;
-            while((getchar())!='\n');
+            //while((getchar())!='\n');
             break;
         }
     }

@@ -28,7 +28,7 @@ int print_friend()
         scanf("%d",&chose);
         if(getchar()!='\n'){
             P_LOCK;
-            printf("\t\t\t\t\t请勿非法输入1!\n");
+            printf("\t\t\t\t\t请勿非法输入!\n");
             P_UNLOCK;
             while((getchar())!='\n');
             continue;
