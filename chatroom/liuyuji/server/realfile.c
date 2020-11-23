@@ -25,6 +25,7 @@ void *realfile(void *arg)
     }
     fd[len]=0;
     printf("fd is %s\n",fd);
+    
     epoll_ctl(epfd,EPOLL_CTL_DEL,atoi(fd),NULL);
     //printf("filedata is %s\n",buffer);
     FILE *fp=fopen(filename,"w");

@@ -19,6 +19,7 @@ void *groupmember(void *arg)
     printf("id is %s\n",id);//
     //获取群id
     char gid[10];
+    memset(gid,0,sizeof(gid));
     if((len=get_arg(arg,gid,10))<0){
         fprintf(stderr,"get_arg failed\n");
     }
@@ -42,7 +43,6 @@ void *groupmember(void *arg)
     MYSQL_RES *result=NULL;
 	MYSQL_ROW row;
     char data[1024];
-
     result=mysql_store_result(&mysql);
     row=mysql_fetch_row(result);
     if(row==NULL){
