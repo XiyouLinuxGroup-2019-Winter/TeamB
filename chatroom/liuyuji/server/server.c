@@ -177,7 +177,6 @@ int main()
                 printf("socket %d ep_have data\n",ep_events[i].data.fd);
                 add_work(unpack,&ep_events[i].data.fd);
                 //printf("add_work\n");
-                //pthread_t tid;//
                 //pthread_create(&tid,NULL,unpack,&ep_events[i].data.fd);
                 //unpack(&ep_events[i].data.fd);
                 continue;
