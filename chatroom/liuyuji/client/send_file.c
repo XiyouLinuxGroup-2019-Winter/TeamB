@@ -12,11 +12,13 @@ int send_file()
     printf("请输入文件的接收者ID\n");
     P_UNLOCK;
     char fid[10];
+    memset(fid,0,sizeof(fid));
     Scanf(fid);
     P_LOCK;
     printf("请输入您要发送的文件路径\n");
     P_UNLOCK;
     char pathname[512];
+    memset(pathname,0,sizeof(pathname));
     Scanfs(pathname);
     FILE *fp;
     if((fp=fopen(pathname,"r"))==NULL){
